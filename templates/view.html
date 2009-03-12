@@ -1,0 +1,13 @@
+{% extends '/base.html' %}
+{% block title %}
+{{ page_name }}
+{% endblock %}
+{% block headline %}
+{{ page_name }}
+{% endblock %}
+{% block contents %}
+{% if can_change %}
+<a href="/admin/wiki/pagina/{{pk}}/">Editar</a><br />
+{% endif %}
+{{ content|safe }}
+{% endblock %}

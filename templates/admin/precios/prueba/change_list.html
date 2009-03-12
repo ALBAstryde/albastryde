@@ -1,0 +1,51 @@
+{% extends "admin/change_list.html" %}
+{% load expr %}
+{% block extrahead %}
+{{ block.super }}
+<!--[if IE]><script language="javascript" type="text/javascript" src="/media/javascript/jQuery/excanvas.pack.js"></script><![endif]-->
+<script src="/media/javascript/jQuery/jquery.js" type="text/javascript"></script>
+<script language="javascript" type="text/javascript" src="/media/javascript/jQuery/jquery.flot.spanish.js"></script>
+<script id="source" language="javascript" type="text/javascript">
+$(function () {
+    var d = {% expr get_graph(query_set=cl.query_set,model=cl.model)%};
+    var options = { xaxis: { mode: "time" },
+		lines: { show: true },
+        	points: { show: true },
+		selection: { mode: "x" } };
+    var plot = $.plot($("#stats"), [d], options);
+
+        var overview = $.plot($("#statsoverview"), [d], {
+        lines: { show: true, lineWidth: 1 },
+        shadowSize: 0,
+        xaxis: { ticks: [], mode: "time" },
+        yaxis: { ticks: []},
+        selection: { mode: "x" }
+    });
+
+    $("#stats").bind("plotselected", function (event, ranges) {
+        // do the zooming
+        plot = $.plot($("#stats"), [d],
+                      $.extend(true, {}, options, {
+                          xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+                      }));
+
+        // don't fire event on the overview to prevent eternal loop
+        overview.setSelection(ranges, true);
+    });
+    $("#statsoverview").bind("plotselected", function (event, ranges) {
+        plot.setSelection(ranges);
+    });
+});
+</script>
+{% endblock %}
+{% block filters %}
+<div id="statsheader" style="width:500px;height:370px;position:absolute; top:60px; right:180px; z-index:1000; border-left:1px solid #ddd; background:#efefef; margin:0;">
+<h2>índice de precio
+ </h2>
+<div id="stats" style="width:500px;height:300px;position:absolute; top:20px; right:0px; z-index:1000; background:#efefef; margin:0;"></div>
+<div id="statsoverview" style="width:500px;height:50px;position:absolute; top:320px; right:0px; z-index:1000; background:#efefef; margin:0;"></div>
+</div>
+{{ block.super }}
+
+{% endblock %}
+

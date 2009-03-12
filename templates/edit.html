@@ -1,0 +1,65 @@
+{% extends '/base.html' %}
+{% block title %}
+{{ page_name }} - editando
+{% endblock %}
+{% block headline %}Editando {{ page_name }}{% endblock %}
+{% block contents %}
+
+<table>
+<tr>
+<td valign="top">
+<form method="post" action="/wiki/{{ page_name }}/save/">
+<textarea name="content" rows="20" cols="60">{{ content }}</textarea>
+<br />
+<input type="submit" value="Save Page">
+</form>
+</td><td valign="top">
+<h4>Formato</h4>
+<p class="description">
+Esto es un párrafo. Tiene dos condenas.<br />
+<br />
+Este es otro párrafo. También tiene dos condenas.<br />
+<br />	
+*énfasis* (cursiva)<br />
+<br />
+**énfasis fuerte** (negrita)<br />
+<br />
+`Código`<br />
+<br />
+lista con viñetas (desordenada):<br />
+<br />
+- Una cosa<br />
+- Otra cosa<br />
+<br />
+lista enumerada (ordenada):<br />
+<br />
+1. Una cosa<br />
+2. Otra cosa<br />
+
+# Título de primer nivel<br />
+#### Título de cuarto nivel<br />
+<br />	
+> Este texto es una cita.<br />
+<br />
+[[enlace a otro articulo en ALBAstryde]]<br />
+<br />
+[texto del enlace](direccion.del.enlace "título del enlace")<br />
+<br />
+![texto alternativo](direccion.del.imagen)<br />
+<br />
+***
+</p>
+</td><td valign="top">
+<h4>_estadisticas[FORMULA]</h4>
+<p class="description">
+<i>por ejemplo: _estadisticas[producto=cafe,primer_ano=1998,anos=10,departamento=chinandega]</i><br />
+<br />
+producto: producto de agricultura<br />
+primer_ano: primer ano de la estadisticas (estandardo: hace 11 anos)<br />
+ultimo_ano: primer ano de la estadisticas (estandardo: hace 1 anos)<br />
+anos: anos presentado en las estadisticas (estandardo: 10 anos)<br />
+departamento: departamento de Nicaragua (estandardo: todo el país)
+</p>
+
+</td></tr></table>
+{% endblock %}

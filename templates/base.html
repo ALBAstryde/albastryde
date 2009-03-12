@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>
+{% block title %}{% endblock %}
+</title>
+<link rel="stylesheet" type="text/css" href="/media/style.css" />
+{% block extraheader %}
+{% endblock %}
+</head>
+<body>
+<div id="page">
+<div id="header">
+<table>
+<tr>
+<td>
+<h1>
+{% block headline %}Header{% endblock %}
+</h1>
+</td>
+<td>
+<form method="get" action="/wiki/searchresults"><input type="text" name="q"><input type="submit" value="buscar"></form>
+</td>
+</tr>
+</table>
+{% block menu %}
+<ul class="menu">
+{% for list_item in menu_list %}
+<li><a href="{{ list_item.url }}" {% if (request.get_full_path()==list_item.url) %}class="active"{% else %}class="inactive"{% endif %}><span>{{ list_item.name | safe}}</span></a></li>
+{% endfor %}
+</ul>
+{% endblock %}
+</div><div id="contents">
+{% block warning %}
+{% if warning %}
+<div class="warning">
+{{ warning }}
+</div>
+{% endif %}
+{% endblock %}
+{% block contents %}
+{% endblock %}
+</div></div>
+<div id="bottom">
+Hecho por <a href="http://www.johanneswilm.org">Johannes Wilm, 2008&ndash;2009.</a>
+</div>
+</body>
