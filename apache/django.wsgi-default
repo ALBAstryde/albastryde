@@ -1,6 +1,6 @@
 import os, sys
 
-topdir='/home/jwilm'
+topdir='TOPDIR'
 sys.path.append(topdir)
 sys.path.append(topdir+'/albastryde')
 sys.path.append(topdir+'/albastryde/wiki')
