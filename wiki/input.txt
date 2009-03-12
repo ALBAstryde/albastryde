@@ -1,0 +1,21 @@
+Esto es un párrafo. Tiene dos condenas.
+
+Este es otro párrafo. También tiene dos condenas.
+
+*énfasis* (cursiva)
+
+_statistics[producto=cafe]
+
+**énfasis fuerte** (negrita)
+
+`Código`
+
+lista con viñetas (desordenada):
+
+- Una cosa
+- Otra cosa
+
+lista enumerada (ordenada):
+
+1. Una cosa
+2. Otra cosa
