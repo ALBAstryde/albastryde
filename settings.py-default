@@ -4,7 +4,9 @@
 
 WIKI_STARTPAGE = 'ALBAstryde' # Cambie a nombre de primera pagina de la wiki
 
-MAIN_URL = 'http://WWW.EXAMPLE.COM'
+SITE_NAME = 'ALBAstryde'
+SITE_URL = 'http://WWW.EXAMPLE_ALBASTRYDE.ORG'
+
 
 
 DEBUG = True
@@ -13,6 +15,9 @@ TEMPLATE_DEBUG = DEBUG
 ADMINS = (
     ('Nombre de Administrador', 'my@correo.com.ni'),
 )
+
+EMAIL_HOST = 'localhost'
+DEFAULT_FROM_EMAIL = 'my@correo.com.ni'
 
 DEFAULT_CHARSET = 'utf-8'
 
