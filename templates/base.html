@@ -28,9 +28,10 @@
 {% for list_item in menu_list %}
 <li><a href="{{ list_item.url }}" {% if (request.get_full_path()==list_item.url) %}class="active"{% else %}class="inactive"{% endif %}><span>{{ list_item.name | safe}}</span></a></li>
 {% endfor %}
-{% if user.is_authenticated() %}
-<li><a href="/profiles/{{ user }}/" {% if (request.get_full_path()=='/profiles/'+user.__str__()+'/') %}class="active"{% else %}class="inactive"{% endif %}><span>Mi perfil</span></a></li>
-{% if user.is_staff %}
+{% if request.user.is_authenticated() %}
+<li><a href="/profiles/{{ request.user }}/" {% if (request.get_full_path()=='/profiles/'+request.user.__str__()+'/') %}class="active"{% else %}class="inactive"{% endif %}><span>Mi 
+perfil</span></a></li>
+{% if request.user.is_staff %}
 <li><a href="/admin/"><span>Administrar</span></a></li>
 {% endif %}
 <li><a href="/accounts/logout"><span>Logout</span></a></li>
