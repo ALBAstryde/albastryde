@@ -45,7 +45,7 @@ class Statisticsplot:
 		os.environ['MPLCONFIGDIR'] = settings.MEDIA_ROOT+"cache/" 
 		import matplotlib
 		from matplotlib import rcParams
-		rcParams['text.usetex']=True
+#		rcParams['text.usetex']=True
 #		rcParams['text.latex.unicode']=True
 #from matplotlib.pyplot import figure, axes, plot, xlabel, ylabel, title, grid, savefig, show
 		matplotlib.use( 'Agg' )
