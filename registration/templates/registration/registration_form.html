@@ -1,0 +1,57 @@
+{% extends "registration/base.html" %}
+
+{% block title %}Registrese{% endblock %}
+{% block headline %}Cree una cuenta{% endblock %}
+
+
+
+{% block maincontents %}
+
+
+  
+  <form method="post" action="" class="wide">
+    <p>
+      <label for="id_username">Usuario:</label>
+      {% if form.username.errors %}
+        <p class="errors">{{ form.username.errors.as_text() }}</p>
+      {% endif %}
+      {{ form.username|safe }}
+    </p>
+    <p>
+      <label for="id_email">Correo electrónico:</label>
+      {% if form.email.errors %}
+        <p class="errors">{{ form.email.errors.as_text() }}</p>
+      {% endif %}
+      {{ form.email|safe }}
+    </p>
+    <p>
+      <label for="id_password1">Contraseña:</label>
+      {% if form.password1.errors %}
+        <p class="errors">{{ form.password1.errors.as_text() }}</p>
+      {% endif %}
+      {{ form.password1|safe }}
+    </p>
+    <p>
+      <label for="id_password2">Contraseña (otra vez, por seguridad):</label>
+      {% if form.password2.errors %}
+        <p class="errors">{{ form.password2.errors.as_text() }}</p>
+      {% endif %}
+      {{ form.password2|safe }}
+    </p>
+    <p class="submit"><input type="submit" value="Registrar &rarr;"></p>
+  </form>
+  
+{% endblock %}
+
+{% block related %}
+<p> Rellene el formulario a la izquierda (todos los campos son obligatorios), y su
+cuenta será creada, se le envió un mensaje de correo electrónico con instrucciones sobre cómo
+para terminar su registro. </p>
+
+<p> Nosotros sólo utilizamos su dirección de correo electrónico para enviarle las instrucciones de registro. Odiamos el spam
+tanto como usted. </p>
+
+<p> Esta cuenta le permitirá entrar en el billete de seguimiento, la reivindicación de entradas,
+y estarán exentos de filtrado de spam. </p>
+
+{% endblock %}

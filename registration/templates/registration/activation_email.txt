@@ -1,0 +1,5 @@
+Alguien, supuestamente usted, ha registrado para una nueva cuenta de {{ site }} usando esta dirección de correo electrónico.
+
+{{ url }}accounts/activate/{{ activation_key }}/
+
+Si no ha solicitado esto, usted no necesita hacer nada, usted no recibirá más mensajes de correo electrónico de nosotros, y la cuenta expirará automáticamente en {{ expiration_days }} días.

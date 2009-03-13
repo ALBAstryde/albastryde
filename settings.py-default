@@ -4,6 +4,9 @@
 
 WIKI_STARTPAGE = 'ALBAstryde' # Cambie a nombre de primera pagina de la wiki
 
+MAIN_URL = 'http://WWW.EXAMPLE.COM'
+
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -22,6 +25,8 @@ DATABASE_USER = 'NOMBRE DE USUARIO'             # Not used with sqlite3.
 DATABASE_PASSWORD = 'CONTRASEÑA'         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+
+ACCOUNT_ACTIVATION_DAYS = 7
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -104,6 +109,7 @@ INSTALLED_APPS = (
     'albastryde.lluvia',
     'django.contrib.comments',
     'albastryde.ajax_comments',
+    'albastryde.registration',
 )
 
 

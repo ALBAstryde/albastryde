@@ -41,5 +41,5 @@ urlpatterns = patterns('',
     (r'^js/estadisticas/$', 'albastryde.graph.views.get_js_graph',{'javascript':True}),
     (r'^comments/', include('django.contrib.comments.urls')),
      (r'^ajax/', include('albastryde.ajax_comments.urls')),
-
+    (r'^accounts/', include('registration.urls')),
 )

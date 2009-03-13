@@ -1,0 +1,14 @@
+{% extends "registration/base.html" %}
+
+{% block title %}Account activated{% endblock %}
+{% block headline %}Account activated{% endblock %}
+
+
+{% block contents%}
+  {% if account %}
+    <p>	Gracias por registrarse! Ahora se puede accesar el <a href="/accounts/login/">login</a>.</p>
+  {% else %}
+<p>Lo sentimos, no funcionó. Su enlace de activación era incorrecta, o la clave de activación de su cuenta ha expirado; claves de activación sólo son válidos durante {{ expiration_days }} 
+días.</p>
+  {% endif %}
+{% endblock %}

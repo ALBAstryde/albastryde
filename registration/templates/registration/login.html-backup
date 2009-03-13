@@ -1,0 +1,26 @@
+{% extends "registration/base.html" %}
+
+{% block title %}Log in{% endblock %}
+{% block headline %}Log in{% endblock %}
+
+{% block maincontents %}
+
+
+{% if form.errors %}
+<p class="warning">Por favor, corija los siguentes erores:</p>
+{% endif %}
+
+<form method="post" action="?next={{ next|default:"/" }}">
+<dl>
+<dt><label for="id_username">Usuario:</label>{% if form.username.errors %} <span class="warning">{{ form.username.errors|join:", " }}</span>{% endif %}</dt>
+<dd>{{ form.username }}</dd>
+<dt><label for="id_password">Contraseña:</label>{% if form.password.errors %} <span class="warning">{{ form.password.errors|join:", " }}</span>{% endif %}</dt>
+<dd>{{ form.password }}</dd>
+<dt><input type="submit" value="Log in" /></dt>
+</dl>
+</form>
+{% endblock %}
+
+{% block related %}
+<p>Si usted ya no tiene cuenta, se puede <a href="/accounts/register/">registrar</a>.
+{% endblock %}
