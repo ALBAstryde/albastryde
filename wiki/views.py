@@ -13,9 +13,9 @@ index_menuitem = {'url' : '/wiki/', 'name' : 'Inicio'}
 #index_menuitem = {'url' : '/wiki/'+str(settings.WIKI_STARTPAGE)+'/', 'name' : 'Inicio'}
 list_menuitem = {'url' : '/wiki/list/', 'name' : 'Lista de p&aacute;ginas'}
 estadisticas_menuitem = {'url' : '/estadisticas/', 'name' : 'Precios'}
-login_menuitem = {'url' : '/accounts/login/', 'name' : 'Login'}
-admin_menuitem = {'url' : '/admin/', 'name' : 'Administrar'}
-menu_list = (index_menuitem, list_menuitem, estadisticas_menuitem, login_menuitem, admin_menuitem)
+#login_menuitem = {'url' : '/accounts/login/', 'name' : 'Login'}
+#admin_menuitem = {'url' : '/admin/', 'name' : 'Administrar'}
+menu_list = (index_menuitem, list_menuitem, estadisticas_menuitem)#, login_menuitem, admin_menuitem)
 
 
 def render_to_html(request,template,variables):

@@ -1,0 +1,23 @@
+{% extends "profiles/base.html" %}
+
+{% block title %}perfil de {{profile}}{% endblock %}
+{% block headline %}perfil de {{profile}}{% endblock %}
+
+{% block contents %}
+
+
+{% if (request.user==profile.user) %}
+<p>
+<a href="/profiles/edit">Editar</a>
+</p>
+{% endif %}
+<p>
+<b>Telefono:</b>
+{{ profile.telefono }}
+</p>
+
+
+
+
+{% endblock %}
+

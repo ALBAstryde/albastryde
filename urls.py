@@ -42,4 +42,5 @@ urlpatterns = patterns('',
     (r'^comments/', include('django.contrib.comments.urls')),
      (r'^ajax/', include('albastryde.ajax_comments.urls')),
     (r'^accounts/', include('registration.urls')),
+    (r'^profiles/', include('profiles.urls')),
 )

@@ -19,6 +19,8 @@ ADMINS = (
 EMAIL_HOST = 'localhost'
 DEFAULT_FROM_EMAIL = 'my@correo.com.ni'
 
+AUTH_PROFILE_MODULE = "profiles.UserProfile"
+
 DEFAULT_CHARSET = 'utf-8'
 
 MANAGERS = ADMINS
@@ -115,6 +117,7 @@ INSTALLED_APPS = (
     'django.contrib.comments',
     'albastryde.ajax_comments',
     'albastryde.registration',
+    'albastryde.profiles',
 )
 
 

@@ -1,0 +1,25 @@
+{% extends "profiles/base.html" %}
+
+{% block title %}Crear perfil{% endblock %}
+{% block headline %}Crear perfil{% endblock %}
+
+{% block maincontents %}
+
+
+{% if form.errors %}
+<p class="warning">Por favor, corija los siguentes erores:</p>
+{% endif %}
+
+<form method="post" action="?next={{ next|default("/") }}">
+<table>
+{{ form|safe }}
+</table>
+<input type="submit" value="guardar">
+</form>
+{% endblock %}
+
+{% block related %}
+<p>
+Por favor, llene su perfil!
+</p>
+{% endblock %}
