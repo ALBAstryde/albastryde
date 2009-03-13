@@ -275,7 +275,14 @@ def profile_detail(request, username, public_profile_field=None,
     try:
         profile_obj = user.get_profile()
     except ObjectDoesNotExist:
-        raise Http404
+	if request.user==user:
+	        return HttpResponseRedirect(reverse('profiles_create_profile'))
+	else:
+		raise Http404 
+#    try:
+#        profile_obj = user.get_profile()
+#    except ObjectDoesNotExist:
+#        raise Http404
     if public_profile_field is not None and \
        not getattr(profile_obj, public_profile_field):
         profile_obj = None
