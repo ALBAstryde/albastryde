@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 # models.py
 import datetime
 import markdown
@@ -11,21 +14,20 @@ from django.forms import ValidationError
 #from wiki.forms import PaginaForm
 # Create your models here.
 
-def markdown_to_html( markdownText, images ):    
-    image_ref = ""
+def markdown_to_html( markdownText, images ):
+    image_ref_list = []
     for image in images:
-        image_url = settings.MEDIA_URL + image.image.url
-        image_ref = "%s\n[%s]: %s" % ( image_ref, image, image_url )
-
-    md = "%s\n%s" % ( markdownText, image_ref )
-    md = albamarkup.ApplyMarkup(md)
-    html = markdown.markdown( md )
-
+        image_url = image.imagen.url
+        image_md = u"!["+image.nombre+"]("+str(image_url)+")" 
+        image_ref = u"!["+image.nombre +"]"
+        markdownText=markdownText.replace(image_ref,image_md)
+    markdownText = albamarkup.ApplyMarkup(markdownText)
+    html = markdown.markdown( markdownText )
     return html
 
 class Imagen( models.Model ):
 	nombre = models.CharField( max_length=100 )
-	imagen = models.ImageField( upload_to="media/cache" )
+	imagen = models.ImageField( upload_to="upload" )
 
 	def __unicode__( self ):
         	return self.nombre
