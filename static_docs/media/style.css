@@ -3,9 +3,13 @@ body {
 	background: #738040;
 }
 
-span.editlink {
-	cursor:default
+span.link {
+	cursor:default;
 }
+span.link:hover {
+	text-decoration:underline;
+}
+
 div.edit {
 	background: #738040
 }

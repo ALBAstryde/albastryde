@@ -14,7 +14,8 @@ function beforeForm() {
 var e_msg,errors;
 //var datapoint_dictionary,comments;
 function processJson(jsondata) { 
-	var query_id,id,cordobagraphs,headline,commentCounter,has_comments,plot,comment_form_open,comments,datapoint_dictionary,graph_height,graph_margin_bottom;
+	var query_id,id,headline,comment_counter,has_comments,plot,comment_form_open,comments,datapoint_dictionary,graph_height,graph_margin_bottom;
+	var cordobagraphs, dollargraphs, eurographs, normalized_cordobagraphs, normalized_dollargraphs, normalized_eurographs;
 	comment_form_open=false;
 	if($.browser.msie){
 		$("div.graph").remove();
@@ -99,8 +100,8 @@ if (eval(has_comments) && unique_pk in comments) {
         labelCanvas.beginPath();
 
 	labelCanvas.arc(x, y, radius*3, 0, 2 * Math.PI, true);
-	var seconddigit = commentCounter%26;
-	var firstdigit = Math.floor(commentCounter/26);
+	var seconddigit = comment_counter%26;
+	var firstdigit = Math.floor(comment_counter/26);
 	if (firstdigit > 26) {
 		firstdigit = firstdigit%26;
 	}
@@ -109,7 +110,7 @@ if (eval(has_comments) && unique_pk in comments) {
 		label+= String.fromCharCode(firstdigit+96);
 	}
         label+= String.fromCharCode(seconddigit+97);
-	commentCounter+=1;
+	comment_counter+=1;
 	var comments_text="";
 	for (var comment_pk in comments[unique_pk]) {
 		if (comments[unique_pk][comment_pk][3]===true) {
@@ -118,7 +119,7 @@ if (eval(has_comments) && unique_pk in comments) {
 			comments_text+='<div class="nonpublicComment">';
 		}
 		if (comments[unique_pk][comment_pk][2]===true) {
-			comments_text+='<p class="editline"><span class="editlink" id="'+unique_pk+'+'+comment_pk+'+'+query_id+'">Editar</span></p>';
+			comments_text+='<p class="editline"><span class="link" id="'+unique_pk+'+'+comment_pk+'+'+query_id+'">Editar</span></p>';
 		}
 		comments_text+="<p>"+comments[unique_pk][comment_pk][0]+"</p>";
 		comments_text+="<p class=\"signature\">"+comments[unique_pk][comment_pk][1]+"</p>";
@@ -127,7 +128,7 @@ if (eval(has_comments) && unique_pk in comments) {
 
 	$("#"+query_id+"comments").append("<tr class=\"comment\" id=\""+query_id+"_"+unique_pk+"comments\"><td valign=\"top\"><b>"+label+"</b></td><td valign=\"top\">"+comments_text+"</td></tr>");
         $('<div class="pointLabel" id="'+query_id+'_'+unique_pk+'label">'+label+'</div>').insertAfter('#'+query_id+'labelcanvas');
-	var editButtons = $('#'+query_id+'_'+unique_pk+'comments p.editline span.editlink');
+	var editButtons = $('#'+query_id+'_'+unique_pk+'comments p.editline span');
 	editButtons.bind("click", function(){
 	  if (!(comment_form_open)) {
 //	    comment_form_open=true;
@@ -292,15 +293,15 @@ function correct_graphheight() {
 		$("#"+query_id).css('margin-bottom',0);
 	}
 }
-function reset_comments() {
+function reset_comments(query_id) {
 	labelCanvas=false;
-	commentCounter=0;
+	comment_counter=0;
 	$("#"+query_id+" tr.comment").remove();
 	$("#"+query_id+"labelcanvas").remove();
 	$("#"+query_id+" div.pointLabel").remove();
 }
 function redraw_graph() {
-        reset_comments();
+        reset_comments(query_id);
 	plot.draw();
         correct_graphheight();
 }
@@ -316,23 +317,27 @@ function calculate_datapoint_dictionary(graphs) {
 function draw_graph_structure(query_id,headline,has_comments,user_can_add,user_logged_in) {
 		var graph_margin='';
 		var comment_list='';
-		if (eval(has_comments) || eval(user_can_add)) {
+		if (eval(has_comments) || user_can_add) {
 			graph_margin="200";
 			comment_list="<table id=\""+query_id+"comments\" style=\"width:200px; position:absolute;right:0;top:0;\"><tr>";
 			comment_list+="<th style=\"width:15px;\">&nbsp;</th><th style=\"width:185px;\">Comentarios</th></tr></table>";			
 		}
-                var graph_html="";
-                graph_html+="<div id=\""+query_id+"\" class=\"graph\" style=\"position:relative;\">";
-		var icon_width=0;
+                var graph_html='';
+                graph_html+='<div id="'+query_id+'" class="graph" style="position:relative;">';
+		graph_html+='<h2 id="'+query_id+'headline" >';
+		graph_html+='<img id="'+query_id+'close" src="/media/icons/close.png" /> ';
+		graph_html+=headline;
+//                graph_html+=' <img id="'+query_id+'tablelink" src="/media/icons/spreadsheet.png"  />';
+//		graph_html+='<img src="/media/icons/print.png" />';
+		graph_html+='</h2>';
+//		var icon_width=0;
 //                graph_html+="<img id=\""+query_id+"print\" src=\"/media/icons/print.png\"/ style=\"position:absolute;left:"+icon_width+"px;top:0px;\" />";
 //		icon_width+=18;
 //		if (user_logged_in) {
 //                	graph_html+="<img id=\""+query_id+"email\" src=\"/media/icons/email.png\"/ style=\"position:absolute;left:"+icon_width+"px;top:0px;\" />";
 //			icon_width+=18;
 //		}
-                graph_html+="<img id=\""+query_id+"csvexport\" src=\"/media/icons/spreadsheet.png\"/ style=\"position:absolute;left:"+icon_width+"px;top:0px;\" />";
-		icon_width+=18;
-		graph_html+="<h2 id=\""+query_id+"headline\" style=\"position:relative;left:"+(icon_width+10)+"px;\">"+headline+"</h2>";
+//		icon_width+=18;
                 graph_html+="<div id=\""+query_id+"stats\" style=\"height:400px; margin-right:"+graph_margin+"px;\"></div>";
                 graph_html+=comment_list;
                 graph_html+="<div id=\""+query_id+"statsoverview\" style=\"height:50px; margin-right:"+graph_margin+"px;\"></div>";
@@ -342,6 +347,7 @@ function draw_graph_structure(query_id,headline,has_comments,user_can_add,user_l
                 graph_html+="<select id=\""+query_id+"xtype\" class=\""+query_id+"graphkind\">";
                 graph_html+="<option selected=\"selected\" value=\"real\">Real</option>";
                 graph_html+="<option value=\"normalized\">Normalizado</option></select>";
+                graph_html+=" <span id=\""+query_id+"csvexport\" class=\"link\">Exportar datos</span>";
                 graph_html+="<div id=\""+query_id+"legend\" style=\"margin-right:"+graph_margin+"px;\"></div></div>";
 		return graph_html;
 }
@@ -376,17 +382,24 @@ function csv_export(graphs) {
 	}
 	return html;
 }
-
-
-function make_graphs(graphs) {
-	reset_comments(); 
-	//first unbind all earlier bindings
+function unbind_all(query_id) {
 	$("#"+query_id+"stats").unbind("plotselected");
 	$("#"+query_id+"statsoverview").unbind("plotselected");
 	$("img#"+query_id+"reset").unbind("click");		
 	$("img#"+query_id+"print").unbind("click");		
 	$("img#"+query_id+"email").unbind("click");		
-	$("img#"+query_id+"csvexport").unbind("click");		
+	$("img#"+query_id+"close").unbind("click");		
+	$("span#"+query_id+"csvexport").unbind("click");		
+	return true;
+}
+function destroy_all_globals() {
+	query_id = id = headline = comment_counter = has_comments = plot = comment_form_open = comments = datapoint_dictionary = graph_height = graph_margin_bottom = null;
+	cordobagraphs = dollargraphs = eurographs = normalized_cordobagraphs = normalized_dollargraphs = normalized_eurographs = null;
+}
+function make_graphs(graphs) {
+	reset_comments(query_id); 
+	//first unbind all earlier bindings
+	unbind_all(query_id);
 	var options,overview;
 	options = { xaxis: { mode: "time", minTickSize: [1, "day"] },
 		lines: { show: true },
@@ -408,7 +421,7 @@ function make_graphs(graphs) {
 	graph_height=$("#"+query_id).height();
 	correct_graphheight();
     	$("#"+query_id+"stats").bind("plotselected", function (event, ranges) {
-		reset_comments();
+		reset_comments(query_id);
       	// clamp the zooming to prevent eternal zoom
         	if (ranges.xaxis.to - ranges.xaxis.from < 0.00001) {
 	        	    ranges.xaxis.to = ranges.xaxis.from + 0.00001;
@@ -427,23 +440,29 @@ function make_graphs(graphs) {
 		correct_graphheight();
     	});
     	$("#"+query_id+"statsoverview").bind("plotselected", function (event, ranges) {
-		reset_comments();
+		reset_comments(query_id);
         	plot.setSelection(ranges);
 		correct_graphheight();
     	});	
 	$("img#"+query_id+"reset").click(function() {		
-		reset_comments();
+		reset_comments(query_id);
 		plot=$.plot($("#"+query_id+"stats"), graphs,options);
 		overview.clearSelection();
 		correct_graphheight();
 	});
-	$("img#"+query_id+"csvexport").click(function(e) {		
+	$("img#"+query_id+"close").click(function() {		
+		reset_comments(query_id);
+		unbind_all(query_id);
+		$("#"+query_id).fadeOut(300, function() { $(this).remove(); });
+		destroy_all_globals();
+	});
+	$("span#"+query_id+"csvexport").click(function(e) {		
 		// si el usuario ha utilizado una tecla de control
 		// no hacemos nada
 		if (e.ctrlKey || e.shiftKey || e.metaKey)
 			return;
 		// abrimos la ventana
-		var w = window.open('', query_id+'.csv','');
+		var w = window.open('', '_blank', '');
 		if (w && !w.closed) {
 			w.document.open("text/csv", "replace");
 			w.document.write(csv_export(graphs));
@@ -526,17 +545,17 @@ function make_graphs(graphs) {
 		$("#GraphsHeader").after(graph_html);
 		
 		make_graphs(cordobagraphs);
-		e_msg = "Nuevo grafico generado.";
+		e_msg = "Nuevo gráfico generado.";
 
 		//Show the message
 		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
 
 		//Calculate other graphs	
-		var dollargraphs=calculate_currencygraphs(eval(jsondata.dollar),cordobagraphs);
-		var eurographs=calculate_currencygraphs(eval(jsondata.euro),cordobagraphs);
-		var normalizedcordobagraphs=calculate_normalizedgraphs(cordobagraphs);
-		var normalizeddollargraphs=calculate_normalizedgraphs(dollargraphs);
-		var normalizedeurographs=calculate_normalizedgraphs(eurographs);
+		dollargraphs=calculate_currencygraphs(eval(jsondata.dollar),cordobagraphs);
+		eurographs=calculate_currencygraphs(eval(jsondata.euro),cordobagraphs);
+		normalized_cordobagraphs=calculate_normalizedgraphs(cordobagraphs);
+		normalized_dollargraphs=calculate_normalizedgraphs(dollargraphs);
+		normalized_eurographs=calculate_normalizedgraphs(eurographs);
 
 
 		$("select."+query_id+"graphkind").change(function() {
@@ -551,11 +570,11 @@ function make_graphs(graphs) {
                         } else if ( xunits == 'euros' && xtype == 'real' ) {
                                 make_graphs(eurographs);
                         } else if ( xunits == 'cordobas' && xtype == 'normalized' ) {
-                                make_graphs(normalizedcordobagraphs);
+                                make_graphs(normalized_cordobagraphs);
                         } else if ( xunits == 'dollars' && xtype == 'normalized' ) {
-                                make_graphs(normalizeddollargraphs);
+                                make_graphs(normalized_dollargraphs);
                         } else if ( xunits == 'euros' && xtype == 'normalized' ) {
-                                make_graphs(normalizedeurographs);
+                                make_graphs(normalized_eurographs);
                         } else {
                                 make_graphs(cordobagraphs);
                         }	
