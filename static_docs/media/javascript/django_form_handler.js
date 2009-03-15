@@ -178,7 +178,7 @@ function create_comment_form(unique_pk,comment_pk) {
   }
   var value = datapoint_dictionary[unique_pk][1];
   var raw_date = datapoint_dictionary[unique_pk][0];
-  var date = new Date(raw_date).toDateString();
+  var date = date_string(raw_date);
 
   var s = '';
   s += '<div class="formDiv" id="'+query_id+'formDiv">';
@@ -313,12 +313,80 @@ function calculate_datapoint_dictionary(graphs) {
 	}
 	return new_datapoint_dictionary;
 }
+function draw_graph_structure(query_id,headline,has_comments,user_can_add,user_logged_in) {
+		var graph_margin='';
+		var comment_list='';
+		if (eval(has_comments) || eval(user_can_add)) {
+			graph_margin="200";
+			comment_list="<table id=\""+query_id+"comments\" style=\"width:200px; position:absolute;right:0;top:0;\"><tr>";
+			comment_list+="<th style=\"width:15px;\">&nbsp;</th><th style=\"width:185px;\">Comentarios</th></tr></table>";			
+		}
+                var graph_html="";
+                graph_html+="<div id=\""+query_id+"\" class=\"graph\" style=\"position:relative;\">";
+		var icon_width=0;
+//                graph_html+="<img id=\""+query_id+"print\" src=\"/media/icons/print.png\"/ style=\"position:absolute;left:"+icon_width+"px;top:0px;\" />";
+//		icon_width+=18;
+//		if (user_logged_in) {
+//                	graph_html+="<img id=\""+query_id+"email\" src=\"/media/icons/email.png\"/ style=\"position:absolute;left:"+icon_width+"px;top:0px;\" />";
+//			icon_width+=18;
+//		}
+                graph_html+="<img id=\""+query_id+"csvexport\" src=\"/media/icons/spreadsheet.png\"/ style=\"position:absolute;left:"+icon_width+"px;top:0px;\" />";
+		icon_width+=18;
+		graph_html+="<h2 id=\""+query_id+"headline\" style=\"position:relative;left:"+(icon_width+10)+"px;\">"+headline+"</h2>";
+                graph_html+="<div id=\""+query_id+"stats\" style=\"height:400px; margin-right:"+graph_margin+"px;\"></div>";
+                graph_html+=comment_list;
+                graph_html+="<div id=\""+query_id+"statsoverview\" style=\"height:50px; margin-right:"+graph_margin+"px;\"></div>";
+                graph_html+="<img id=\""+query_id+"reset\" src=\"/media/icons/reset.png\" />";
+                graph_html+="<select id=\""+query_id+"xunits\" class=\""+query_id+"graphkind\"><option selected=\"selected\" value=\"cordobas\">Cordobas</option>";
+		graph_html+="<option value=\"dollars\">USD</option><option value=\"euros\">Euros</option></select>";
+                graph_html+="<select id=\""+query_id+"xtype\" class=\""+query_id+"graphkind\">";
+                graph_html+="<option selected=\"selected\" value=\"real\">Real</option>";
+                graph_html+="<option value=\"normalized\">Normalizado</option></select>";
+                graph_html+="<div id=\""+query_id+"legend\" style=\"margin-right:"+graph_margin+"px;\"></div></div>";
+		return graph_html;
+}
+
+
+function date_string(timestamp) {
+	var raw_date=new Date(timestamp);
+	var day= raw_date.getUTCDate();
+	if (day < 10) {
+		day = "0"+day;
+	}
+	var month=raw_date.getUTCMonth()+1; 
+	if (month < 10) {
+		month = "0"+month;
+	}
+	var year=raw_date.getUTCFullYear();
+	var date_string = year+'-'+month+'-'+day;
+	return date_string;
+}
+function print_html(graphs) {
+	return "";
+}
+
+function csv_export(graphs) {
+	var html="";
+	var date;
+	for (var series = 0; series < graphs.length; ++series) {
+		for (var datapoint =0; datapoint < graphs[series]['data'].length; ++datapoint) {
+			date = date_string(graphs[series]['data'][datapoint][0]);
+			html+=date+', '+graphs[series]['data'][datapoint][1]+', "'+graphs[series]['unit']+'", "'+graphs[series]['label']+'"\n'
+		}
+	}
+	return html;
+}
+
+
 function make_graphs(graphs) {
 	reset_comments(); 
 	//first unbind all earlier bindings
 	$("#"+query_id+"stats").unbind("plotselected");
 	$("#"+query_id+"statsoverview").unbind("plotselected");
 	$("img#"+query_id+"reset").unbind("click");		
+	$("img#"+query_id+"print").unbind("click");		
+	$("img#"+query_id+"email").unbind("click");		
+	$("img#"+query_id+"csvexport").unbind("click");		
 	var options,overview;
 	options = { xaxis: { mode: "time", minTickSize: [1, "day"] },
 		lines: { show: true },
@@ -369,6 +437,45 @@ function make_graphs(graphs) {
 		overview.clearSelection();
 		correct_graphheight();
 	});
+	$("img#"+query_id+"csvexport").click(function(e) {		
+		// si el usuario ha utilizado una tecla de control
+		// no hacemos nada
+		if (e.ctrlKey || e.shiftKey || e.metaKey)
+			return;
+		// abrimos la ventana
+		var w = window.open('', query_id+'.csv','');
+		if (w && !w.closed) {
+			w.document.open("text/csv", "replace");
+			w.document.write(csv_export(graphs));
+			w.document.close();
+			// si efectivamente hemos logrado abrirla
+			// la ponemos en foco
+			w.focus();
+			// y cancelamos el comportamiento por defecto
+			// del enlace
+			e.preventDefault();
+		}
+
+	});
+	$("img#"+query_id+"print").click(function(e) {		
+		// si el usuario ha utilizado una tecla de control
+		// no hacemos nada
+		if (e.ctrlKey || e.shiftKey || e.metaKey)
+			return;
+		// abrimos la ventana
+		var w = window.open('', query_id+'.csv','');
+		if (w && !w.closed) {
+			w.document.write(print_html(graphs));
+			w.document.close();
+			// si efectivamente hemos logrado abrirla
+			// la ponemos en foco
+			w.focus();
+			// y cancelamos el comportamiento por defecto
+			// del enlace
+			e.preventDefault();
+		}
+
+	});
 	$("#"+query_id+"stats").bind("plotclick", function (event, pos, item) {
         if ((item) && (!(comment_form_open))) {
 //	    var theDate = new Date(item.datapoint[0]); 
@@ -415,24 +522,7 @@ function make_graphs(graphs) {
 		headline=jsondata.headline;
 
 		query_id=String(new Date().getTime());
-		var graph_margin='';
-		var comment_list='';
-		if (eval(has_comments) || eval(user_can_add)) {
-			graph_margin="200";
-			comment_list="<table id=\""+query_id+"comments\" style=\"width:200px; position:absolute;right:0;top:0;\"><tr>";
-			comment_list+="<th style=\"width:15px;\">&nbsp;</th><th style=\"width:185px;\">Comentarios</th></tr></table>";			
-		}
-		var graph_html="";
-		graph_html+="<div id=\""+query_id+"\" class=\"graph\" style=\"position:relative;\"><h2 id=\""+query_id+"headline\">"+headline+"</h2>";
-                graph_html+="<div id=\""+query_id+"stats\" style=\"height:400px; margin-right:"+graph_margin+"px;\"></div>";
-		graph_html+=comment_list;
-		graph_html+="<div id=\""+query_id+"statsoverview\" style=\"height:50px; margin-right:"+graph_margin+"px;\"></div>";
-                graph_html+="<img id=\""+query_id+"reset\" src=\"/media/icons/reset.png\" />";
-		graph_html+="<select id=\""+query_id+"xunits\" class=\""+query_id+"graphkind\"><option selected=\"selected\" value=\"cordobas\">Cordobas</option><option value=\"dollars\">USD</option><option value=\"euros\">Euros</option></select>";
-		graph_html+="<select id=\""+query_id+"xtype\" class=\""+query_id+"graphkind\">";
-                graph_html+="<option selected=\"selected\" value=\"real\">Real</option>";
-                graph_html+="<option value=\"normalized\">Normalizado</option></select>";
-                graph_html+="<div id=\""+query_id+"legend\" style=\"margin-right:"+graph_margin+"px;\"></div></div>";
+		graph_html=draw_graph_structure(query_id,headline,has_comments,user_can_add,user_logged_in);
 		$("#GraphsHeader").after(graph_html);
 		
 		make_graphs(cordobagraphs);
