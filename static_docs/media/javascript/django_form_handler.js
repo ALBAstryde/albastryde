@@ -15,13 +15,32 @@ var e_msg,errors;
 //var datapoint_dictionary,comments;
 function processJson(jsondata) { 
 	var query_id,id,headline,comment_counter,has_comments,plot,comment_form_open,comments,datapoint_dictionary,graph_height,graph_margin_bottom;
-	var cordobagraphs, dollargraphs, eurographs, normalized_cordobagraphs, normalized_dollargraphs, normalized_eurographs;
+	var raw_graphs, cordobagraphs, dollargraphs, eurographs, normalized_cordobagraphs, normalized_dollargraphs, normalized_eurographs;
 	comment_form_open=false;
 	if($.browser.msie){
 		$("div.graph").remove();
 	}
 
 
+function convert_graphs_after_transport(graphs) {
+	var new_graphs,data,new_data,label,unit,time,new_time,unit;
+	new_graphs=[];
+	$.each(graphs, function () {
+		label=this['label'];
+		data=this['data'];
+		unit=this['unit'];
+		new_data=[];
+		$.each(data,function() {
+			time=this[0];
+			new_time=time*1000000; //add 7 zeroes to end of time string
+			value=this[1];
+			pk=this[2];
+			new_data.push([new_time,value,pk]);
+		});
+		new_graphs.push({'label':label,'data':new_data,'unit':unit});
+	});
+	return new_graphs;
+}
 
 function calculate_currencygraphs(currency_dic,cordobagraphs) { 
 		var new_graphs,label,data,currency_data,new_data,unit,time,new_unit,cordoba,currency,currency_value;
@@ -394,7 +413,7 @@ function unbind_all(query_id) {
 }
 function destroy_all_globals() {
 	query_id = id = headline = comment_counter = has_comments = plot = comment_form_open = comments = datapoint_dictionary = graph_height = graph_margin_bottom = null;
-	cordobagraphs = dollargraphs = eurographs = normalized_cordobagraphs = normalized_dollargraphs = normalized_eurographs = null;
+	raw_graphs = cordobagraphs = dollargraphs = eurographs = normalized_cordobagraphs = normalized_dollargraphs = normalized_eurographs = null;
 }
 function make_graphs(graphs) {
 	reset_comments(query_id); 
@@ -530,7 +549,8 @@ function make_graphs(graphs) {
 			comments={};
 			has_comments=false;
 		}
-		cordobagraphs=eval(jsondata.graphs).sort();
+		raw_graphs=eval(jsondata.graphs).sort();
+		cordobagraphs=convert_graphs_after_transport(raw_graphs);
 		if (cordobagraphs.length===0) {
 			e_msg = "No hay datos para la seleccion!";
 			$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
@@ -551,8 +571,8 @@ function make_graphs(graphs) {
 		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
 
 		//Calculate other graphs	
-		dollargraphs=calculate_currencygraphs(eval(jsondata.dollar),cordobagraphs);
-		eurographs=calculate_currencygraphs(eval(jsondata.euro),cordobagraphs);
+		dollargraphs=convert_graphs_after_transport(calculate_currencygraphs(eval(jsondata.dollar),raw_graphs));
+		eurographs=convert_graphs_after_transport(calculate_currencygraphs(eval(jsondata.euro),raw_graphs));
 		normalized_cordobagraphs=calculate_normalizedgraphs(cordobagraphs);
 		normalized_dollargraphs=calculate_normalizedgraphs(dollargraphs);
 		normalized_eurographs=calculate_normalizedgraphs(eurographs);

@@ -127,8 +127,9 @@ def price_graph(mercado,producto,start_date,end_date,mercado_count,producto_coun
 		if i.maximo != i.minimo:
 			precio=int((i.maximo+i.minimo)/2)
 		else:
-			precio=int(i.maximo)
-		fecha=mktime(i.fecha.timetuple())*1000#+1e-6*fecha.microsecond)
+			precio=int(i.maximo)		
+		fecha=mktime(i.fecha.timetuple())/1000
+#		fecha=mktime(i.fecha.timetuple())*1000#+1e-6*fecha.microsecond)
 		if not str(int(fecha)) in dollar:
 			dollar[str(int(fecha))]=float(USD.objects.get(fecha__exact=i.fecha).cordobas)
 			euro[str(int(fecha))]=float(Euro.objects.get(fecha__exact=i.fecha).cordobas)
