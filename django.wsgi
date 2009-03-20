@@ -1,9 +1,9 @@
 import os, sys
+import SITE_URL from local_settings
 
-topdir='TOPDIR'
-sys.path.append(topdir)
-sys.path.append(topdir+'/albastryde')
-sys.path.append(topdir+'/albastryde/wiki')
+sys.path.append(SITE_URL)
+sys.path.append(SITE_URL+'/albastryde')
+sys.path.append(SITE_URL+'/albastryde/wiki')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'albastryde.settings'
 os.environ['MPLCONFIGDIR'] = topdir+"/albastryde/media/cache/" 
 import django.core.handlers.wsgi
