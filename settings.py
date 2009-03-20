@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from local_settings import *
+LOGIN_REDIRECT_URL="/"
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 AUTH_PROFILE_MODULE = "profiles.UserProfile"
