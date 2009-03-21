@@ -532,13 +532,18 @@ function make_graphs(graphs) {
         	if (ranges.yaxis.to - ranges.yaxis.from < 0.00001) {
 	        	    ranges.yaxis.to = ranges.yaxis.from + 0.00001;
 		}
+        	if (ranges.y2axis.to - ranges.y2axis.from < 0.00001) {
+	        	    ranges.yaxis.to = ranges.yaxis.from + 0.00001;
+		}
 	        // do the zooming
 	        plot = $.plot($("#"+query_id+"stats"), graphs,
                       $.extend(true, {}, options, {
                           xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
-                          yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
+                          yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to },
+                          y2axis: { min: ranges.y2axis.from, max: ranges.y2axis.to }
                       }));
         	// don't fire event on the overview to prevent eternal loop
+		overview.clearSelection(true);
         	overview.setSelection(ranges, true);
 		correct_graphheight();
     	});
@@ -550,7 +555,7 @@ function make_graphs(graphs) {
 	$("img#"+query_id+"reset").click(function() {		
 		reset_comments(query_id);
 		plot=$.plot($("#"+query_id+"stats"), graphs,options);
-		overview.clearSelection();
+		overview.clearSelection(true);
 		correct_graphheight();
 	});
 	$("img#"+query_id+"close").click(function() {		
