@@ -1,7 +1,8 @@
 from django.template import RequestContext
 from django.utils import simplejson
 from django.http import HttpResponseRedirect, HttpResponse
-from precios.models import Prueba
+from precios.models import Prueba as PrecioPrueba
+from lluvia.models import Prueba as LLuviaPrueba
 from django.utils import simplejson
 from graph.forms import DbForm
 from coffin.shortcuts import render_to_response
@@ -37,44 +38,72 @@ def get_js_graph(request,query_set=None,javascript=False,model=None):
                         # Bung all that into the dict
                         rdict.update({'errs': d  })
                 else:   
-			last_date=datetime.date(1970,1,1)
+			last_date=datetime.date(1920,1,1)
 			first_date=datetime.date.today()
-			dollar={'unit':'USD'}
-			euro={'unit':'Euro'}			
 			pk_list=[]
 			graphs=[]
 			mercados = form.cleaned_data['mercado']
 			productos = form.cleaned_data['producto']
+			lluvias = form.cleaned_data['lluvia']
 			start_date = form.cleaned_data['start_date']
 			end_date = form.cleaned_data['end_date']
 			mercado_count=len(mercados)
 			producto_count=len(productos)
+			lluvia_count=len(lluvias)
+			if mercado_count > 0 and producto_count > 0:
+				dollar={'unit':'USD'}
+				euro={'unit':'Euro'}			
 #			valuta_count=1
 #			global last_date, first_date
 		        pricectype = ContentType.objects.get(app_label__exact='precios', name__exact='prueba')
+		        lluviactype = ContentType.objects.get(app_label__exact='lluvia', name__exact='prueba')
 			for i in mercados:
 				for b in productos:
 					graph,dollar,euro,pk_list,first_date,last_date=price_graph(mercado=i,producto=b,start_date=start_date,end_date=end_date,mercado_count=mercado_count,producto_count=producto_count,dollar=dollar,euro=euro,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=pricectype)
 					if not graph==None:
 						graphs.append(graph)
+			for c in lluvias:
+				graph,pk_list,first_date,last_date=lluvia_graph(lluvia=c,start_date=start_date,end_date=end_date,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=lluviactype)
+				if not graph==None:
+					graphs.append(graph)
 			rdict.update({'graphs':graphs})
-			rdict.update({'dollar':dollar})
-			rdict.update({'euro':euro})
-
 			mercado_name=""
-			for i in mercados:
-				mercado_name+=i.nombre+", "
-			mercado_name=mercado_name.strip(", ")
-			if len(mercado_name)>60:
-				mercado_name="el mercado"
+			lluvia_name=""
 			producto_name=""
-			for i in productos:
-				producto_name+=i.nombre+", "
-			producto_name=producto_name.strip(", ")
-			if len(producto_name)>60:
-				producto_name="Unos productos"
+			precio_name=""
+			if mercado_count > 0 and producto_count > 0:
+				rdict.update({'dollar':dollar})
+				rdict.update({'euro':euro})
 
-			headline=producto_name.capitalize()+" en "+mercado_name+ ": "+str(first_date)+"&ndash;"+str(last_date)
+				for i in mercados:
+					mercado_name+=i.nombre+", "
+				mercado_name=mercado_name.strip(", ")
+				if len(mercado_name)>60:
+					mercado_name="el mercado"
+				for i in productos:
+					producto_name+=i.nombre.title()+", "
+				producto_name=producto_name.strip(", ")
+				if len(producto_name)>60:
+					producto_name="Unos productos"
+				precio_name=producto_name+" en "+mercado_name 
+			if lluvia_count > 0:
+				for i in lluvias:
+					lluvia_name+=i.nombre.title()+", "
+				lluvia_name=lluvia_name.strip(", ")
+			headline=""
+			if precio_name != "" and lluvia_name !="":
+				headline += "Precios "
+				headline += precio_name
+				headline += " y lluvia en "				
+				headline +=lluvia_name
+			elif lluvia_name !="":
+				headline +="Lluvia en "
+				headline +=lluvia_name
+			elif precio_name !="":
+				headline +="Precios "
+				headline +=precio_name
+				
+			headline+=": "+str(first_date)+"&ndash;"+str(last_date)
 			rdict.update({'headline':headline})
 			comments={}
 			for content_type in pk_list :
@@ -113,7 +142,7 @@ def get_js_graph(request,query_set=None,javascript=False,model=None):
 
 
 def price_graph(mercado,producto,start_date,end_date,mercado_count,producto_count,dollar,euro,pk_list,first_date,last_date,ctype):
-	queryset =Prueba.objects.filter(producto=producto).filter(mercado=mercado).filter(fecha__range=[start_date,end_date]).order_by('fecha')
+	queryset =PrecioPrueba.objects.filter(producto=producto).filter(mercado=mercado).filter(fecha__range=[start_date,end_date]).order_by('fecha')
 	content_type=ctype.id
 	if len(queryset)==0:
 		return None,dollar,euro,pk_list,first_date,last_date
@@ -129,7 +158,6 @@ def price_graph(mercado,producto,start_date,end_date,mercado_count,producto_coun
 		else:
 			precio=int(i.maximo)		
 		fecha=mktime(i.fecha.timetuple())/1000
-#		fecha=mktime(i.fecha.timetuple())*1000#+1e-6*fecha.microsecond)
 		if not str(int(fecha)) in dollar:
 			dollar[str(int(fecha))]=float(USD.objects.get(fecha__exact=i.fecha).cordobas)
 			euro[str(int(fecha))]=float(Euro.objects.get(fecha__exact=i.fecha).cordobas)
@@ -138,19 +166,35 @@ def price_graph(mercado,producto,start_date,end_date,mercado_count,producto_coun
 		list_of_pk.append(str(i.pk))
 		data.append([fecha,precio,unique_pk])
 	pk_list.append([content_type,list_of_pk])
-	label=""
-	if producto_count>1:
-		label+=producto.nombre+" "
+	label=producto.nombre+" "
 	if mercado_count>1:
 		label+="en "+mercado.nombre+" "
-	#if valuta_count>1:
-	#	label+="(cordobas)"+" "
 	label=label.strip()
-	if label=="":
-		label==producto.nombre
-	
-	result={'label':label,'data':data,'unit':'cordoba'}
+	result={'label':label,'data':data,'unit':'cordoba','tipo':'precio'}
 	return result,dollar,euro,pk_list,first_date,last_date
+
+def lluvia_graph(lluvia,start_date,end_date,pk_list,first_date,last_date,ctype):
+	queryset =LLuviaPrueba.objects.filter(estacion=lluvia).filter(fecha__range=[start_date,end_date]).order_by('fecha')
+	content_type=ctype.id
+	if len(queryset)==0:
+		return None,pk_list,first_date,last_date
+	data=[]
+	list_of_pk=[]
+	for i in queryset:
+		if i.fecha < first_date:
+			first_date=i.fecha
+		if i.fecha > last_date:
+			last_date=i.fecha
+		value=str(i.milimetros_de_lluvia)
+		fecha=mktime(i.fecha.timetuple())/1000
+		fecha=int(fecha)
+		unique_pk=str(content_type)+"_"+str(i.pk)		
+		list_of_pk.append(str(i.pk))
+		data.append([fecha,value,unique_pk])
+	pk_list.append([content_type,list_of_pk])
+	label="lluvia en "+lluvia.nombre
+	result={'label':label,'data':data,'unit':'mm','tipo':'lluvia'}
+	return result,pk_list,first_date,last_date
 
 
 
@@ -158,7 +202,7 @@ def get_graph(query_set=None,model=None):
 #	cl=query
 	if query_set and model:
 #		output=str(request)
-		if model==Prueba:
+		if model==PrecioPrueba:
 			#output="Price graph"
 	                #output+=str(query_set)
 			dic_list = [] #list of all items returned by query

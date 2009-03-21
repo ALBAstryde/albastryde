@@ -12,13 +12,13 @@ $.preloadImages("/media/icons/ajax-loader.gif","/media/icons/reset.png");
             {
                                 $('#id_start_date').datePicker(
                                         {
-                                                startDate: '01/01/1990',
+                                                startDate: '01/01/1920',
                                                 endDate: (new Date()).addDays(-1).asString()
                                         }
                                 );
                                 $('#id_end_date').datePicker(
                                         {
-                                                startDate: '02/01/1990',
+                                                startDate: '02/01/1920',
                                                 endDate: (new Date()).asString()
                                         }
                                 );
