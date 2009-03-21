@@ -59,10 +59,8 @@ function convert_graphs_after_transport(graphs) {
 		var new_graph = {'label':label,'data':new_data,'unit':unit,'yaxis':yaxis,'tipo':tipo};
 		if (tipo=='precio') {
 			new_graph['lines'] = {'show': true};
-			new_graph['points'] = {'show': true};
 		} else if (tipo=='lluvia') {
 			new_graph['bars'] = {'show': true, 'barWidth': 86400000};
-			new_graph['points'] = {'show': true};
 		}
 		new_graphs.push(new_graph);
 	});
@@ -508,7 +506,7 @@ function make_graphs(graphs) {
 	yaxis: { tickFormatter: function (v, axis) { return v.toFixed(axis.tickDecimals) +graphs.yaxis }},
 	y2axis: { tickFormatter: function (v, axis) { return v.toFixed(axis.tickDecimals) +graphs.y2axis }},
 		legend: { container: "#"+query_id+"legend"},
-        	points: { drawCall:drawPoint },
+        	points: { show: true, drawCall:drawPoint },
 		selection: { mode: "xy" } };
 	if (user_logged_in) {
 		options['grid']={ hoverable: true, clickable: true };
@@ -516,6 +514,7 @@ function make_graphs(graphs) {
 	plot=$.plot($("#"+query_id+"stats"), graphs,options);
         overview = $.plot($("#"+query_id+"statsoverview"), graphs, {
         	lines: { lineWidth: 1 },
+		points: { show: false },
 		legend: { show: false },
         	shadowSize: 0,
         	xaxis: { ticks: [], mode: "time" },
