@@ -532,16 +532,20 @@ function make_graphs(graphs) {
         	if (ranges.yaxis.to - ranges.yaxis.from < 0.00001) {
 	        	    ranges.yaxis.to = ranges.yaxis.from + 0.00001;
 		}
-        	if (ranges.y2axis.to - ranges.y2axis.from < 0.00001) {
-	        	    ranges.yaxis.to = ranges.yaxis.from + 0.00001;
+		if (y2axis in ranges) {
+	        	if (ranges.y2axis.to - ranges.y2axis.from < 0.00001) {
+		        	    ranges.yaxis.to = ranges.yaxis.from + 0.00001;
+			}
 		}
 	        // do the zooming
+		var axis_dic =  {xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
+                          yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }};
+			  if (y2axis in ranges) {
+                          	axis_dic['y2axis']= { min: ranges.y2axis.from, max: ranges.y2axis.to }
+			  }
+
 	        plot = $.plot($("#"+query_id+"stats"), graphs,
-                      $.extend(true, {}, options, {
-                          xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
-                          yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to },
-                          y2axis: { min: ranges.y2axis.from, max: ranges.y2axis.to }
-                      }));
+                      $.extend(true, {}, options, axis_dic));
         	// don't fire event on the overview to prevent eternal loop
 		overview.clearSelection(true);
         	overview.setSelection(ranges, true);
