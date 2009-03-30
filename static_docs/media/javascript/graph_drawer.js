@@ -33,7 +33,6 @@ function processJson(jsondata) {
 			new_data = [],
 			new_fill_data = [],
 			new_shadow_data = [],
-			new_point_data = [],
 			max_data = [],
 			min_data_dic = {},
 			tipo,
@@ -84,11 +83,10 @@ function processJson(jsondata) {
 				start_value=max_data[0][1];
 				start_date=max_data[0][0];
 				var new_max_data = [],
-				new_middle_data=[],
 				new_min_data = [];
 				$.each(max_data,
 				function() {
-					var pk, max_value, middle_value, min_value, time, new_time;
+					var pk, max_value, min_value, time, new_time;
 					time = this[0];
 					new_time = time * 1000000; //add 7 zeroes to end of time string
 					max_value = this[1];
@@ -98,14 +96,11 @@ function processJson(jsondata) {
 					} else {
 						min_value = max_value;
 					}
-					middle_value=(max_value+min_value)/2;
 					new_min_data.push([new_time, min_value, pk]);
-					new_middle_data.push([new_time, middle_value, pk]);
 					new_max_data.push([new_time, max_value, pk]);
 				});
 				new_fill_data = new_min_data.concat(new_max_data.reverse());
 				new_shadow_data = new_min_data;
-				new_point_data = new_middle_data;
 				new_data = new_max_data.reverse();
 			}
 			var yaxis = 1;
@@ -129,7 +124,6 @@ function processJson(jsondata) {
 				'bars': {},
 				'lines': {},
 				'points': {},
-				'shadowSize': 3,
 				'start_value':start_value,
 				'start_date':start_date
 			};
@@ -148,9 +142,6 @@ function processJson(jsondata) {
 			}
 			if (new_fill_data.length > 0) {
 				new_graph.shadowSize = 0;
-				new_graph.hoverable = false;
-				new_graph.clickable = false;
-				new_graph.points = {'show':false};
 				var new_fill_graph = {
 					'data': new_fill_data,
 					'unit': unit,
@@ -185,27 +176,8 @@ function processJson(jsondata) {
 					'start_date':start_date
 				};
 				new_graphs.push(new_shadow_graph);
-				var new_point_graph = {
-					'data': new_point_data,
-					'unit': unit,
-					'yaxis': yaxis,
-					'tipo': tipo,
-					'relevance': 'point',
-					'color': color_counter,
-					'hoverable': true,
-					'clickable': true,
-					'bars': {},
-					'points': {'show':true},
-					'lines': {'show':true},
-					'shadowSize': 0,
-					'start_value':start_value,
-					'start_date':start_date
-				};
-				new_graphs.push(new_graph);
-				new_graphs.push(new_point_graph);
-			} else {
-				new_graphs.push(new_graph);
 			}
+			new_graphs.push(new_graph);
 			color_counter += 1;
 		});
 		var yaxis = '',
