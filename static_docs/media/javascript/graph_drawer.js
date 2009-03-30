@@ -111,6 +111,8 @@ function processJson(jsondata) {
 				'tipo': tipo,
 				'relevance': 'main',
 				'color': color_counter,
+				'clickable': {},
+				'hoverable': {},
 				'bars': {},
 				'lines': {},
 				'points': {}
@@ -138,7 +140,7 @@ function processJson(jsondata) {
 					'relevance': 'extra',
 					'color': color_counter,
 					'hoverable': false,
-					'clickable': true,
+					'clickable': false,
 					'bars': {}
 				};
 				new_fill_graph.points = {
@@ -183,6 +185,8 @@ function processJson(jsondata) {
 			var points = this.points;
 			var bars = this.bars;
 			var relevance = this.relevance;
+			var clickable = this.clickable;
+			var hoverable = this.hoverable;
 
 			if (unit == 'cordoba') {
 				var currency_data = [];
@@ -235,7 +239,9 @@ function processJson(jsondata) {
 				'lines': lines,
 				'bars': bars,
 				'color': color,
-				'relevance': relevance
+				'relevance': relevance,
+				'clickable': clickable,
+				'hoverable': hoverable
 			};
 			if (tipo == 'precio') {
 				new_graph.producto = producto;
@@ -278,6 +284,8 @@ function processJson(jsondata) {
 			var lines = this.lines;
 			var points = this.points;
 			var relevance = this.relevance;
+			var clickable = this.clickable;
+			var hoverable = this.hoverable;
 			var start_value = data[0][1];
 			if (relevance == 'main') {
 				if (tipo == 'precio') {
@@ -311,7 +319,10 @@ function processJson(jsondata) {
 				'bars': bars,
 				'points': points,
 				'lines': lines,
-				'color': color
+				'color': color,
+				'relevance': relevance,
+				'clickable': clickable,
+				'hoverable': hoverable
 			};
 			new_graphs.push(new_graph);
 		});
@@ -936,7 +947,7 @@ function processJson(jsondata) {
 			$("#GraphsHeader").after(graph_html);
 
 			make_graphs(converted_graphs);
-			e_msg = "Nuevo grÃ¡fico generado.";
+			e_msg = "Nuevo gráfico generado.";
 
 			//Show the message
 			$('#AjaxFormWarning').text(e_msg).fadeIn("slow");
