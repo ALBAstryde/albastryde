@@ -24,30 +24,64 @@ function processJson(jsondata) {
 
 
 function convert_graphs_after_transport(graphs) {
-	var new_graphs,data,new_data,label,unit,time,new_time,unit, tipos_graficos,tipo;
+	var new_graphs,tipos_graficos,color_counter=0;
 	new_graphs=[];
 	tipos_graficos={};
 	includes_currency_graphs=false;
 	$.each(graphs, function () {
-		data=this['data'];
+		var data=[], new_data=[], new_fill_data=[], max_data=[], min_data_dic={}, graph_kind='lines', tipo, unit, producto, mercado, lluvia, label;
+		if ('data' in this) {
+			data=this['data'];
+		} else {
+			max_data=this['max_data'];
+			min_data_dic=this['min_data_dic'];
+		}
 		unit=this['unit'];
-		label=this['label']+' '+unit;
 		tipo=this['tipo'];
-		graph_kind='lines';
 		if (tipo=='precio') {
 			includes_currency_graphs=true;
-		} 
+			producto=this['producto'];
+			mercado=this['mercado'];
+			label=producto+' en '+mercado+' ('+unit+')';
+		}  else if (tipo=='lluvia') {
+			lluvia=this['lluvia'];
+			label='lluvia en '+lluvia+' ('+unit+')';
+		} else {
+			label ='';
+		}
 		if (!(tipo in tipos_graficos)) {
 			tipos_graficos[tipo]=unit;
 		}
-		new_data=[];
-		$.each(data,function() {
-			time=this[0];
-			new_time=time*1000000; //add 7 zeroes to end of time string
-			value=this[1];
-			pk=this[2];
-			new_data.push([new_time,value,pk]);
-		});
+//		e_msg = "Going through each graph."+String(data);
+//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
+		if (data.length > 0) {
+			$.each(data,function() {
+				var pk, value, time, new_time;
+				time=this[0];
+				new_time=time*1000000; //add 7 zeroes to end of time string
+				value=this[1];
+				pk=this[2];
+				new_data.push([new_time,value,pk]);
+			});
+		} else {
+			var new_max_data=[], new_min_data=[];
+			$.each(max_data,function() {
+				var pk, max_value, min_value, time, new_time;
+				time=this[0];
+				new_time=time*1000000; //add 7 zeroes to end of time string
+				max_value=this[1];
+				pk=this[2];
+				if (String(time) in min_data_dic) {
+					min_value=min_data_dic[String(time)];
+				} else {
+					min_value=max_value;
+				}
+				new_min_data.push([new_time,min_value,pk]);
+				new_max_data.push([new_time,max_value,pk]);
+			});
+			new_fill_data = new_min_data.concat(new_max_data.reverse());	
+			new_data = new_max_data.reverse();	
+		}
 		var yaxis=1;
 		var yaxis_finder=1;
 		for (var item in tipos_graficos) {
@@ -56,15 +90,26 @@ function convert_graphs_after_transport(graphs) {
 			}
 			yaxis_finder+=1;
 		}
-		var new_graph = {'label':label,'data':new_data,'unit':unit,'yaxis':yaxis,'tipo':tipo};
+		var new_graph = {'label':label,'data':new_data,'unit':unit,'yaxis':yaxis,'tipo':tipo,'relevance':'main','color':color_counter,'bars':{},'lines':{},'points':{}};
 		if (tipo=='precio') {
 			new_graph['lines'] = {'show': true};
+			new_graph['producto']=producto;
+			new_graph['mercado']=mercado;
 		} else if (tipo=='lluvia') {
 			new_graph['bars'] = {'show': true, 'barWidth': 86400000};
+			new_graph['lluvia']=lluvia;
+		}
+		if (new_fill_data.length>0) {
+			new_graph['shadowSize']=0;
+			var new_fill_graph = {'data':new_fill_data,'unit':unit,'yaxis':yaxis,'tipo':tipo,'relevance':'extra','color':color_counter,'hoverable':false,'clickable':true,'bars':{}};
+			new_fill_graph['points'] = {'show':false};
+			new_fill_graph['lines'] = {'fill':true};
+			new_graphs.push(new_fill_graph);
 		}
 		new_graphs.push(new_graph);
+		color_counter+=1;
 	});
-	var yaxis=y2axis="";
+	var yaxis='',y2axis='';
 	var yaxis_finder=1;
 	for (var item in tipos_graficos) {
 		if (yaxis_finder==1) {
@@ -80,22 +125,27 @@ function convert_graphs_after_transport(graphs) {
 }
 
 function calculate_currencygraphs(currency_dic,cordobagraphs) { 
-		var new_graphs,label,data,currency_data,new_data,unit,time,new_unit,cordoba,currency,currency_value,tipos_graficos,tipo;
-		new_graphs=[];
-		tipos_graficos={}
+		var new_graphs=[];
+		var tipos_graficos={}
 		$.each(cordobagraphs,function() {
-			label=this['label'];
-			data=this['data'];
-			unit=this['unit'];
-			tipo=this['tipo'];
+			var label='',mercado,producto,lluvia,current_data,current_unit;
+			var data=this['data'];
+			var unit=this['unit'];
+			var tipo=this['tipo'];
+			var color=this['color'];
+			var lines=this['lines'];
+			var points=this['points'];
+			var bars=this['bars'];
+			var relevance=this['relevance'];
+
 			if (unit=='cordoba') {
-				currency_data=[];
+				var currency_data=[];
 				$.each(data,function() {
-					time=this[0];
-					cordoba=this[1];
-					pk=this[2];
-					currency=currency_dic[String(time)];
-					currency_value = parseFloat(cordoba) * parseFloat(currency);
+					var time=this[0];
+					var cordoba=this[1];
+					var pk=this[2];
+					var currency=currency_dic[String(time/1000000)]; //convert to transfer time format to get currency timestamp
+					var currency_value = parseFloat(cordoba) * parseFloat(currency);
 					currency_data.push([time,currency_value,pk]);
 				});
 
@@ -104,6 +154,18 @@ function calculate_currencygraphs(currency_dic,cordobagraphs) {
 			} else {
 				current_data=data;
 				current_unit=unit;
+			}
+			if (tipo=='precio') {
+				producto=this['producto'];
+				mercado=this['mercado'];
+				if (relevance=='main') {
+					label=producto+' en '+mercado+' ('+current_unit+')';
+				} 
+			}  else if (tipo=='lluvia') {
+				lluvia=this['lluvia'];
+				if (relevance=='main') {
+					label='lluvia en '+lluvia+' ('+current_unit+')';
+				}
 			}
 			if (!(tipo in tipos_graficos)) {
 				tipos_graficos[tipo]=current_unit;
@@ -116,12 +178,12 @@ function calculate_currencygraphs(currency_dic,cordobagraphs) {
 				}
 				yaxis_finder+=1;
 			}
-			var new_graph = {'label':label,'data':current_data,'unit':current_unit,'tipo':tipo,'yaxis':yaxis};
+			var new_graph = {'label':label,'data':current_data,'unit':current_unit,'tipo':tipo,'yaxis':yaxis,'points':points,'lines':lines,'bars':bars,'color':color,'relevance':relevance};
 			if (tipo=='precio') {
-				new_graph['lines'] = {'show': true};
-				new_graph['points'] = {'show': true};
+				new_graph['producto']=producto;
+				new_graph['mercado']=mercado;
 			} else if (tipo=='lluvia') {
-				new_graph['bars'] = {'show': true, 'barWidth': 86400000};
+				new_graph['lluvia']=lluvia;
 			}
 			new_graphs.push(new_graph);
 		});
@@ -141,35 +203,51 @@ function calculate_currencygraphs(currency_dic,cordobagraphs) {
 }
 
 function calculate_normalizedgraphs(unitgraphs) {
-                var new_graphs,label,new_label,data,new_data,unit,time,start_value,unit_value,normalized_value,tipo;
-                new_graphs=[];
+                var new_graphs=[];
+		print_start_value=[];
                 $.each(unitgraphs,function() {
-                        label=this['label'];
-                        data=this['data'];
-                        unit=this['unit'];
-                        tipo=this['tipo'];
-			start_value=data[0][1];
-			new_label=label+" (1 = "+String(start_value)+" "+unit+"s)";
-			new_data=[];
+			print_normalized_graph=this;
+			var new_data, producto, mercado, lluvia;
+                        var label='';
+                        var data=this['data'];
+                        var unit=this['unit'];
+                        var tipo=this['tipo'];
+                        var color=this['color'];
+                        var bars=this['bars'];
+                        var lines=this['lines'];
+                        var points=this['points'];
+                        var relevance=this['relevance'];
+			var start_value=data[0][1];
+			print_start_value.push([start_value,unit,tipo,relevance,color]);
+			if (relevance=='main') {
+				if (tipo=='precio') {
+					producto=this['producto'];
+					mercado=this['mercado'];
+					if (relevance=='main') {
+						label=producto+' en '+mercado+' (1 = '+String(start_value)+' '+unit+'s)';
+					} 
+				}  else if (tipo=='lluvia') {
+					lluvia=this['lluvia'];
+					if (relevance=='main') {
+						label='lluvia en '+lluvia+' (1 = '+String(start_value)+' '+unit+'s)';
+					}
+				}
+
+			} 
+			var new_data=[];
 			$.each(data,function() {
-				time=this[0];
-				unit_value=this[1];
-				pk=this[2];
-				normalized_value=parseFloat(unit_value)/parseFloat(start_value)*100;
+				var time=this[0];
+				var unit_value=this[1];
+				var pk=this[2];
+				var normalized_value=parseFloat(unit_value)/parseFloat(start_value)*100;
 				new_data.push([time,normalized_value,pk]);
 			});
-			var new_graph = {'label':new_label,'data':new_data,'unit':'%','tipo':'normalizado','yaxis':1};
-			if (tipo=='precio') {
-				new_graph['lines'] = {'show': true};
-				new_graph['points'] = {'show': true};
-			} else if (tipo=='lluvia') {
-				new_graph['bars'] = {'show': true, 'barWidth': 86400000};
-			}
+			var new_graph = {'label':label,'data':new_data,'unit':'%','tipo':'normalizado','yaxis':1,'bars':bars,'points':points,'lines':lines,'color':color};
 			new_graphs.push(new_graph);
 		});
 		new_graphs['yaxis']='%';
 		new_graphs['y2axis']='';
-		return new_graphs.sort();
+		return new_graphs;
 }
             function makeLabelCanvas(width, height) {
                 var c = document.createElement('canvas');
@@ -473,11 +551,64 @@ function print_html(graphs) {
 
 function csv_export(graphs) {
 	var html="";
-	var date;
+	var headerline='';
 	for (var series = 0; series < graphs.length; ++series) {
-		for (var datapoint =0; datapoint < graphs[series]['data'].length; ++datapoint) {
-			date = date_string(graphs[series]['data'][datapoint][0]);
-			html+=date+', '+graphs[series]['data'][datapoint][1]+', "'+graphs[series]['unit']+'", "'+graphs[series]['label']+'"\n'
+		if ('max_data' in graphs[series]) {
+			for (var datapoint =0; datapoint < graphs[series]['max_data'].length; ++datapoint) {
+				if (datapoint==0) {
+					var new_headerline='fecha, min, max, unidad, tipo';
+					if (graphs[series]['tipo']=='precio') { 
+						new_headerline+=', mercado, producto';
+					} else if (graphs[series]['tipo']=='lluvia') {
+						new_headerline+=', estacion de lluvia';
+					}
+					if (!(new_headerline==headerline)) {
+						html+='\n';
+						html+=new_headerline+'\n';
+						headerline=new_headerline;
+					}
+				}
+				var date = graphs[series]['max_data'][datapoint][0];
+				var date_str = date_string(date*1000000);
+				var max = graphs[series]['max_data'][datapoint][1];
+				var min;
+				if (String(date) in graphs[series]['min_data_dic']) {
+					min = graphs[series]['min_data_dic'][String(date)];
+				} else {
+					min = max;
+				}
+				html+=date_str+', '+min+', '+max+', "'+graphs[series]['unit']+'", "'+graphs[series]['tipo']+'"';
+				if (graphs[series]['tipo']=='precio') {
+					html+=', "'+graphs[series]['mercado']+'", "'+ graphs[series]['producto']+'"';
+				} else if (graphs[series]['tipo']=='lluvia') {
+					html+=', "'+graphs[series]['lluvia']+'"';
+				}
+				html+='\n';
+			}
+		} else {
+			for (var datapoint =0; datapoint < graphs[series]['data'].length; ++datapoint) {
+				if (datapoint==0) {
+					var new_headerline='fecha, valor, unidad, tipo';
+					if (graphs[series]['tipo']=='precio') { 
+						new_headerline+=', mercado, producto';
+					} else if (graphs[series]['tipo']=='lluvia') {
+						new_headerline+=', estacion de lluvia';
+					}
+					if (!(new_headerline==headerline)) {
+						html+='\n';
+						html+=new_headerline+'\n';
+						headerline=new_headerline;
+					}
+				}
+				date = date_string(graphs[series]['data'][datapoint][0]*1000000);
+				html+=date+', '+graphs[series]['data'][datapoint][1]+', "'+graphs[series]['unit']+'", "'+graphs[series]['tipo']+'"';
+				if (graphs[series]['tipo']=='precio') {
+					html+=', "'+graphs[series]['mercado']+'", "'+ graphs[series]['producto']+'"';
+				} else if (graphs[series]['tipo']=='lluvia') {
+					html+=', "'+graphs[series]['lluvia']+'"';
+				}
+				html+='\n';
+			}
 		}
 	}
 	return html;
@@ -494,7 +625,7 @@ function unbind_all(query_id) {
 }
 function destroy_all_globals() {
 	query_id = id = headline = comment_counter = has_comments = plot = comment_form_open = comments = datapoint_dictionary = graph_height = graph_margin_bottom = null;
-	raw_graphs = converted_bagraphs = dollargraphs = eurographs = normalized_graphs = normalized_dollargraphs = normalized_eurographs = null;
+	raw_graphs = converted_graphs = dollargraphs = eurographs = normalized_graphs = normalized_dollargraphs = normalized_eurographs = null;
 }
 function make_graphs(graphs) {
 	reset_comments(query_id); 
@@ -532,7 +663,7 @@ function make_graphs(graphs) {
         	if (ranges.yaxis.to - ranges.yaxis.from < 0.00001) {
 	        	    ranges.yaxis.to = ranges.yaxis.from + 0.00001;
 		}
-		if (y2axis in ranges) {
+		if ('y2axis' in ranges) {
 	        	if (ranges.y2axis.to - ranges.y2axis.from < 0.00001) {
 		        	    ranges.yaxis.to = ranges.yaxis.from + 0.00001;
 			}
@@ -540,7 +671,7 @@ function make_graphs(graphs) {
 	        // do the zooming
 		var axis_dic =  {xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
                           yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }};
-			  if (y2axis in ranges) {
+			  if ('y2axis' in ranges) {
                           	axis_dic['y2axis']= { min: ranges.y2axis.from, max: ranges.y2axis.to }
 			  }
 
@@ -577,7 +708,7 @@ function make_graphs(graphs) {
 		var w = window.open('', '_blank', '');
 		if (w && !w.closed) {
 			w.document.open("text/csv", "replace");
-			w.document.write(csv_export(graphs));
+			w.document.write(csv_export(raw_graphs));
 			w.document.close();
 			// si efectivamente hemos logrado abrirla
 			// la ponemos en foco
@@ -625,7 +756,9 @@ function make_graphs(graphs) {
 
 	//Do we have any data at all?
 	if (jsondata) {
-		e_msg = "We received your form, thank you.";
+//		e_msg = "We received your form, thank you.";
+//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
+
 		if (eval(jsondata.bad)) {
 			e_msg = "Please check your form.";
 			errors = eval(jsondata.errs); //Again with the eval :)
@@ -642,20 +775,25 @@ function make_graphs(graphs) {
 			comments={};
 			has_comments=false;
 		}
+//		e_msg = "Checked for comments.";
+//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
 		raw_graphs=eval(jsondata.graphs).sort();
+//		e_msg = "Raw graphs OK.";
+//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
 		converted_graphs=convert_graphs_after_transport(raw_graphs);
+//		e_msg = "Converted graphs.";
+//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
 		if (converted_graphs.length===0) {
 			e_msg = "No hay datos para la seleccion!";
 			$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
 			$('#AjaxFormSubmit').attr("disabled","");
 			return true;
-		} 
-		
+		} 		
 		datapoint_dictionary=calculate_datapoint_dictionary(converted_graphs);
 		headline=jsondata.headline;
 
 		query_id=String(new Date().getTime());
-		graph_html=draw_graph_structure(query_id,headline,has_comments,user_can_add,user_logged_in);
+		var graph_html=draw_graph_structure(query_id,headline,has_comments,user_can_add,user_logged_in);
 		$("#GraphsHeader").after(graph_html);
 		
 		make_graphs(converted_graphs);
@@ -666,9 +804,11 @@ function make_graphs(graphs) {
 
 		//Calculate other graphs	
 		normalized_graphs=calculate_normalizedgraphs(converted_graphs);
+
+
 		if (includes_currency_graphs) {
-			dollargraphs=convert_graphs_after_transport(calculate_currencygraphs(eval(jsondata.dollar),raw_graphs));
-			eurographs=convert_graphs_after_transport(calculate_currencygraphs(eval(jsondata.euro),raw_graphs));
+			dollargraphs=calculate_currencygraphs(eval(jsondata.dollar),converted_graphs);
+			eurographs=calculate_currencygraphs(eval(jsondata.euro),converted_graphs);
 			normalized_dollargraphs=calculate_normalizedgraphs(dollargraphs);
 			normalized_eurographs=calculate_normalizedgraphs(eurographs);
 		}

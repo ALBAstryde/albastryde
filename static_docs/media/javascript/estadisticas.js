@@ -48,12 +48,12 @@ $('#id_start_date').bind(
             });
 
 $(document).ready(function() {
-producto_height = $('#producto-chooser').height();
-mercado_height = $('#mercado-chooser').height();
-mercado_width = $('#mercado-chooser').width();
-producto_width = $("#producto-chooser").width();
-submit_height= $("#form-submitter").height();
-contents_width = $("#contents").width();
+var producto_height = $('#producto-chooser').height();
+var mercado_height = $('#mercado-chooser').height();
+var mercado_width = $('#mercado-chooser').width();
+var producto_width = $("#producto-chooser").width();
+var submit_height= $("#form-submitter").height();
+var contents_width = $("#contents").width();
 
 $("#mercado-chooser").css( { "left": (producto_width + 10) + "px"});
 $("#from-chooser").css( { "left": (producto_width + mercado_width + 20) + "px"});
