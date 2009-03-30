@@ -32,6 +32,7 @@ function processJson(jsondata) {
 			var data = [],
 			new_data = [],
 			new_fill_data = [],
+			new_shadow_data = [],
 			max_data = [],
 			min_data_dic = {},
 			tipo,
@@ -39,7 +40,9 @@ function processJson(jsondata) {
 			producto,
 			mercado,
 			lluvia,
-			label;
+			label,
+			start_value,
+			start_date;
 			if ('data' in this) {
 				data = this.data;
 			} else {
@@ -65,6 +68,8 @@ function processJson(jsondata) {
 			//		e_msg = "Going through each graph."+String(data);
 			//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
 			if (data.length > 0) {
+				start_value=data[0][1];
+				start_date=data[0][0];
 				$.each(data,
 				function() {
 					var pk, value, time, new_time;
@@ -75,6 +80,8 @@ function processJson(jsondata) {
 					new_data.push([new_time, value, pk]);
 				});
 			} else {
+				start_value=max_data[0][1];
+				start_date=max_data[0][0];
 				var new_max_data = [],
 				new_min_data = [];
 				$.each(max_data,
@@ -93,6 +100,7 @@ function processJson(jsondata) {
 					new_max_data.push([new_time, max_value, pk]);
 				});
 				new_fill_data = new_min_data.concat(new_max_data.reverse());
+				new_shadow_data = new_min_data;
 				new_data = new_max_data.reverse();
 			}
 			var yaxis = 1;
@@ -115,7 +123,9 @@ function processJson(jsondata) {
 				'hoverable': {},
 				'bars': {},
 				'lines': {},
-				'points': {}
+				'points': {},
+				'start_value':start_value,
+				'start_date':start_date
 			};
 			if (tipo == 'precio') {
 				new_graph.lines = {
@@ -137,19 +147,35 @@ function processJson(jsondata) {
 					'unit': unit,
 					'yaxis': yaxis,
 					'tipo': tipo,
-					'relevance': 'extra',
+					'relevance': 'fill',
 					'color': color_counter,
 					'hoverable': false,
 					'clickable': false,
-					'bars': {}
-				};
-				new_fill_graph.points = {
-					'show': false
-				};
-				new_fill_graph.lines = {
-					'fill': true
+					'shadowSize': 0,
+					'bars': {},
+					'points': {'show':false},
+					'lines': {'fill':true},
+					'start_value':start_value,
+					'start_date':start_date
 				};
 				new_graphs.push(new_fill_graph);
+				var new_shadow_graph = {
+					'data': new_shadow_data,
+					'unit': unit,
+					'yaxis': yaxis,
+					'tipo': tipo,
+					'relevance': 'shadow',
+					'color': color_counter,
+					'hoverable': false,
+					'clickable': false,
+					'bars': {},
+					'points': {'show':false},
+					'lines': {},
+					'shadowSize': 3,
+					'start_value':start_value,
+					'start_date':start_date
+				};
+				new_graphs.push(new_shadow_graph);
 			}
 			new_graphs.push(new_graph);
 			color_counter += 1;
@@ -187,7 +213,9 @@ function processJson(jsondata) {
 			var relevance = this.relevance;
 			var clickable = this.clickable;
 			var hoverable = this.hoverable;
-
+			var shadowSize = this.shadowSize;
+			var start_date = this.start_date;
+			var start_value = currency_dic[String(start_date)]*this.start_value;
 			if (unit == 'cordoba') {
 				var currency_data = [];
 				$.each(data,
@@ -240,6 +268,9 @@ function processJson(jsondata) {
 				'bars': bars,
 				'color': color,
 				'relevance': relevance,
+				'start_date': start_date,
+				'start_value': start_value,
+				'shadowSize': shadowSize,
 				'clickable': clickable,
 				'hoverable': hoverable
 			};
@@ -284,9 +315,10 @@ function processJson(jsondata) {
 			var lines = this.lines;
 			var points = this.points;
 			var relevance = this.relevance;
+			var shadowSize = this.shadowSize;
 			var clickable = this.clickable;
 			var hoverable = this.hoverable;
-			var start_value = data[0][1];
+			var start_value = this.start_value;
 			if (relevance == 'main') {
 				if (tipo == 'precio') {
 					producto = this.producto;
@@ -321,6 +353,7 @@ function processJson(jsondata) {
 				'lines': lines,
 				'color': color,
 				'relevance': relevance,
+				'shadowSize': shadowSize,
 				'clickable': clickable,
 				'hoverable': hoverable
 			};
