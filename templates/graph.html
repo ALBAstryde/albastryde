@@ -1,0 +1,76 @@
+{% extends "/base_graph.html" %}
+{% block title %}
+Estad&iacute;stica
+{% endblock %}
+{% block headline %}
+Estad&iacute;stica
+{% endblock %}
+
+{% block extraheader %}
+<script type="text/javascript" src="/media/javascript/jQuery/jquery.js"></script>
+<!-- datePicker required styles -->
+<link rel="stylesheet" type="text/css" media="screen" href="/media/javascript/jQuery/datePicker.css" />
+<!--[if IE]><script language="javascript" type="text/javascript" src="/media/javascript/jQuery/excanvas.min.js"></script><![endif]-->
+<!--[if IE]><script language="javascript" type="text/javascript" src="/media/javascript/jQuery/jquery.bgiframe.js"></script><![endif]-->
+
+<script type="text/javascript" src="/media/javascript/jQuery/jquery.dimensions.js"></script>
+<script type="text/javascript" src="/media/javascript/jQuery/jquery.flot.spanish.js"></script>
+
+<script type="text/javascript" src="/media/javascript/graph_drawer.js"></script>
+
+<script language="javascript" type="text/javascript">
+
+{% if request.user.is_authenticated() %}
+user_logged_in =true;
+user_name='{{ username }}';
+user_id={{ request.user.id }};
+{% else %}
+user_logged_in=false;
+user_name='';
+user_id=-1;
+{% endif %}
+{% if request.user.has_perm('comments.add_comment') %}
+user_can_add=true;
+{% else %}
+user_can_add=false;
+{% endif %}
+{% if request.user.has_perm('comments.change_comment') %}
+user_can_change=true;
+{% else %}
+user_can_change=false;
+{% endif %}
+{% if request.user.has_perm('comments.moderate_comment') %}
+user_can_moderate=true;
+{% else %}
+user_can_moderate=false;
+{% endif %}
+{% if request.user.has_perm('comments.delete_comment') %}
+user_can_delete=true;
+{% else %}
+user_can_delete=false;
+{% endif %}
+
+{% if request.user.has_perm('comment_flag.delete_comment_flag') %}
+user_can_delete_flag=true;
+{% else %}
+user_can_delete_flag=false;
+{% endif %}
+{% if request.user.has_perm('comment_flag.change_comment_flag') %}
+user_can_change_flag=true;
+{% else %}
+user_can_change_flag=false;
+{% endif %}
+{% if request.user.has_perm('comment_flag.add_comment_flag') %}
+user_can_add_flag=true;
+{% else %}
+user_can_add_flag=false;
+{% endif %}
+
+
+
+</script>
+{% endblock %}
+{% block contents %}
+
+
+{% endblock %}
