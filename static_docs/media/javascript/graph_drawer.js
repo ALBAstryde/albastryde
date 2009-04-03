@@ -1,7 +1,7 @@
 var e_msg, errors;
 //var datapoint_dictionary,comments;
 
-function create_graphs(jsondata,close_button) {
+function create_graphs(jsondata,close_button,graphsheader) {
 	if (jsondata.comments) {
 		comments = jsondata.comments;
 		has_comments = true;
@@ -28,7 +28,7 @@ function create_graphs(jsondata,close_button) {
 
 	query_id = String(new Date().getTime());
 	var graph_html = draw_graph_structure(query_id, headline, has_comments, user_can_add, user_logged_in);
-	$("#GraphsHeader").after(graph_html);
+	$(graphsheader).after(graph_html);
 
 	make_graphs(converted_graphs);
 	e_msg = "Nuevo gráfico generado.";
@@ -701,6 +701,9 @@ function create_graphs(jsondata,close_button) {
 		//                graph_html+=' <img id="'+query_id+'tablelink" src="/media/icons/spreadsheet.png"  />';
 		//		graph_html+='<img src="/media/icons/print.png" />';
 		graph_html += '</h2>';
+		if (jsondata.query_link) {
+			graph_html += '<p><a href="/estadisticas/'+jsondata.query_link+'">enlace permanente</a></p>';
+		}
 		//		var icon_width=0;
 		//                graph_html+="<img id=\""+query_id+"print\" src=\"/media/icons/print.png\"/ style=\"position:absolute;left:"+icon_width+"px;top:0px;\" />";
 		//		icon_width+=18;

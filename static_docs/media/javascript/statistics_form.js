@@ -101,7 +101,7 @@ function processJson(jsondata) {
 				$(id).parent().after(errmsg); //I want the error above the <p> holding the field
 			});
 		} else {
-			create_graphs(jsondata,true);
+			create_graphs(jsondata,true,'#GraphsHeader');
 
 		}
 	} else {

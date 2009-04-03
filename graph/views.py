@@ -24,6 +24,8 @@ def show_form(request,query_set=None,javascript=False,model=None):
 		query = request.POST
 		user = request.user
 		rdict = build_graph(query,user)
+		query_link=reverse_translate_query(query)
+		rdict['query_link']=query_link
 		json = simplejson.dumps(rdict, ensure_ascii=False)
         	return HttpResponse( json, mimetype='application/javascript')
 	else:
@@ -46,12 +48,18 @@ def show_graph(request,query_string):
 	return render_to_response("/graph.html", {"request":request,"json":json,"menu_list":menu_list})	
 
 
+
+
 def translate_query_string(query_string):
 	word_query=QueryDict(query_string)
-	new_query_string=''
+	new_query_string=u''
 	for i in word_query.lists():
 		model= i[0]
 		value=i[1]
+		if model=='desde':
+			model='start_date'
+		if model=='hasta':
+			model='end_date'
 		if model=='start_date' or model=='end_date':
 			new_query_string+="&"+model+"="+value[0]
 		else:
@@ -63,6 +71,30 @@ def translate_query_string(query_string):
 					d=model_class.objects.filter(nombre=b)
 					if len(d) > 0:
 						new_query_string+="&"+model+"="+str(d[0].pk)
+	new_query_string=new_query_string.lstrip("&")
+	return new_query_string
+
+def reverse_translate_query(query):
+	new_query_string=u''
+	for i in query.lists():
+		model=i[0]
+		value=i[1]
+		if model=='start_date':
+			model='desde'
+		if model=='end_date':
+			model='hasta'
+		if model=='desde' or model=='hasta':
+			new_query_string+="&"+model+"="+value[0]
+		else:
+			ctype_list = ContentType.objects.filter(name=model)
+			if len(ctype_list) > 0:
+				ctype=ctype_list[0]
+				model_class=ctype.model_class()
+				for b in value:
+					d=model_class.objects.filter(pk=b)
+					if len(d) > 0:
+						new_query_string+="&"+model+"="+d[0].nombre
+	new_query_string=new_query_string.lstrip("&")
 	return new_query_string
 
 
