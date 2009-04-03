@@ -59,3 +59,56 @@ $(document).ready(function() {
 	});
 
 });
+
+function beforeForm() {
+	$('#AjaxFormSubmit').attr("disabled", "disabled"); //Disable the submit button - can't click twice
+	$('.errorlist').remove(); //Get rid of any old error uls
+	//$('#AjaxFormWarning').fadeOut('slow'); //Get rid of the main error message
+	$('#AjaxFormWarning').html("<img src=\"/media/icons/ajax-loader.gif\" />").fadeIn('slow');
+	$("#AjaxFormWarning").ajaxError(function() {
+		$(this).html("Hay problemas con el red!").fadeIn('slow');
+		$('#AjaxFormSubmit').attr("disabled", "");
+
+	});
+	return true;
+}
+
+$(document).ready(function() {
+	// prepare Options Object 
+	var options = {
+		url: '.',
+		// Here we pass the xhr flag
+		dataType: 'json',
+		success: processJson,
+		//What to call after a reply from Django
+		beforeSubmit: beforeForm
+	};
+	// bind form using ajaxForm 
+	$('#AjaxForm').ajaxForm(options); //My form id is 'AjaxForm'
+});
+
+function processJson(jsondata) {
+	//Do we have any data at all?
+	if (jsondata) {
+		//		e_msg = "We received your form, thank you.";
+		//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
+		if (eval(jsondata.bad)) {
+			e_msg = "Please check your form.";
+			errors = eval(jsondata.errs); //Again with the eval :)
+			$.each(errors,
+			function(fieldname, errmsg) {
+				id = "#id_" + fieldname;
+				$(id).parent().after(errmsg); //I want the error above the <p> holding the field
+			});
+		} else {
+			create_graphs(jsondata);
+
+		}
+	} else {
+		//DON'T PANIC :D
+		$('#AjaxFormWarning').text("Ajax error : no data received. ").fadeIn("slow");
+	}
+	// re-enable the submit button, coz user has to fix stuff.
+	$('#AjaxFormSubmit').attr("disabled", "");
+
+}

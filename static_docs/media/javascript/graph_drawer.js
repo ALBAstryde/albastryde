@@ -1,19 +1,77 @@
-function beforeForm() {
-	$('#AjaxFormSubmit').attr("disabled", "disabled"); //Disable the submit button - can't click twice
-	$('.errorlist').remove(); //Get rid of any old error uls
-	//$('#AjaxFormWarning').fadeOut('slow'); //Get rid of the main error message
-	$('#AjaxFormWarning').html("<img src=\"/media/icons/ajax-loader.gif\" />").fadeIn('slow');
-	$("#AjaxFormWarning").ajaxError(function() {
-		$(this).html("Hay problemas con el red!").fadeIn('slow');
-		$('#AjaxFormSubmit').attr("disabled", "");
-
-	});
-	return true;
-}
-
 var e_msg, errors;
 //var datapoint_dictionary,comments;
-function processJson(jsondata) {
+
+function create_graphs(jsondata) {
+	if (jsondata.comments) {
+		comments = jsondata.comments;
+		has_comments = true;
+	} else {
+		comments = {};
+		has_comments = false;
+	}
+	//		e_msg = "Checked for comments.";
+	//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
+	raw_graphs = eval(jsondata.graphs).sort();
+	//		e_msg = "Raw graphs OK.";
+	//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
+	converted_graphs = convert_graphs_after_transport(raw_graphs);
+	//		e_msg = "Converted graphs.";
+	//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
+	if (converted_graphs.length === 0) {
+		e_msg = "No hay datos para la seleccion!";
+		$('#AjaxFormWarning').text(e_msg).fadeIn("slow");
+		$('#AjaxFormSubmit').attr("disabled", "");
+		return true;
+	}
+	datapoint_dictionary = calculate_datapoint_dictionary(converted_graphs);
+	headline = jsondata.headline;
+
+	query_id = String(new Date().getTime());
+	var graph_html = draw_graph_structure(query_id, headline, has_comments, user_can_add, user_logged_in);
+	$("#GraphsHeader").after(graph_html);
+
+	make_graphs(converted_graphs);
+	e_msg = "Nuevo gráfico generado.";
+
+	//Show the message
+	$('#AjaxFormWarning').text(e_msg).fadeIn("slow");
+
+	//Calculate other graphs	
+	normalized_graphs = calculate_normalizedgraphs(converted_graphs);
+
+	if (includes_currency_graphs) {
+		dollargraphs = calculate_currencygraphs(eval(jsondata.dollar), converted_graphs);
+		eurographs = calculate_currencygraphs(eval(jsondata.euro), converted_graphs);
+		normalized_dollargraphs = calculate_normalizedgraphs(dollargraphs);
+		normalized_eurographs = calculate_normalizedgraphs(eurographs);
+	}
+
+	$("select." + query_id + "graphkind").change(function() {
+		var xunits;
+		var xunits_selector = $("select#" + query_id + "xunits");
+		if (xunits_selector.length > 0) {
+			xunits = xunits_selector.val();
+		} else {
+			xunits = 'other';
+		}
+		var xtype = $("select#" + query_id + "xtype").val();
+		if ((xunits == 'cordobas' || xunits == 'other') && xtype == 'real') {
+			make_graphs(converted_graphs);
+		} else if (xunits == 'dollars' && xtype == 'real') {
+			make_graphs(dollargraphs);
+		} else if (xunits == 'euros' && xtype == 'real') {
+			make_graphs(eurographs);
+		} else if ((xunits == 'cordobas' || xunits == 'other') && xtype == 'normalized') {
+			make_graphs(normalized_graphs);
+		} else if (xunits == 'dollars' && xtype == 'normalized') {
+			make_graphs(normalized_dollargraphs);
+		} else if (xunits == 'euros' && xtype == 'normalized') {
+			make_graphs(normalized_eurographs);
+		} else {
+			make_graphs(converted_graphs);
+		}
+	});
+
 	var query_id, id, headline, comment_counter, has_comments, plot, comment_form_open, comments, datapoint_dictionary, graph_height, graph_margin_bottom;
 	var raw_graphs, converted_graphs, dollargraphs, eurographs, normalized_graphs, normalized_dollargraphs, normalized_eurographs;
 	var includes_currency_graphs;
@@ -68,8 +126,8 @@ function processJson(jsondata) {
 			//		e_msg = "Going through each graph."+String(data);
 			//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
 			if (data.length > 0) {
-				start_value=data[0][1];
-				start_date=data[0][0];
+				start_value = data[0][1];
+				start_date = data[0][0];
 				$.each(data,
 				function() {
 					var pk, value, time, new_time;
@@ -80,8 +138,8 @@ function processJson(jsondata) {
 					new_data.push([new_time, value, pk]);
 				});
 			} else {
-				start_value=max_data[0][1];
-				start_date=max_data[0][0];
+				start_value = max_data[0][1];
+				start_date = max_data[0][0];
 				var new_max_data = [],
 				new_min_data = [];
 				$.each(max_data,
@@ -124,8 +182,8 @@ function processJson(jsondata) {
 				'bars': {},
 				'lines': {},
 				'points': {},
-				'start_value':start_value,
-				'start_date':start_date
+				'start_value': start_value,
+				'start_date': start_date
 			};
 			if (tipo == 'precio') {
 				new_graph.lines = {
@@ -153,10 +211,14 @@ function processJson(jsondata) {
 					'clickable': false,
 					'shadowSize': 0,
 					'bars': {},
-					'points': {'show':false},
-					'lines': {'fill':true},
-					'start_value':start_value,
-					'start_date':start_date
+					'points': {
+						'show': false
+					},
+					'lines': {
+						'fill': true
+					},
+					'start_value': start_value,
+					'start_date': start_date
 				};
 				new_graphs.push(new_fill_graph);
 				var new_shadow_graph = {
@@ -169,11 +231,13 @@ function processJson(jsondata) {
 					'hoverable': false,
 					'clickable': false,
 					'bars': {},
-					'points': {'show':false},
+					'points': {
+						'show': false
+					},
 					'lines': {},
 					'shadowSize': 3,
-					'start_value':start_value,
-					'start_date':start_date
+					'start_value': start_value,
+					'start_date': start_date
 				};
 				new_graphs.push(new_shadow_graph);
 			}
@@ -215,7 +279,7 @@ function processJson(jsondata) {
 			var hoverable = this.hoverable;
 			var shadowSize = this.shadowSize;
 			var start_date = this.start_date;
-			var start_value = currency_dic[String(start_date)]*this.start_value;
+			var start_value = currency_dic[String(start_date)] * this.start_value;
 			if (unit == 'cordoba') {
 				var currency_data = [];
 				$.each(data,
@@ -938,109 +1002,4 @@ function processJson(jsondata) {
 
 	}
 
-	//Do we have any data at all?
-	if (jsondata) {
-		//		e_msg = "We received your form, thank you.";
-		//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
-		if (eval(jsondata.bad)) {
-			e_msg = "Please check your form.";
-			errors = eval(jsondata.errs); //Again with the eval :)
-			$.each(errors,
-			function(fieldname, errmsg) {
-				id = "#id_" + fieldname;
-				$(id).parent().after(errmsg); //I want the error above the <p> holding the field
-			});
-		} else {
-			if (jsondata.comments) {
-				comments = jsondata.comments;
-				has_comments = true;
-			} else {
-				comments = {};
-				has_comments = false;
-			}
-			//		e_msg = "Checked for comments.";
-			//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
-			raw_graphs = eval(jsondata.graphs).sort();
-			//		e_msg = "Raw graphs OK.";
-			//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
-			converted_graphs = convert_graphs_after_transport(raw_graphs);
-			//		e_msg = "Converted graphs.";
-			//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
-			if (converted_graphs.length === 0) {
-				e_msg = "No hay datos para la seleccion!";
-				$('#AjaxFormWarning').text(e_msg).fadeIn("slow");
-				$('#AjaxFormSubmit').attr("disabled", "");
-				return true;
-			}
-			datapoint_dictionary = calculate_datapoint_dictionary(converted_graphs);
-			headline = jsondata.headline;
-
-			query_id = String(new Date().getTime());
-			var graph_html = draw_graph_structure(query_id, headline, has_comments, user_can_add, user_logged_in);
-			$("#GraphsHeader").after(graph_html);
-
-			make_graphs(converted_graphs);
-			e_msg = "Nuevo gráfico generado.";
-
-			//Show the message
-			$('#AjaxFormWarning').text(e_msg).fadeIn("slow");
-
-			//Calculate other graphs	
-			normalized_graphs = calculate_normalizedgraphs(converted_graphs);
-
-			if (includes_currency_graphs) {
-				dollargraphs = calculate_currencygraphs(eval(jsondata.dollar), converted_graphs);
-				eurographs = calculate_currencygraphs(eval(jsondata.euro), converted_graphs);
-				normalized_dollargraphs = calculate_normalizedgraphs(dollargraphs);
-				normalized_eurographs = calculate_normalizedgraphs(eurographs);
-			}
-
-			$("select." + query_id + "graphkind").change(function() {
-				var xunits;
-				var xunits_selector = $("select#" + query_id + "xunits");
-				if (xunits_selector.length > 0) {
-					xunits = xunits_selector.val();
-				} else {
-					xunits = 'other';
-				}
-				var xtype = $("select#" + query_id + "xtype").val();
-				if ((xunits == 'cordobas' || xunits == 'other') && xtype == 'real') {
-					make_graphs(converted_graphs);
-				} else if (xunits == 'dollars' && xtype == 'real') {
-					make_graphs(dollargraphs);
-				} else if (xunits == 'euros' && xtype == 'real') {
-					make_graphs(eurographs);
-				} else if ((xunits == 'cordobas' || xunits == 'other') && xtype == 'normalized') {
-					make_graphs(normalized_graphs);
-				} else if (xunits == 'dollars' && xtype == 'normalized') {
-					make_graphs(normalized_dollargraphs);
-				} else if (xunits == 'euros' && xtype == 'normalized') {
-					make_graphs(normalized_eurographs);
-				} else {
-					make_graphs(converted_graphs);
-				}
-			});
-
-		}
-	} else {
-		//DON'T PANIC :D
-		$('#AjaxFormWarning').text("Ajax error : no data received. ").fadeIn("slow");
-	}
-	// re-enable the submit button, coz user has to fix stuff.
-	$('#AjaxFormSubmit').attr("disabled", "");
-
 }
-
-$(document).ready(function() {
-	// prepare Options Object 
-	var options = {
-		url: '.',
-		// Here we pass the xhr flag
-		dataType: 'json',
-		success: processJson,
-		//What to call after a reply from Django
-		beforeSubmit: beforeForm
-	};
-	// bind form using ajaxForm 
-	$('#AjaxForm').ajaxForm(options); //My form id is 'AjaxForm'
-});
