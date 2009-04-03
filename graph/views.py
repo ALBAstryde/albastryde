@@ -39,10 +39,31 @@ def show_form(request,query_set=None,javascript=False,model=None):
 
 def show_graph(request,query_string):
 	user = request.user
-	query = QueryDict(query_string)
+	new_query_string = translate_query_string(query_string)
+	query = QueryDict(new_query_string)
 	rdict = build_graph(query,user)
 	json = simplejson.dumps(rdict, ensure_ascii=False)
 	return render_to_response("/graph.html", {"request":request,"json":json,"menu_list":menu_list})	
+
+
+def translate_query_string(query_string):
+	word_query=QueryDict(query_string)
+	new_query_string=''
+	for i in word_query.lists():
+		model= i[0]
+		value=i[1]
+		if model=='start_date' or model=='end_date':
+			new_query_string+="&"+model+"="+value[0]
+		else:
+			ctype_list = ContentType.objects.filter(name=model)
+			if len(ctype_list) > 0:
+				ctype=ctype_list[0]
+				model_class=ctype.model_class()
+				for b in value:
+					d=model_class.objects.filter(nombre=b)
+					if len(d) > 0:
+						new_query_string+="&"+model+"="+str(d[0].pk)
+	return new_query_string
 
 
 def build_graph(query,user):
