@@ -1,7 +1,7 @@
 var e_msg, errors;
 //var datapoint_dictionary,comments;
 
-function create_graphs(jsondata) {
+function create_graphs(jsondata,close_button) {
 	if (jsondata.comments) {
 		comments = jsondata.comments;
 		has_comments = true;
@@ -694,7 +694,9 @@ function create_graphs(jsondata) {
 		var graph_html = '';
 		graph_html += '<div id="' + query_id + '" class="graph" style="position:relative;">';
 		graph_html += '<h2 id="' + query_id + 'headline" >';
-		graph_html += '<img id="' + query_id + 'close" src="/media/icons/close.png" /> ';
+		if (close_button) {
+			graph_html += '<img id="' + query_id + 'close" src="/media/icons/close.png" /> ';
+		}
 		graph_html += headline;
 		//                graph_html+=' <img id="'+query_id+'tablelink" src="/media/icons/spreadsheet.png"  />';
 		//		graph_html+='<img src="/media/icons/print.png" />';

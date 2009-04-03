@@ -1,15 +1,33 @@
 {% extends "/base_graph.html" %}
-
 {% block extrastatisticsheader %}
-
-
-
 <script language="javascript" type="text/javascript">
+var jsondata={{json|safe}};
+
+$(document).ready(function() {
+	//Do we have any data at all?
+	if (jsondata) {
+		if (eval(jsondata.bad)) {
+			$('#Warning').text("Por favor, cheque la URL.");
+			errors = eval(jsondata.errs); 
+			$.each(errors,
+			function(fieldname, errmsg) {
+				$('#Warning').after(fieldname+": "+errmsg); 
+			});
+		} else {
+			create_graphs(jsondata,false);
+		}
+	} else {
+		//DON'T PANIC :D
+		$('#Warning').text("Por favor, cheque la URL.").fadeIn("slow");
+	}
+});
 </script>
 
 
 {% endblock %}
 {% block contents %}
+<div id="Warning"></div>
 
+<div id="GraphsHeader"></div>
 
 {% endblock %}

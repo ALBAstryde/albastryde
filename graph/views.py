@@ -34,14 +34,15 @@ def show_form(request,query_set=None,javascript=False,model=None):
 			username = request.user.get_full_name()
 			if username=="":
 				username = request.user.username
-		form =DbForm()
+		form = DbForm()
 		return render_to_response("/graph_form.html", {"form":form,"request":request,"menu_list":menu_list,"username":username})	
 
 def show_graph(request,query_string):
 	user = request.user
 	query = QueryDict(query_string)
 	rdict = build_graph(query,user)
-	return render_to_response("/graph.html", {"request":request,"rdict":rdict,"menu_list":menu_list,"username":username})	
+	json = simplejson.dumps(rdict, ensure_ascii=False)
+	return render_to_response("/graph.html", {"request":request,"json":json,"menu_list":menu_list})	
 
 
 def build_graph(query,user):

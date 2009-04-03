@@ -14,15 +14,9 @@ def gotowiki(request):
 	return HttpResponseRedirect("/wiki/"+settings.WIKI_STARTPAGE)
 
 urlpatterns = patterns('',
-    # Example:
-#   (r'^albastryde/', include('albastryde.foo.urls')),
-
-    # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
-    # to INSTALLED_APPS to enable admin documentation:
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
     (r'^admin/(.*)', admin.site.root),
+
     (r'^wiki/searchresults/$', 'albastryde.wiki.views.search_page'),
     (r'^wiki/list/$', 'albastryde.wiki.views.list_page'),
     (r'^wiki/(?P<page_name>[^/]+)/$', 'albastryde.wiki.views.view_page'),
@@ -35,11 +29,8 @@ urlpatterns = patterns('',
     (r'^js/wiki/(?P<page_name>[^/]+)/$', 'albastryde.wiki.views.view_page',{'javascript':True}),
     (r'^js$', gotowiki),
     (r'^js/wiki/$', gotowiki),
-#    (r'^js/wiki/(?P<page_name>[^/]+)/edit/$', 'albastryde.wiki.views.edit_page',{'javascript':True}),
-#    (r'^js/wiki/(?P<page_name>[^/]+)/save/$', 'albastryde.wiki.views.save_page',{'javascript':True}),
-    (r'^estadisticas/(?P<query_string>[^/]+)/$', 'albastryde.graph.views.show_graph'),
+    (r'^estadisticas/(?P<query_string>.+)$', 'albastryde.graph.views.show_graph'),
     (r'^estadisticas/$', 'albastryde.graph.views.show_form'),
-#    (r'^js/estadisticas/$', 'albastryde.graph.views.show_form',{'javascript':True}),
     (r'^comments/', include('django.contrib.comments.urls')),
      (r'^ajax/', include('albastryde.ajax_comments.urls')),
     (r'^accounts/', include('registration.urls')),
