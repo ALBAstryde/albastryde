@@ -1,29 +1,14 @@
 # -*- coding: utf-8 -*-
 
-
-# models.py
 import datetime
 import markdown
 from django.db import models
-from albastryde import djangosearch
+import djangosearch
 from django.conf import settings
-from wiki import albamarkup
+from wiki.albamarkup import albamarkup
 import unicodedata
 from django import forms  
-from django.forms import ValidationError
-#from wiki.forms import PaginaForm
-# Create your models here.
 
-def markdown_to_html( markdownText, images ):
-    image_ref_list = []
-    for image in images:
-        image_url = image.imagen.url
-        image_md = u"!["+image.nombre+"]("+str(image_url)+")" 
-        image_ref = u"!["+image.nombre +"]"
-        markdownText=markdownText.replace(image_ref,image_md)
-    markdownText = albamarkup.ApplyMarkup(markdownText)
-    html = markdown.markdown( markdownText )
-    return html
 
 class Imagen( models.Model ):
 	nombre = models.CharField( max_length=100 )
@@ -43,8 +28,22 @@ class Pagina(models.Model):
 	def __unicode__( self ):
         	return self.nombre
 
- 	def body_html( self ):
-        	return markdown_to_html( self.contenido, self.imagenes.all() )
+	def markdown_to_html( self ):
+		markdownText= self.contenido
+		images = self.imagenes.all()
+    		image_ref_list = []
+    		for image in images:
+        		image_url = image.imagen.url
+        		image_md = u"!["+image.nombre+"]("+str(image_url)+")" 
+        		image_ref = u"!["+image.nombre +"]"
+        		markdownText=markdownText.replace(image_ref,image_md)
+    		albatranslator=albamarkup(markdownText)
+    		markdownText = albatranslator.returntext
+    		html = markdown.markdown( markdownText )
+		self.json_data = albatranslator.json_data
+		self.body_html = html
+    		return True
+
 
 #	def standardize_nombre(self):
 #        	unspanish_nombre=unicodedata.normalize('NFKD', unicode(self.nombre.strip())).encode('ascii','ignore')

@@ -1,7 +1,23 @@
-{% extends '/base.html' %}
+{% extends '/base_graph.html' %}
 {% block title %}
 {{ page_name }}
 {% endblock %}
+
+{% block extrastatisticsheader %}
+<script language="javascript" type="text/javascript">
+{{ json_data|safe }}
+
+$(document).ready(function() {
+	$('div.graph').each(function (index,domEle) {
+		var graph_name=$(domEle).attr('id');
+		var graph_data=eval(graph_name);
+		create_graphs(graph_data,false,'#'+graph_name);
+	});
+});
+
+</script>
+{% endblock %}
+
 {% block headline %}
 {{ page_name }}
 {% endblock %}
@@ -9,5 +25,5 @@
 {% if can_change %}
 <a href="/admin/wiki/pagina/{{pk}}/">Editar</a><br />
 {% endif %}
-{{ content|safe }}
+{{ body_html|safe }}
 {% endblock %}
