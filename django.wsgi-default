@@ -6,7 +6,6 @@ sys.path.append(SITE_ROOT)
 sys.path.append(SITE_ROOT+'/albastryde')
 sys.path.append(SITE_ROOT+'/albastryde/wiki')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'albastryde.settings'
-os.environ['MPLCONFIGDIR'] = SITE_ROOT+"/albastryde/media/cache/" 
 import django.core.handlers.wsgi
 
 application = django.core.handlers.wsgi.WSGIHandler()
