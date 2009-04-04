@@ -57,6 +57,13 @@ user_can_add_flag=true;
 {% else %}
 user_can_add_flag=false;
 {% endif %}
+{% if request.user.has_perm('wiki.change_pagina') %}
+can_edit_wiki=true;
+{% elif request.user.has_perm('wiki.add_pagina') %}
+can_edit_wiki=true;
+{% else %}
+can_edit_wiki=false;
+{% endif %}
 </script>
 {% block extrastatisticsheader %}
 {% endblock %}

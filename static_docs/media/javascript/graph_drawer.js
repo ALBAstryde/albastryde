@@ -690,6 +690,9 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		graph_html += '</h2>';
 		if (jsondata.query_link) {
 			graph_html += '<p><a href="/estadisticas/'+jsondata.query_link+'">enlace permanente</a></p>';
+			if (can_edit_wiki) {
+				graph_html += '<p>Codigo para incluir en el wiki: <b>_estadisticas['+jsondata.query_link+']</b></p>';
+			}
 		}
 		//		var icon_width=0;
 		//                graph_html+="<img id=\""+query_id+"print\" src=\"/media/icons/print.png\"/ style=\"position:absolute;left:"+icon_width+"px;top:0px;\" />";
