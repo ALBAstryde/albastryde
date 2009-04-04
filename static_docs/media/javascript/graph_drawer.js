@@ -689,9 +689,11 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		//		graph_html+='<img src="/media/icons/print.png" />';
 		graph_html += '</h2>';
 		if (jsondata.query_link) {
-			graph_html += '<p><a href="/estadisticas/'+jsondata.query_link+'">enlace permanente</a></p>';
+			graph_html += '<p><a href="/estadisticas/'+jsondata.query_link+'" target+"_blank">enlace permanente</a></p>';
+		}
+		if (jsondata.wiki_code) {
 			if (can_edit_wiki) {
-				graph_html += '<p>Codigo para incluir en el wiki: <b>_estadisticas['+jsondata.query_link+']</b></p>';
+				graph_html += '<p>Codigo para incluir en pagina de wiki:<br /><b>_estadisticas['+jsondata.wiki_code+']</b></p>';
 			}
 		}
 		//		var icon_width=0;
