@@ -1,5 +1,4 @@
 var e_msg, errors;
-//var datapoint_dictionary,comments;
 
 function create_graphs(jsondata,close_button,graphsheader) {
 	if (jsondata.comments) {
@@ -9,14 +8,8 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		comments = {};
 		has_comments = false;
 	}
-	//		e_msg = "Checked for comments.";
-	//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
 	raw_graphs = eval(jsondata.graphs).sort();
-	//		e_msg = "Raw graphs OK.";
-	//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
 	converted_graphs = convert_graphs_after_transport(raw_graphs);
-	//		e_msg = "Converted graphs.";
-	//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
 	if (converted_graphs.length === 0) {
 		e_msg = "No hay datos para la seleccion!";
 		$('#AjaxFormWarning').text(e_msg).fadeIn("slow");
@@ -123,8 +116,6 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			if (! (tipo in tipos_graficos)) {
 				tipos_graficos[tipo] = unit;
 			}
-			//		e_msg = "Going through each graph."+String(data);
-			//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
 			if (data.length > 0) {
 				start_value = data[0][1];
 				start_date = data[0][0];
@@ -491,11 +482,9 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			function() {
 				var total_pk, this_unique_pk, this_comment_pk;
 				if (! (comment_form_open)) {
-					//	    		comment_form_open=true;
 					total_pk = $(this).attr('id').split('+');
 					this_unique_pk = total_pk[0];
 					this_comment_pk = total_pk[1];
-					//	    		alert( $(this).text() +" "+unique_pk + " " + this_unique_pk +" "+ this_comment_pk);
 					create_comment_form(this_unique_pk, this_comment_pk);
 				}
 			});
@@ -529,9 +518,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		comment_form_open = true;
 		timestamp = parseInt(new Date().getTime().toString().substring(0, 10), 10);
 		if (comment_pk) {
-			//    var comment_text=comments[unique_pk][comment_pk];
 			var comment_text = comments[unique_pk][comment_pk][0];
-			//    var comment_author=comments[unique_pk][comment_pk][1];
 		}
 		var label = datapoint_dictionary[unique_pk][3];
 		if (label.length === 0) {
@@ -994,13 +981,6 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		$("#" + query_id + "stats").bind("plotclick",
 		function(event, pos, item) {
 			if ((item) && (!(comment_form_open))) {
-				//	    var theDate = new Date(item.datapoint[0]); 
-				//	    var date = theDate.toDateString(); 
-				//	    var label=item.series.label;
-				//	    if (label.length===0) {
-				//		label='producto';
-				//	    }
-				//	    create_comment_form(item.datapoint[2],label,item.datapoint[1],date);
 				create_comment_form(item.datapoint[2]);
 			}
 		});

@@ -30,9 +30,17 @@ def translate_query_string(query_string):
 				ctype=ctype_list[0]
 				model_class=ctype.model_class()
 				for b in value:
-					d=model_class.objects.filter(nombre=b)
+					d=model_class.objects.filter(nombre__startswith=b)
 					if len(d) > 0:
 						new_query_string+="&"+model+"="+str(d[0].pk)
+					else:
+						try:
+							int(b)
+							e=model_class.objects.filter(pk=int(b))
+							if len(e) > 0:
+								new_query_string+="&"+model+"="+str(b)
+						except ValueError:
+							pass
 	new_query_string=new_query_string.lstrip("&")
 	return new_query_string
 
