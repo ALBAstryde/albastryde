@@ -25,7 +25,7 @@ def translate_query_string(query_string):
 		if model=='start_date' or model=='end_date':
 			new_query_string+="&"+model+"="+value[0]
 		else:
-			ctype_list = ContentType.objects.filter(name=model)
+			ctype_list = ContentType.objects.filter(model=model)
 			if len(ctype_list) > 0:
 				ctype=ctype_list[0]
 				model_class=ctype.model_class()
@@ -56,7 +56,7 @@ def reverse_translate_query(query):
 		if model=='desde' or model=='hasta':
 			new_query_string+="&"+model+"="+value[0]
 		else:
-			ctype_list = ContentType.objects.filter(name=model)
+			ctype_list = ContentType.objects.filter(model=model)
 			if len(ctype_list) > 0:
 				ctype=ctype_list[0]
 				model_class=ctype.model_class()
@@ -87,12 +87,12 @@ def build_graph(query,user):
 		graphs=[]
 		mercados = form.cleaned_data['mercado']
 		productos = form.cleaned_data['producto']
-		lluvias = form.cleaned_data['lluvia']
+		estaciones_de_lluvia = form.cleaned_data['estaciondelluvia']
 		start_date = form.cleaned_data['start_date']
 		end_date = form.cleaned_data['end_date']
 		mercado_count=len(mercados)
 		producto_count=len(productos)
-		lluvia_count=len(lluvias)
+		lluvia_count=len(estaciones_de_lluvia)
 		if mercado_count > 0 and producto_count > 0:
 			dollar={'unit':'USD'}
 			euro={'unit':'Euro'}			
@@ -103,7 +103,7 @@ def build_graph(query,user):
 				graph,dollar,euro,pk_list,first_date,last_date=price_graph(mercado=i,producto=b,start_date=start_date,end_date=end_date,mercado_count=mercado_count,producto_count=producto_count,dollar=dollar,euro=euro,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=pricectype)
 				if not graph==None:
 					graphs.append(graph)
-		for c in lluvias:
+		for c in estaciones_de_lluvia:
 			graph,pk_list,first_date,last_date=lluvia_graph(lluvia=c,start_date=start_date,end_date=end_date,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=lluviactype)
 			if not graph==None:
 				graphs.append(graph)							
@@ -127,7 +127,7 @@ def build_graph(query,user):
 				producto_name="Unos productos"
 			precio_name=producto_name+" en "+mercado_name 
 		if lluvia_count > 0:
-			for i in lluvias:
+			for i in estaciones_de_lluvia:
 				lluvia_name+=i.nombre.title()+", "
 			lluvia_name=lluvia_name.strip(", ")
 		headline=""

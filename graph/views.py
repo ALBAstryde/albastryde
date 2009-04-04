@@ -21,6 +21,8 @@ def show_form(request,query_set=None,javascript=False,model=None):
 		user = request.user
 		rdict = build_graph(query,user)
 		wiki_code=reverse_translate_query(query)
+		wiki_code+=" | "+query.urlencode()
+#		wiki_code=query.urlencode()
 		rdict['wiki_code']=wiki_code
 		rdict['query_link']=b64encode(smart_str(query.urlencode()))
 		json = simplejson.dumps(rdict, ensure_ascii=False)
