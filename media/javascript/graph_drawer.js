@@ -2,7 +2,7 @@ var e_msg, errors;
 
 function create_graphs(jsondata,close_button,graphsheader) {
 	var query_id, id, headline, comment_counter, has_comments, plot, comment_form_open, comments, datapoint_dictionary, graph_height, graph_margin_bottom;
-	var raw_graphs, converted_graphs, dollargraphs, eurographs, normalized_graphs, normalized_dollargraphs, normalized_eurographs,color_counter=0;
+	var raw_graphs, converted_graphs, dollargraphs, eurographs, normalized_graphs, normalized_dollargraphs, normalized_eurographs,color_counter=0,all_lluvias,all_mercados,all_productos;
 	comment_form_open = false;
 	if (jsondata.comments) {
 		comments = jsondata.comments;
@@ -27,14 +27,14 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		converted_graphs=converted_graphs.concat(median_producto_graphs);
 	}
 	if (all_mercados.length>1) {
-		median_mercado_graphs=calculate_mediangraphs(converted_graphs,'mercado');
+		var median_mercado_graphs=calculate_mediangraphs(converted_graphs,'mercado');
 		converted_graphs=converted_graphs.concat(median_mercado_graphs);
 		if (all_productos.length>1) {
 			for (i in median_mercado_graphs) {
 				median_mercado_graphs[i].producto='1';
 				median_mercado_graphs[i].relevance='main';
 			}
-			median_mercado_producto_graphs=calculate_mediangraphs(median_mercado_graphs,'producto');
+			var median_mercado_producto_graphs=calculate_mediangraphs(median_mercado_graphs,'producto');
 			if (median_mercado_producto_graphs.length>0) {
 				median_mercado_producto_graphs[0].advanced_label='mediano de todos los mercados y todos los productos';
 				median_mercado_producto_graphs[0].label='mediano de todos los mercados y todos los productos (cordoba)';
@@ -402,6 +402,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			}
 		});
 		var new_graphs_list=[],graph_time_dic,graph_counter,empty_values,data_string,value_string,graph_counter,time_item,counter,search_counter,i,median_value,start_value,start_date;
+		var graph_time_data,graph_time_data_list,date_item,graph_item,median_variable_item,new_graph,total_value;
 		for (median_variable_item in graph_dic) {
 			if (graph_dic[median_variable_item].length > 1) {
 				graph_time_dic={};
