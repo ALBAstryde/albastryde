@@ -35,10 +35,12 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				median_mercado_graphs[i].relevance='main';
 			}
 			median_mercado_producto_graphs=calculate_mediangraphs(median_mercado_graphs,'producto');
-			median_mercado_producto_graphs[0].advanced_label='mediano de todos los mercados y todos los productos';
-			median_mercado_producto_graphs[0].label='mediano de todos los mercados y todos los productos (cordoba)';
-			median_mercado_producto_graphs[0].producto=null;
-			converted_graphs=converted_graphs.concat(median_mercado_producto_graphs);
+			if (median_mercado_producto_graphs.length>0) {
+				median_mercado_producto_graphs[0].advanced_label='mediano de todos los mercados y todos los productos';
+				median_mercado_producto_graphs[0].label='mediano de todos los mercados y todos los productos (cordoba)';
+				median_mercado_producto_graphs[0].producto=null;
+				converted_graphs=converted_graphs.concat(median_mercado_producto_graphs);
+			}
 		}
 	}
 	converted_graphs.yaxis=yaxis;
@@ -401,97 +403,98 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		});
 		var new_graphs_list=[],graph_time_dic,graph_counter,empty_values,data_string,value_string,graph_counter,time_item,counter,search_counter,i,median_value,start_value,start_date;
 		for (median_variable_item in graph_dic) {
-			graph_time_dic={};
-			graph_counter=0;
-			empty_values=0;
-			for (graph_item in graph_dic[median_variable_item]) {
-				for (date_item in graph_dic[median_variable_item][graph_item]['data']) {
-					data_string=graph_dic[median_variable_item][graph_item]['data'][date_item][0];
-					value_string=graph_dic[median_variable_item][graph_item]['data'][date_item][1];
-					if (data_string in graph_time_dic) {
-						empty_values=graph_counter - graph_time_dic[data_string].length;
-					} else {
-						if (graph_counter===0) {
-							graph_time_dic[data_string]=[value_string];
-							empty_values=-1;
+			if (graph_dic[median_variable_item].length > 1) {
+				graph_time_dic={};
+				graph_counter=0;
+				empty_values=0;
+				for (graph_item in graph_dic[median_variable_item]) {
+					for (date_item in graph_dic[median_variable_item][graph_item]['data']) {
+						data_string=graph_dic[median_variable_item][graph_item]['data'][date_item][0];
+						value_string=graph_dic[median_variable_item][graph_item]['data'][date_item][1];
+						if (data_string in graph_time_dic) {
+							empty_values=graph_counter - graph_time_dic[data_string].length;
 						} else {
-							graph_time_dic[data_string]=[null];
-							empty_values=graph_counter-1;
-						}
-					}
-					if (empty_values>-1) {
-						for ( i = 0 ; i < empty_values ; i++ ) {
-							graph_time_dic[data_string].push(null);
-						}
-						graph_time_dic[data_string].push(value_string);
-					}
-				}
-				graph_counter+=1;
-			}
-			graph_counter-=1;
-			for (time_item in graph_time_dic) { // filling in zeroes (null) at end
-				empty_values=(graph_counter+1)-graph_time_dic[time_item].length;
-				for ( i = 0 ; i < empty_values ; i++ ) {
-					graph_time_dic[time_item].push(null);
-				}
-			} 
-			graph_time_data_list=[];
-			for (time_item in graph_time_dic) {
-				graph_time_data_list.push([time_item,graph_time_dic[time_item]]);
-			}
-			graph_time_data_list=graph_time_data_list.sort();
-			graph_time_data=[];
-			for ( counter = 0 ; counter < graph_time_data_list.length ; counter++ ) {
-				total_value=0;
-				for (i in graph_time_data_list[counter][1]) {
-					if (graph_time_data_list[counter][1][i]==null) {
-						if (counter===0) {
-							for ( search_counter = 0; search_counter < graph_time_data_list.length ; search_counter++) {
-								if (!(graph_time_data_list[search_counter][1][i]==null)) {
-									graph_time_data_list[0][1][i]=graph_time_data_list[search_counter][1][i];									
-									break;
-								}
+							if (graph_counter===0) {
+								graph_time_dic[data_string]=[value_string];
+								empty_values=-1;
+							} else {
+								graph_time_dic[data_string]=[null];
+								empty_values=graph_counter-1;
 							}
-						} else {
-							graph_time_data_list[counter][1][i]=graph_time_data_list[counter-1][1][i];
 						}
-					} 
-					total_value+=graph_time_data_list[counter][1][i];						
-				} 
-				median_value=total_value/(graph_counter+1);
-				graph_time_data.push([parseInt(graph_time_data_list[counter][0]),median_value]);
-				if (counter===0) {
-					start_value=median_value;
-					start_date=parseInt(graph_time_data_list[counter][0])/1000000;
+						if (empty_values>-1) {
+							for ( i = 0 ; i < empty_values ; i++ ) {
+								graph_time_dic[data_string].push(null);
+							}
+							graph_time_dic[data_string].push(value_string);
+						}
+					}
+					graph_counter+=1;
 				}
+				graph_counter-=1;
+				for (time_item in graph_time_dic) { // filling in zeroes (null) at end
+					empty_values=(graph_counter+1)-graph_time_dic[time_item].length;
+					for ( i = 0 ; i < empty_values ; i++ ) {
+						graph_time_dic[time_item].push(null);
+					}
+				} 
+				graph_time_data_list=[];
+				for (time_item in graph_time_dic) {
+					graph_time_data_list.push([time_item,graph_time_dic[time_item]]);
+				}
+				graph_time_data_list=graph_time_data_list.sort();
+				graph_time_data=[];
+				for ( counter = 0 ; counter < graph_time_data_list.length ; counter++ ) {
+					total_value=0;
+					for (i in graph_time_data_list[counter][1]) {
+						if (graph_time_data_list[counter][1][i]==null) {
+							if (counter===0) {
+								for ( search_counter = 0; search_counter < graph_time_data_list.length ; search_counter++) {
+									if (!(graph_time_data_list[search_counter][1][i]==null)) {
+										graph_time_data_list[0][1][i]=graph_time_data_list[search_counter][1][i];									
+										break;
+									}
+								}
+							} else {
+								graph_time_data_list[counter][1][i]=graph_time_data_list[counter-1][1][i];
+							}
+						} 
+						total_value+=graph_time_data_list[counter][1][i];						
+					} 
+					median_value=total_value/(graph_counter+1);
+					graph_time_data.push([parseInt(graph_time_data_list[counter][0]),median_value]);
+					if (counter===0) {
+						start_value=median_value;
+						start_date=parseInt(graph_time_data_list[counter][0])/1000000;
+					}
+				}
+				var model_graph=graph_dic[median_variable_item][0];
+				new_graph={
+					'points': {
+                                		'show': false
+                                	},
+                                	'lines': {
+						'show':true,
+                                		'fill': false
+                                	},
+					'hoverable': false,
+					'clickable': false,		
+					'start_date': start_date,		
+					'start_value': start_value,		
+					'unit': model_graph.unit,
+					'tipo': model_graph.tipo,
+					'yaxis': model_graph.yaxis,
+					'relevance': 'mediano',
+					'color': color_counter
+				};
+				color_counter += 1;
+				new_graph.data=graph_time_data;
+				new_graph[median_variable]=median_variable_item;
+				new_graph.label=median_variable_item+" mediano ("+model_graph.unit+")";
+				new_graph.advanced_label=median_variable_item+" mediano";
+				new_graphs_list.push(new_graph);
 			}
-			var model_graph=graph_dic[median_variable_item][0];
-			new_graph={
-				'points': {
-                                	'show': false
-                                },
-                                'lines': {
-					'show':true,
-                                	'fill': false
-                                },
-				'hoverable': false,
-				'clickable': false,		
-				'start_date': start_date,		
-				'start_value': start_value,		
-				'unit': model_graph.unit,
-				'tipo': model_graph.tipo,
-				'yaxis': model_graph.yaxis,
-				'relevance': 'mediano',
-				'color': color_counter
-			};
-			color_counter += 1;
-			new_graph.data=graph_time_data;
-			new_graph[median_variable]=median_variable_item;
-			new_graph.label=median_variable_item+" mediano ("+model_graph.unit+")";
-			new_graph.advanced_label=median_variable_item+" mediano";
-			new_graphs_list.push(new_graph);
 		}
-		
 		return new_graphs_list;
 		
 	}

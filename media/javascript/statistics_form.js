@@ -4,7 +4,7 @@ $.preloadImages = function() {
 	}
 };
 
-$.preloadImages("/media/icons/ajax-loader.gif", "/media/icons/reset.png");
+$.preloadImages("/media/icons/ajax-loader.gif", "/media/icons/reset.png", "/media/icons/close.png");
 
 $(function() {
 	$('#id_StartDate').datePicker({
