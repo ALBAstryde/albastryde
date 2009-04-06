@@ -1,6 +1,9 @@
 var e_msg, errors;
 
 function create_graphs(jsondata,close_button,graphsheader) {
+	var query_id, id, headline, comment_counter, has_comments, plot, comment_form_open, comments, datapoint_dictionary, graph_height, graph_margin_bottom;
+	var raw_graphs, converted_graphs, dollargraphs, eurographs, normalized_graphs, normalized_dollargraphs, normalized_eurographs,color_counter=0;
+	comment_form_open = false;
 	if (jsondata.comments) {
 		comments = jsondata.comments;
 		has_comments = true;
@@ -18,7 +21,28 @@ function create_graphs(jsondata,close_button,graphsheader) {
 	}
 	datapoint_dictionary = calculate_datapoint_dictionary(converted_graphs);
 	headline = jsondata.headline;
-
+	var yaxis=converted_graphs.yaxis,y2axis=converted_graphs.y2axis;
+	if (all_productos.length>1) {
+		var median_producto_graphs=calculate_mediangraphs(converted_graphs,'producto');
+		converted_graphs=converted_graphs.concat(median_producto_graphs);
+	}
+	if (all_mercados.length>1) {
+		median_mercado_graphs=calculate_mediangraphs(converted_graphs,'mercado');
+		converted_graphs=converted_graphs.concat(median_mercado_graphs);
+		if (all_productos.length>1) {
+			for (i in median_mercado_graphs) {
+				median_mercado_graphs[i].producto='1';
+				median_mercado_graphs[i].relevance='main';
+			}
+			median_mercado_producto_graphs=calculate_mediangraphs(median_mercado_graphs,'producto');
+			median_mercado_producto_graphs[0].advanced_label='mediano de todos los mercados y todos los productos';
+			median_mercado_producto_graphs[0].label='mediano de todos los mercados y todos los productos (cordoba)';
+			median_mercado_producto_graphs[0].producto=null;
+			converted_graphs=converted_graphs.concat(median_mercado_producto_graphs);
+		}
+	}
+	converted_graphs.yaxis=yaxis;
+	converted_graphs.y2axis=y2axis;
 	query_id = String(new Date().getTime());
 	var graph_html = draw_graph_structure(query_id, headline, has_comments, user_can_add, user_logged_in);
 	$(graphsheader).after(graph_html);
@@ -65,15 +89,12 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		}
 	});
 
-	var query_id, id, headline, comment_counter, has_comments, plot, comment_form_open, comments, datapoint_dictionary, graph_height, graph_margin_bottom;
-	var raw_graphs, converted_graphs, dollargraphs, eurographs, normalized_graphs, normalized_dollargraphs, normalized_eurographs;
-	comment_form_open = false;
 	if ($.browser.msie) {
 		$("div.graph").remove();
 	}
 
 	function convert_graphs_after_transport(graphs) {
-		var new_graphs, tipos_graficos, color_counter = 0;
+		var new_graphs, tipos_graficos;
 		new_graphs = [];
 		tipos_graficos = {};
 		all_productos = [];
@@ -114,10 +135,10 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				}
 				label = producto + ' en ' + mercado + ' (' + unit + ')';
 			} else if (tipo == 'lluvia') {
-				if (!(lluvia in all_lluvias)) {
-					all_lluvia.push(lluvia);
-				}
 				lluvia = this.lluvia;
+				if (!(lluvia in all_lluvias)) {
+					all_lluvias.push(lluvia);
+				}
 				label = 'lluvia en ' + lluvia + ' (' + unit + ')';
 			} else {
 				label = '';
@@ -161,11 +182,11 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				new_shadow_data = new_min_data;
 				new_data = new_max_data.reverse();
 			}
-			var yaxis = 1;
+			var graph_yaxis = 1;
 			var yaxis_finder = 1;
 			for (var item in tipos_graficos) {
 				if (item == tipo) {
-					yaxis = yaxis_finder;
+					graph_yaxis = yaxis_finder;
 				}
 				yaxis_finder += 1;
 			}
@@ -173,7 +194,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				'label': label,
 				'data': new_data,
 				'unit': unit,
-				'yaxis': yaxis,
+				'yaxis': graph_yaxis,
 				'tipo': tipo,
 				'relevance': 'main',
 				'color': color_counter,
@@ -310,6 +331,9 @@ function create_graphs(jsondata,close_button,graphsheader) {
 					label = 'lluvia en ' + lluvia + ' (' + current_unit + ')';
 				}
 			}
+			if ('advanced_label' in this) {
+				label = this.advanced_label+' ('+current_unit+')';
+			}
 			if (! (tipo in tipos_graficos)) {
 				tipos_graficos[tipo] = current_unit;
 			}
@@ -344,6 +368,9 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			} else if (tipo == 'lluvia') {
 				new_graph.lluvia = lluvia;
 			}
+			if ('advanced_label' in this) {
+				new_graph.advanced_label=this.advanced_label;
+			}
 			new_graphs.push(new_graph);
 		});
 		var yaxis = "",
@@ -360,6 +387,113 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		new_graphs.yaxis = yaxis;
 		new_graphs.y2axis = y2axis;
 		return new_graphs.sort();
+	}
+	function calculate_mediangraphs(cordobagraphs,median_variable) {
+		var graph_dic= {};
+		$.each(cordobagraphs, function() {
+			if ((median_variable in this) && (this.relevance=='main')) {
+				if (this[median_variable] in graph_dic) {
+					graph_dic[this[median_variable]].push(this);
+				} else {
+					graph_dic[this[median_variable]]=[this];
+				}
+			}
+		});
+		var new_graphs_list=[],graph_time_dic,graph_counter,empty_values,data_string,value_string,graph_counter,time_item,counter,search_counter,i,median_value,start_value,start_date;
+		for (median_variable_item in graph_dic) {
+			graph_time_dic={};
+			graph_counter=0;
+			empty_values=0;
+			for (graph_item in graph_dic[median_variable_item]) {
+				for (date_item in graph_dic[median_variable_item][graph_item]['data']) {
+					data_string=graph_dic[median_variable_item][graph_item]['data'][date_item][0];
+					value_string=graph_dic[median_variable_item][graph_item]['data'][date_item][1];
+					if (data_string in graph_time_dic) {
+						empty_values=graph_counter - graph_time_dic[data_string].length;
+					} else {
+						if (graph_counter===0) {
+							graph_time_dic[data_string]=[value_string];
+							empty_values=-1;
+						} else {
+							graph_time_dic[data_string]=[null];
+							empty_values=graph_counter-1;
+						}
+					}
+					if (empty_values>-1) {
+						for ( i = 0 ; i < empty_values ; i++ ) {
+							graph_time_dic[data_string].push(null);
+						}
+						graph_time_dic[data_string].push(value_string);
+					}
+				}
+				graph_counter+=1;
+			}
+			graph_counter-=1;
+			for (time_item in graph_time_dic) { // filling in zeroes (null) at end
+				empty_values=(graph_counter+1)-graph_time_dic[time_item].length;
+				for ( i = 0 ; i < empty_values ; i++ ) {
+					graph_time_dic[time_item].push(null);
+				}
+			} 
+			graph_time_data_list=[];
+			for (time_item in graph_time_dic) {
+				graph_time_data_list.push([time_item,graph_time_dic[time_item]]);
+			}
+			graph_time_data_list=graph_time_data_list.sort();
+			graph_time_data=[];
+			for ( counter = 0 ; counter < graph_time_data_list.length ; counter++ ) {
+				total_value=0;
+				for (i in graph_time_data_list[counter][1]) {
+					if (graph_time_data_list[counter][1][i]==null) {
+						if (counter===0) {
+							for ( search_counter = 0; search_counter < graph_time_data_list.length ; search_counter++) {
+								if (!(graph_time_data_list[search_counter][1][i]==null)) {
+									graph_time_data_list[0][1][i]=graph_time_data_list[search_counter][1][i];									
+									break;
+								}
+							}
+						} else {
+							graph_time_data_list[counter][1][i]=graph_time_data_list[counter-1][1][i];
+						}
+					} 
+					total_value+=graph_time_data_list[counter][1][i];						
+				} 
+				median_value=total_value/(graph_counter+1);
+				graph_time_data.push([parseInt(graph_time_data_list[counter][0]),median_value]);
+				if (counter===0) {
+					start_value=median_value;
+					start_date=parseInt(graph_time_data_list[counter][0])/1000000;
+				}
+			}
+			var model_graph=graph_dic[median_variable_item][0];
+			new_graph={
+				'points': {
+                                	'show': false
+                                },
+                                'lines': {
+					'show':true,
+                                	'fill': false
+                                },
+				'hoverable': false,
+				'clickable': false,		
+				'start_date': start_date,		
+				'start_value': start_value,		
+				'unit': model_graph.unit,
+				'tipo': model_graph.tipo,
+				'yaxis': model_graph.yaxis,
+				'relevance': 'mediano',
+				'color': color_counter
+			};
+			color_counter += 1;
+			new_graph.data=graph_time_data;
+			new_graph[median_variable]=median_variable_item;
+			new_graph.label=median_variable_item+" mediano ("+model_graph.unit+")";
+			new_graph.advanced_label=median_variable_item+" mediano";
+			new_graphs_list.push(new_graph);
+		}
+		
+		return new_graphs_list;
+		
 	}
 
 	function calculate_normalizedgraphs(unitgraphs) {
@@ -383,8 +517,10 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			var clickable = this.clickable;
 			var hoverable = this.hoverable;
 			var start_value = this.start_value;
-			if (relevance == 'main') {
-				if (tipo == 'precio') {
+			if ((relevance == 'main') || (relevance == 'mediano')){
+				if ('advanced_label' in this) {
+					label = this.advanced_label+' (1 = ' + String(start_value) + ' ' + unit +'s)';
+				} else if (tipo == 'precio') {
 					producto = this.producto;
 					mercado = this.mercado;
 					if (relevance == 'main') {
@@ -717,14 +853,25 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		graph_html += comment_list;
 		graph_html += "<div id=\"" + query_id + "statsoverview\" style=\"height:50px; margin-right:" + graph_margin + "px;\"></div>";
 		graph_html += "<img id=\"" + query_id + "reset\" src=\"/media/icons/reset.png\" />";
-		if (all_productos.length>0) {
-			graph_html += "<select id=\"" + query_id + "xunits\" class=\"" + query_id + "graphkind\"><option selected=\"selected\" value=\"cordobas\">Cordobas</option>";
-			graph_html += "<option value=\"dollars\">USD</option><option value=\"euros\">Euros</option></select>";
-		}
 		graph_html += "<select id=\"" + query_id + "xtype\" class=\"" + query_id + "graphkind\">";
 		graph_html += "<option selected=\"selected\" value=\"real\">Real</option>";
 		graph_html += "<option value=\"normalized\">Normalizado</option></select>";
 		graph_html += " <span id=\"" + query_id + "csvexport\" class=\"link\">Exportar datos</span>";
+		if (all_productos.length>0) {
+			graph_html += '<br />Precios: ';
+			graph_html += '<select id="' + query_id + 'xunits" class="' + query_id + 'graphkind"><option selected="selected" value="cordobas">Cordobas</option>';
+			graph_html += '<option value="dollars">USD</option><option value="euros">Euros</option></select>';
+			//if (all_productos.length>1) {
+			//graph_html += '<input type="checkbox" id="'+query_id+'show_median_productos" class="graphkind" /> mediano de todos los productos';
+			//}	
+			//if (all_mercados.length>1) {
+			//graph_html += '<input type="checkbox" id="'+query_id+'show_median_mercados" class="graphkind" /> mediano de todos los mercados';
+			//}	
+			//if ((all_mercados.length>1) && (all_productos.length>1)) {
+			//graph_html += '<input type="checkbox" id="'+query_id+'show_median_productos_and_mercados" class="graphkind" /> mediano de todos los mercados y productos';
+			//}	
+			//graph_html += '<br />';
+		}
 		graph_html += "<div id=\"" + query_id + "legend\" style=\"margin-right:" + graph_margin + "px;\"></div></div>";
 		return graph_html;
 	}
