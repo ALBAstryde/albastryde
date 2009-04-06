@@ -4,7 +4,6 @@ import os, sys
 SITE_ROOT="/dir/de/albastryde"
 sys.path.append(SITE_ROOT)
 sys.path.append(SITE_ROOT+'/albastryde')
-sys.path.append(SITE_ROOT+'/albastryde/wiki')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'albastryde.settings'
 import django.core.handlers.wsgi
 

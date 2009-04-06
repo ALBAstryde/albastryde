@@ -14,7 +14,6 @@ DATABASE_HOST = '' #basillo en caso de localhost
 DATABASE_PORT = '' #normalmente basillo        
 TIME_ZONE = 'America/Managua'
 LANGUAGE_CODE = 'es-ni'
-MEDIA_URL = 'http://localhost/'
 SECRET_KEY = 'algunas letras'
 
 

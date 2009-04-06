@@ -12,7 +12,7 @@ SEARCH_ENGINE = 'postgresql'
 ACCOUNT_ACTIVATION_DAYS = 7
 SITE_ID = 1
 USE_I18N = True
-ADMIN_MEDIA_PREFIX = '/adminmedia/'
+ADMIN_MEDIA_PREFIX = '/media/admin/'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.load_template_source',
     'django.template.loaders.app_directories.load_template_source',
@@ -23,6 +23,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 )
 MEDIA_ROOT = SITE_ROOT+'/media/'
+MEDIA_URL = '/media/'
 TEMPLATE_DIRS = (
 SITE_ROOT+"/templates",
 )

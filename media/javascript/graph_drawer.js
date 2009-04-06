@@ -32,7 +32,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 	//Calculate other graphs	
 	normalized_graphs = calculate_normalizedgraphs(converted_graphs);
 
-	if (includes_currency_graphs) {
+	if (all_productos.length>0) {
 		dollargraphs = calculate_currencygraphs(eval(jsondata.dollar), converted_graphs);
 		eurographs = calculate_currencygraphs(eval(jsondata.euro), converted_graphs);
 		normalized_dollargraphs = calculate_normalizedgraphs(dollargraphs);
@@ -67,7 +67,6 @@ function create_graphs(jsondata,close_button,graphsheader) {
 
 	var query_id, id, headline, comment_counter, has_comments, plot, comment_form_open, comments, datapoint_dictionary, graph_height, graph_margin_bottom;
 	var raw_graphs, converted_graphs, dollargraphs, eurographs, normalized_graphs, normalized_dollargraphs, normalized_eurographs;
-	var includes_currency_graphs;
 	comment_form_open = false;
 	if ($.browser.msie) {
 		$("div.graph").remove();
@@ -77,7 +76,9 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		var new_graphs, tipos_graficos, color_counter = 0;
 		new_graphs = [];
 		tipos_graficos = {};
-		includes_currency_graphs = false;
+		all_productos = [];
+		all_mercados = [];
+		all_lluvias = [];
 		$.each(graphs,
 		function() {
 			var data = [],
@@ -103,11 +104,19 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			unit = this.unit;
 			tipo = this.tipo;
 			if (tipo == 'precio') {
-				includes_currency_graphs = true;
 				producto = this.producto;
 				mercado = this.mercado;
+				if (!(producto in all_productos)) {
+					all_productos.push(producto);
+				}
+				if (!(mercado in all_mercados)) {
+					all_mercados.push(mercado);
+				}
 				label = producto + ' en ' + mercado + ' (' + unit + ')';
 			} else if (tipo == 'lluvia') {
+				if (!(lluvia in all_lluvias)) {
+					all_lluvia.push(lluvia);
+				}
 				lluvia = this.lluvia;
 				label = 'lluvia en ' + lluvia + ' (' + unit + ')';
 			} else {
@@ -708,7 +717,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		graph_html += comment_list;
 		graph_html += "<div id=\"" + query_id + "statsoverview\" style=\"height:50px; margin-right:" + graph_margin + "px;\"></div>";
 		graph_html += "<img id=\"" + query_id + "reset\" src=\"/media/icons/reset.png\" />";
-		if (includes_currency_graphs) {
+		if (all_productos.length>0) {
 			graph_html += "<select id=\"" + query_id + "xunits\" class=\"" + query_id + "graphkind\"><option selected=\"selected\" value=\"cordobas\">Cordobas</option>";
 			graph_html += "<option value=\"dollars\">USD</option><option value=\"euros\">Euros</option></select>";
 		}
