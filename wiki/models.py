@@ -17,6 +17,9 @@ class Imagen( models.Model ):
 	def __unicode__( self ):
         	return self.nombre
 
+	class Meta:
+		verbose_name_plural='imagenes'
+
 
 class Pagina(models.Model):
 	nombre = models.CharField(max_length=100,unique=True)

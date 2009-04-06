@@ -4,6 +4,7 @@ from graph.forms import DbForm
 from valuta.models import USD,Euro
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.comments.models import Comment
+from django.db.models.options import get_verbose_name
 
 import operator
 import itertools
@@ -12,33 +13,42 @@ import datetime
 from time import mktime
 from django.http import QueryDict
 
+def camelcase(string):
+	decamelcase_list= string.strip().split()
+	camelcase_string=''
+	for j in decamelcase_list:
+		camelcase_string+=j.capitalize()
+	return camelcase_string
+
+
 def translate_query_string(query_string):
 	word_query=QueryDict(query_string)
 	new_query_string=u''
 	for i in word_query.lists():
-		model= i[0]
-		value=i[1]
-		if model=='desde':
-			model='start_date'
-		if model=='hasta':
-			model='end_date'
-		if model=='start_date' or model=='end_date':
-			new_query_string+="&"+model+"="+value[0]
+		modelname=i[0].strip().lower()
+		values= i[1]
+		if modelname==u'desde':
+			modelname=u'start date'
+		if modelname==u'hasta':
+			modelname=u'end date'
+		if modelname==u'start date' or modelname==u'end date':
+			new_query_string+="&"+camelcase(modelname)+"="+values[0]
 		else:
-			ctype_list = ContentType.objects.filter(model=model)
+			ctype_list = ContentType.objects.filter(name=modelname)
 			if len(ctype_list) > 0:
 				ctype=ctype_list[0]
 				model_class=ctype.model_class()
-				for b in value:
-					d=model_class.objects.filter(nombre__startswith=b)
+				for b in values:
+					value=b.strip()
+					d=model_class.objects.filter(nombre__startswith=value)
 					if len(d) > 0:
-						new_query_string+="&"+model+"="+str(d[0].pk)
+						new_query_string+="&"+camelcase(modelname)+"="+str(d[0].pk)
 					else:
 						try:
-							int(b)
-							e=model_class.objects.filter(pk=int(b))
+							int(value)
+							e=model_class.objects.filter(pk=int(value))
 							if len(e) > 0:
-								new_query_string+="&"+model+"="+str(b)
+								new_query_string+="&"+camelcase(modelname)+"="+str(value)
 						except ValueError:
 							pass
 	new_query_string=new_query_string.lstrip("&")
@@ -47,23 +57,23 @@ def translate_query_string(query_string):
 def reverse_translate_query(query):
 	new_query_string=u''
 	for i in query.lists():
-		model=i[0]
+		modelname=get_verbose_name(i[0])
 		value=i[1]
-		if model=='start_date':
-			model='desde'
-		if model=='end_date':
-			model='hasta'
-		if model=='desde' or model=='hasta':
-			new_query_string+="&"+model+"="+value[0]
+		if modelname=='start date':
+			modelname='desde'
+		if modelname=='end date':
+			modelname='hasta'
+		if modelname=='desde' or modelname=='hasta':
+			new_query_string+="&"+modelname+"="+value[0]
 		else:
-			ctype_list = ContentType.objects.filter(model=model)
+			ctype_list = ContentType.objects.filter(name=modelname)
 			if len(ctype_list) > 0:
 				ctype=ctype_list[0]
 				model_class=ctype.model_class()
 				for b in value:
 					d=model_class.objects.filter(pk=b)
 					if len(d) > 0:
-						new_query_string+="&"+model+"="+d[0].nombre
+						new_query_string+="&"+modelname+"="+d[0].nombre
 	new_query_string=new_query_string.lstrip("&")
 	return new_query_string
 
@@ -85,11 +95,11 @@ def build_graph(query,user):
 		first_date=datetime.date.today()
 		pk_list=[]
 		graphs=[]
-		mercados = form.cleaned_data['mercado']
-		productos = form.cleaned_data['producto']
-		estaciones_de_lluvia = form.cleaned_data['estaciondelluvia']
-		start_date = form.cleaned_data['start_date']
-		end_date = form.cleaned_data['end_date']
+		mercados = form.cleaned_data['Mercado']
+		productos = form.cleaned_data['Producto']
+		estaciones_de_lluvia = form.cleaned_data['EstacionDeLluvia']
+		start_date = form.cleaned_data['StartDate']
+		end_date = form.cleaned_data['EndDate']
 		mercado_count=len(mercados)
 		producto_count=len(productos)
 		lluvia_count=len(estaciones_de_lluvia)

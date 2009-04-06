@@ -34,6 +34,8 @@ class Municipio(models.Model):
 	nombre = models.CharField(max_length=30)
 	sub_numero = models.DecimalField(decimal_places=0,max_digits=2)			
 	departamento = models.ForeignKey(Departamento,related_name='municipios')	
+#	number = models.IntegerField()
+#	total_number = models.IntegerField(primary_key=True)
 	total_number = models.IntegerField()
 	geom = models.GeometryField(srid=26716,null=True,blank=True)
 	objects = models.GeoManager()
@@ -56,15 +58,15 @@ class Municipio(models.Model):
 
 
 	def save(self, force_insert=False, force_update=False):
-		if self.geom== None:
-			try:
-				print "Starting geom calculation for "+self.nombre+"!"
-				self.geom=self.generate_map()
-		                super(Municipio, self).save(force_insert,force_update)
-				print self.nombre+" saved!"
-			except:
-				print "Geom calculation unsuccesful!"
-#                super(Departamento, self).save(force_insert,force_update)
+		#if self.geom== None:
+		#	try:
+		#		print "Starting geom calculation for "+self.nombre+"!"
+		#		self.geom=self.generate_map()
+		#                super(Municipio, self).save(force_insert,force_update)
+		#		print self.nombre+" saved!"
+		#	except:
+		#		print "Geom calculation unsuccesful!"
+                super(Departamento, self).save(force_insert,force_update)
 
 
 

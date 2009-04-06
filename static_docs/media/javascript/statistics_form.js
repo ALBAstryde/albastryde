@@ -7,28 +7,28 @@ $.preloadImages = function() {
 $.preloadImages("/media/icons/ajax-loader.gif", "/media/icons/reset.png");
 
 $(function() {
-	$('#id_start_date').datePicker({
+	$('#id_StartDate').datePicker({
 		startDate: '01/01/1920',
 		endDate: (new Date()).addDays( - 1).asString()
 	});
-	$('#id_end_date').datePicker({
+	$('#id_EndDate').datePicker({
 		startDate: '02/01/1920',
 		endDate: (new Date()).asString()
 	});
-	$('#id_start_date').bind('dpClosed',
+	$('#id_StartDate').bind('dpClosed',
 	function(e, selectedDates) {
 		var d = selectedDates[0];
 		if (d) {
 			d = new Date(d);
-			$('#id_end_date').dpSetStartDate(d.addDays(1).asString());
+			$('#id_EndDate').dpSetStartDate(d.addDays(1).asString());
 		}
 	});
-	$('#id_end_date').bind('dpClosed',
+	$('#id_EndDate').bind('dpClosed',
 	function(e, selectedDates) {
 		var d = selectedDates[0];
 		if (d) {
 			d = new Date(d);
-			$('#id_start_date').dpSetEndDate(d.addDays( - 1).asString());
+			$('#id_StartDate').dpSetEndDate(d.addDays( - 1).asString());
 		}
 	});
 

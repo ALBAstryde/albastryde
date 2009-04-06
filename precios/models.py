@@ -1,20 +1,15 @@
 from django.db import models
-from precios.inherit_model import Approvable, Timestamped
+from graph.models import Approvable,StatisticsFormVariable
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.comments.models import Comment
 
-class Producto(models.Model):
-	nombre = models.CharField(max_length="60")
+class Producto(StatisticsFormVariable):
+	pass
 
-	def __unicode__(self):
-		return self.nombre
-
-class Mercado(models.Model):
-	nombre = models.CharField(max_length="60")
+class Mercado(StatisticsFormVariable):
+	pass
 #	municipio = models.ForeignKey(Municipio)
 
-	def __unicode__(self):
-		return self.nombre
 
 class Prueba(Approvable):
 	mercado = models.ForeignKey(Mercado)

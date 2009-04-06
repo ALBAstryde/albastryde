@@ -44,6 +44,9 @@ class Precipitation(models.Model):
     geom = models.GeometryField(srid=26716,null=True,blank=True)
     objects = models.GeoManager()
 
+    class Meta:
+        verbose_name_plural='precipitationes'
+
     def __unicode__(self):
 	description=""
 	if self.nombre != None:
@@ -160,6 +163,10 @@ class TierraPerfil(models.Model):
     def __unicode__(self):
 	return  u'%s' % self.perf
 
+    class Meta:
+        verbose_name_plural='tierra perfiles'
+
+
     def generate_map(self):
         qs= self.perf_field.all()
         polygon=qs.unionagg()
@@ -215,6 +222,10 @@ class Erosion(models.Model):
 
     def __unicode__(self):
 	return self.nombre
+
+    class Meta:
+        verbose_name_plural='erosiones'
+
 
     def generate_map(self):
         qs= self.eros_field.all()

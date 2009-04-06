@@ -1,12 +1,17 @@
 from django.db import models
+from graph.models import StatisticsFormVariable
 
-class EstacionDeLluvia(models.Model):
-	nombre = models.CharField(max_length=60)
+REGION_CHOICES=[('RAAN','RAAN'),('RAAS','RAAS'),('I','Region I'),('II','Region II'),('III','Region III'),('IV','Region IV'),('V','Region V'),('VI','Region VI'),('None','Quien sabe?')]
+
+class EstacionDeLluvia(StatisticsFormVariable):
 	numero = models.IntegerField(primary_key=True)
+	region = models.CharField(max_length=4,choices=REGION_CHOICES)	
 
 	def __unicode__(self):
 		return self.nombre
 
+	class Meta:
+		verbose_name_plural='estaciones de lluvia'
 
 class Prueba(models.Model):
 	estacion = models.ForeignKey(EstacionDeLluvia)
