@@ -37,12 +37,25 @@ def translate_query_string(query_string):
 			ctype_list = ContentType.objects.filter(name=modelname)
 			if len(ctype_list) > 0:
 				ctype=ctype_list[0]
+				if len(ctype_list) > 1:
+					name_length=len(ctype.name)
+					for i in ctype_list:
+						if len(i.name) < name_length:
+							ctype=i
+							name_length=len(ctype.name)
 				model_class=ctype.model_class()
 				for b in values:
 					value=b.strip()
 					d=model_class.objects.filter(nombre__startswith=value)
 					if len(d) > 0:
-						new_query_string+="&"+camelcase(modelname)+"="+str(d[0].pk)
+						variable_value=d[0]
+						if len(d) > 1:
+							name_length=len(variable_value.nombre)
+							for i in d:
+								if len(i.nombre)<name_length:
+									variable_value=i
+									name_length=len(variable_value.nombre)
+						new_query_string+="&"+camelcase(modelname)+"="+str(variable_value.pk)
 					else:
 						try:
 							int(value)
