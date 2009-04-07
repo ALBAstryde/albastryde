@@ -14,9 +14,9 @@ function create_graphs(jsondata,close_button,graphsheader) {
 	raw_graphs = eval(jsondata.graphs).sort();
 	converted_graphs = convert_graphs_after_transport(raw_graphs);
 	if (converted_graphs.length === 0) {
-		e_msg = "No hay datos para la seleccion!";
-		$('#AjaxFormWarning').text(e_msg).fadeIn("slow");
-		$('#AjaxFormSubmit').attr("disabled", "");
+		e_msg = 'No hay datos para la seleccion!';
+		$('#AjaxFormWarning').text(e_msg).fadeIn('slow');
+		$('#AjaxFormSubmit').attr('disabled', '');
 		return true;
 	}
 	datapoint_dictionary = calculate_datapoint_dictionary(converted_graphs);
@@ -50,10 +50,10 @@ function create_graphs(jsondata,close_button,graphsheader) {
 	$(graphsheader).after(graph_html);
 
 	make_graphs(converted_graphs);
-	e_msg = "Nuevo gráfico generado.";
+	e_msg = 'Nuevo gráfico generado.';
 
 	//Show the message
-	$('#AjaxFormWarning').text(e_msg).fadeIn("slow");
+	$('#AjaxFormWarning').text(e_msg).fadeIn('slow');
 
 	//Calculate other graphs	
 	normalized_graphs = calculate_normalizedgraphs(converted_graphs);
@@ -65,15 +65,15 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		normalized_eurographs = calculate_normalizedgraphs(eurographs);
 	}
 
-	$("select." + query_id + "graphkind").change(function() {
+	$('select.' + query_id + 'graphkind').change(function() {
 		var xunits;
-		var xunits_selector = $("select#" + query_id + "xunits");
+		var xunits_selector = $('select#' + query_id + 'xunits');
 		if (xunits_selector.length > 0) {
 			xunits = xunits_selector.val();
 		} else {
 			xunits = 'other';
 		}
-		var xtype = $("select#" + query_id + "xtype").val();
+		var xtype = $('select#' + query_id + 'xtype').val();
 		if ((xunits == 'cordobas' || xunits == 'other') && xtype == 'real') {
 			make_graphs(converted_graphs);
 		} else if (xunits == 'dollars' && xtype == 'real') {
@@ -92,7 +92,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 	});
 
 	if ($.browser.msie) {
-		$("div.graph").remove();
+		$('div.graph').remove();
 	}
 
 	function convert_graphs_after_transport(graphs) {
@@ -375,8 +375,8 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			}
 			new_graphs.push(new_graph);
 		});
-		var yaxis = "",
-		y2axis = "";
+		var yaxis = '',
+		y2axis = '';
 		var yaxis_finder = 1;
 		for (var item in tipos_graficos) {
 			if (yaxis_finder == 1) {
@@ -491,8 +491,8 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				color_counter += 1;
 				new_graph.data=graph_time_data;
 				new_graph[median_variable]=median_variable_item;
-				new_graph.label=median_variable_item+" mediano ("+model_graph.unit+")";
-				new_graph.advanced_label=median_variable_item+" mediano";
+				new_graph.label=median_variable_item+' mediano ('+model_graph.unit+')';
+				new_graph.advanced_label=median_variable_item+' mediano';
 				new_graphs_list.push(new_graph);
 			}
 		}
@@ -589,7 +589,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 					left: 0,
 					top: 0
 				}).insertAfter('#' + query_id + 'stats canvas:first').get(0);
-				labelCanvas = canvas.getContext("2d");
+				labelCanvas = canvas.getContext('2d');
 				labelCanvas.translate(plotOffset.left, plotOffset.top);
 				labelCanvas.lineWidth = ctx.lineWidth;
 			}
@@ -609,7 +609,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			}
 			label += String.fromCharCode(seconddigit + 97);
 			comment_counter += 1;
-			var comments_text = "";
+			var comments_text = '';
 			for (var comment_pk in comments[unique_pk]) {
 				if (comments[unique_pk][comment_pk][3] === true) {
 					comments_text += '<div class="publicComment">';
@@ -619,15 +619,15 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				if (comments[unique_pk][comment_pk][2] === true) {
 					comments_text += '<p class="editline"><span class="link" id="' + unique_pk + '+' + comment_pk + '+' + query_id + '">Editar</span></p>';
 				}
-				comments_text += "<p>" + comments[unique_pk][comment_pk][0] + "</p>";
-				comments_text += "<p class=\"signature\">" + comments[unique_pk][comment_pk][1] + "</p>";
+				comments_text += '<p>' + comments[unique_pk][comment_pk][0] + '</p>';
+				comments_text += '<p class="signature">' + comments[unique_pk][comment_pk][1] + '</p>';
 				comments_text += '</div>';
 			}
 
-			$("#" + query_id + "comments").append("<tr class=\"comment\" id=\"" + query_id + "_" + unique_pk + "comments\"><td valign=\"top\"><b>" + label + "</b></td><td valign=\"top\">" + comments_text + "</td></tr>");
+			$('#' + query_id + 'comments').append('<tr class="comment" id="' + query_id + '_' + unique_pk + 'comments"><td valign="top"><b>' + label + '</b></td><td valign="top">' + comments_text + '</td></tr>');
 			$('<div class="pointLabel" id="' + query_id + '_' + unique_pk + 'label">' + label + '</div>').insertAfter('#' + query_id + 'labelcanvas');
 			var editButtons = $('#' + query_id + '_' + unique_pk + 'comments p.editline span');
-			editButtons.bind("click",
+			editButtons.bind('click',
 			function() {
 				var total_pk, this_unique_pk, this_comment_pk;
 				if (! (comment_form_open)) {
@@ -684,55 +684,55 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		} else {
 			s += '  <strong>Nuevo Comentario</strong><br /><br />';
 		}
-		s += '  <strong>' + label + ': ' + value + ' (' + date + ')</strong><br /><br />';
-		s += '  <form name="newcomment" id="' + query_id + 'newcomment" method="post">';
+		s += '<strong>' + label + ': ' + value + ' (' + date + ')</strong><br /><br />';
+		s += '<form name="newcomment" id="' + query_id + 'newcomment" method="post">';
 		if (comment_pk) {
-			s += '  <input type="hidden" name="comment_pk" id="' + query_id + 'comment_pk" value="' + comment_pk + '">';
+			s += '<input type="hidden" name="comment_pk" id="' + query_id + 'comment_pk" value="' + comment_pk + '">';
 		}
-		s += '  <input type="hidden" name="timestamp" id="' + query_id + 'timestamp_field" value="' + timestamp + '">';
-		s += '  <input type="hidden" name="honeypot" id="' + query_id + 'honeypot_field" value="">';
-		s += '  <textarea id="' + query_id + 'comment_field" name="comment" rows="10" cols="40" name="comment" class="vLargeTextField">';
+		s += '<input type="hidden" name="timestamp" id="' + query_id + 'timestamp_field" value="' + timestamp + '">';
+		s += '<input type="hidden" name="honeypot" id="' + query_id + 'honeypot_field" value="">';
+		s += '<textarea id="' + query_id + 'comment_field" name="comment" rows="10" cols="40" name="comment" class="vLargeTextField">';
 		if (comment_text) {
 			s += comment_text;
 		}
 		s += '</textarea>';
-		s += '  <div id ="' + query_id + 'formDivMessage">&nbsp;</div>';
-		s += '  <input type="button" name="btnSave" id="' + query_id + 'btnSave" value="Guardar"><input type="button" name="btnCancel" id="' + query_id + 'btnCancel" value="Cancelar">';
+		s += '<div id ="' + query_id + 'formDivMessage">&nbsp;</div>';
+		s += '<input type="button" name="btnSave" id="' + query_id + 'btnSave" value="Guardar"><input type="button" name="btnCancel" id="' + query_id + 'btnCancel" value="Cancelar">';
 		if (comment_pk) {
-			s += '  <input type="button" name="btnDelete" id="' + query_id + 'btnDelete" value="Borrar">';
+			s += '<input type="button" name="btnDelete" id="' + query_id + 'btnDelete" value="Borrar">';
 		}
-		s += '  </form>';
+		s += '</form>';
 		s += '</div>';
 		pk_array = unique_pk.split('_');
 		content_type = pk_array[0];
 		object_pk = pk_array[1];
-		$("#" + query_id).append(s);
-		$("#" + query_id + "btnSave").unbind(); // so other form doesn't get submitted
+		$('#' + query_id).append(s);
+		$('#' + query_id + 'btnSave').unbind(); // so other form doesn't get submitted
 		form_info = {};
-		$("#" + query_id + "btnCancel").click(function() {
-			$("#" + query_id + "formDivMessage").html('Cancelando...');
-			$("#" + query_id + "formDiv").fadeOut(300,
+		$('#' + query_id + 'btnCancel').click(function() {
+			$('#' + query_id + 'formDivMessage').html('Cancelando...');
+			$('#' + query_id + 'formDiv').fadeOut(300,
 			function() {
 				$(this).remove();
 			});
 			comment_form_open = false;
 		});
 		if (comment_pk) {
-			$("#" + query_id + "btnDelete").click(function() {
+			$('#' + query_id + 'btnDelete').click(function() {
 				form_info = {
 					object_pk: object_pk,
 					content_type: content_type,
 					remove: true,
 					comment_pk: comment_pk
 				};
-				form_info.timestamp = $("#" + query_id + "timestamp_field").val();
-				form_info.honeypot = $("#" + query_id + "honeypot_field").val();
+				form_info.timestamp = $('#' + query_id + 'timestamp_field').val();
+				form_info.honeypot = $('#' + query_id + 'honeypot_field').val();
 				returnFormResponse(form_info, 'Borrando...', 'Borrado con exito!');
 			});
 
 		}
-		$("#" + query_id + "btnSave").click(function() {
-			comment = $("#" + query_id + "comment_field").val();
+		$('#' + query_id + 'btnSave').click(function() {
+			comment = $('#' + query_id + 'comment_field').val();
 			form_info = {
 				object_pk: object_pk,
 				content_type: content_type,
@@ -741,17 +741,17 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			if (comment_pk) {
 				form_info.comment_pk = comment_pk;
 			}
-			form_info.timestamp = $("#" + query_id + "timestamp_field").val();
-			form_info.honeypot = $("#" + query_id + "honeypot_field").val();
+			form_info.timestamp = $('#' + query_id + 'timestamp_field').val();
+			form_info.honeypot = $('#' + query_id + 'honeypot_field').val();
 			returnFormResponse(form_info, 'Guardando...', 'Guardado con exito!');
 		});
 		function returnFormResponse(fI, processMessage, successMessage) {
-			$("#" + query_id + "btnSave").attr('disabled', 'disabled');
-			$("#" + query_id + "btnDelete").attr('disabled', 'disabled');
-			$("#" + query_id + "formDivMessage").html(processMessage);
+			$('#' + query_id + 'btnSave').attr('disabled', 'disabled');
+			$('#' + query_id + 'btnDelete').attr('disabled', 'disabled');
+			$('#' + query_id + 'formDivMessage').html(processMessage);
 			$.post('/ajax/comment/post/', fI,
 			function(data) {
-				if (data.status == "success") {
+				if (data.status == 'success') {
 					if ('remove' in data) {
 						delete comments[unique_pk][data.pk];
 						var datapoint_comments_length = 0;
@@ -769,42 +769,42 @@ function create_graphs(jsondata,close_button,graphsheader) {
 						comments[unique_pk][data.pk] = [comment, user_name, true, data.public];
 					}
 					redraw_graph();
-					$("#" + query_id + "formDivMessage").html(successMessage);
-					$("#" + query_id + "formDiv").fadeOut(300,
+					$('#' + query_id + 'formDivMessage').html(successMessage);
+					$('#' + query_id + 'formDiv').fadeOut(300,
 					function() {
 						$(this).remove();
 					});
 					comment_form_open = false;
 				} else {
-					$("#" + query_id + "formDivMessage").html('Hubo un error!');
-					$("#" + query_id + "btnSave").attr('disabled', '');
-					$("#" + query_id + "btnDelete").attr('disabled', '');
+					$('#' + query_id + 'formDivMessage').html('Hubo un error!');
+					$('#' + query_id + 'btnSave').attr('disabled', '');
+					$('#' + query_id + 'btnDelete').attr('disabled', '');
 				}
 				// The success or failure check will go here. . .
 			},
-			"json");
+			'json');
 		}
 	}
 	graph_margin_bottom = 0;
 	function correct_graphheight() {
 		var comments_height;
-		header_height = $("#" + query_id + "header").height();
-		comments_height = $("#" + query_id + "comments").height() + header_height;
-		$("#" + query_id+"comments").css('top', header_height + 'px');
+		header_height = $('#' + query_id + 'header').height();
+		comments_height = $('#' + query_id + 'comments').height() + header_height;
+		$('#' + query_id+'comments').css('top', header_height + 'px');
 		if (comments_height > graph_height) {
 			graph_margin_bottom = comments_height - graph_height;
-			$("#" + query_id).css('margin-bottom', graph_margin_bottom + 'px');
+			$('#' + query_id).css('margin-bottom', graph_margin_bottom + 'px');
 		} else if (graph_margin_bottom > 0) {
 			graph_margin_bottom = 0;
-			$("#" + query_id).css('margin-bottom', 0);
+			$('#' + query_id).css('margin-bottom', 0);
 		}
 	}
 	function reset_comments() {
 		//labelCanvas = false;
 		comment_counter = 0;
-		$("#" + query_id + " tr.comment").remove();
-		//$("#" + query_id + "labelcanvas").remove();
-		$("#" + query_id + " div.pointLabel").remove();
+		$('#' + query_id + ' tr.comment').remove();
+		//$('#' + query_id + 'labelcanvas').remove();
+		$('#' + query_id + ' div.pointLabel').remove();
 	}
 	function redraw_graph() {
 		reset_comments();
@@ -825,9 +825,9 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		var graph_margin = '';
 		var comment_list = '';
 		if (eval(has_comments) || user_can_add) {
-			graph_margin = "200";
-			comment_list = "<table id=\"" + query_id + "comments\" style=\"width:200px; position:absolute;right:0;top:50px;\"><tr>";
-			comment_list += "<th style=\"width:15px;\">&nbsp;</th><th style=\"width:185px;\">Comentarios</th></tr></table>";
+			graph_margin = '200';
+			comment_list = '<table id="' + query_id + 'comments" style="width:200px; position:absolute;right:0;top:50px;"><tr>';
+			comment_list += '<th style="width:15px;">&nbsp;</th><th style="width:185px;">Comentarios</th></tr></table>';
 		}
 		var graph_html = '';
 		graph_html += '<div id="' + query_id + '" class="graph" style="position:relative;">';
@@ -837,7 +837,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			graph_html += '<img id="' + query_id + 'close" src="/media/icons/close.png" /> ';
 		}
 		graph_html += headline;
-		//                graph_html+=' <img id="'+query_id+'tablelink" src="/media/icons/spreadsheet.png"  />';
+		//                graph_html+='<img id="'+query_id+'tablelink" src="/media/icons/spreadsheet.png" />';
 		//		graph_html+='<img src="/media/icons/print.png" />';
 		graph_html += '</h2>';
 		if (jsondata.query_link) {
@@ -849,22 +849,22 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			}
 		}
 		//		var icon_width=0;
-		//                graph_html+="<img id=\""+query_id+"print\" src=\"/media/icons/print.png\"/ style=\"position:absolute;left:"+icon_width+"px;top:0px;\" />";
+		//                graph_html+='<img id="'+query_id+'print" src="/media/icons/print.png"/ style="position:absolute;left:'+icon_width+'px;top:0px;" />';
 		//		icon_width+=18;
 		//		if (user_logged_in) {
-		//                	graph_html+="<img id=\""+query_id+"email\" src=\"/media/icons/email.png\"/ style=\"position:absolute;left:"+icon_width+"px;top:0px;\" />";
+		//                	graph_html+='<img id="'+query_id+'email" src="/media/icons/email.png"/ style="position:absolute;left:'+icon_width+'px;top:0px;" />';
 		//			icon_width+=18;
 		//		}
 		//		icon_width+=18;
 		graph_html += '</div>';
-		graph_html += "<div id=\"" + query_id + "stats\" style=\"height:400px; margin-right:" + graph_margin + "px;\"></div>";
+		graph_html += '<div id="' + query_id + 'stats" style="height:400px; margin-right:' + graph_margin + 'px;"></div>';
 		graph_html += comment_list;
-		graph_html += "<div id=\"" + query_id + "statsoverview\" style=\"height:50px; margin-right:" + graph_margin + "px;\"></div>";
-		graph_html += "<img id=\"" + query_id + "reset\" src=\"/media/icons/reset.png\" />";
-		graph_html += "<select id=\"" + query_id + "xtype\" class=\"" + query_id + "graphkind\">";
-		graph_html += "<option selected=\"selected\" value=\"real\">Real</option>";
-		graph_html += "<option value=\"normalized\">Normalizado</option></select>";
-		graph_html += " <span id=\"" + query_id + "csvexport\" class=\"link\">Exportar datos</span>";
+		graph_html += '<div id="' + query_id + 'statsoverview" style="height:50px; margin-right:' + graph_margin + 'px;"></div>';
+		graph_html += '<img id="' + query_id + 'reset" src="/media/icons/reset.png" />';
+		graph_html += '<select id="' + query_id + 'xtype" class="' + query_id + 'graphkind">';
+		graph_html += '<option selected="selected" value="real">Real</option>';
+		graph_html += '<option value="normalized">Normalizado</option></select>';
+		graph_html += '<span id="' + query_id + 'csvexport" class="link">Exportar datos</span>';
 		if (all_productos.length>0) {
 			graph_html += '<br />Precios: ';
 			graph_html += '<select id="' + query_id + 'xunits" class="' + query_id + 'graphkind"><option selected="selected" value="cordobas">Cordobas</option>';
@@ -880,7 +880,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			//}	
 			//graph_html += '<br />';
 		}
-		graph_html += "<div id=\"" + query_id + "legend\" style=\"margin-right:" + graph_margin + "px;\"></div></div>";
+		graph_html += '<div id="' + query_id + 'legend" style="margin-right:' + graph_margin + 'px;"></div></div>';
 		return graph_html;
 	}
 
@@ -888,22 +888,22 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		var raw_date = new Date(timestamp);
 		var day = raw_date.getUTCDate();
 		if (day < 10) {
-			day = "0" + day;
+			day = '0' + day;
 		}
 		var month = raw_date.getUTCMonth() + 1;
 		if (month < 10) {
-			month = "0" + month;
+			month = '0' + month;
 		}
 		var year = raw_date.getUTCFullYear();
 		var formated_date_string = year + '-' + month + '-' + day;
 		return formated_date_string;
 	}
 	function print_html(graphs) {
-		return "";
+		return '';
 	}
 
 	function csv_export(graphs) {
-		var html = "";
+		var html = '';
 		var headerline = '',
 		new_headerline;
 		for (var series = 0; series < graphs.length; ++series) {
@@ -969,14 +969,14 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		return html;
 	}
 	function unbind_all() {
-		$("#" + query_id + "stats").unbind("plotselected");
-		$("#" + query_id + "statsoverview").unbind("plotselected");
-		$("img#" + query_id + "reset").unbind("click");
-		$("img#" + query_id + "print").unbind("click");
-		$("img#" + query_id + "email").unbind("click");
-		$("img#" + query_id + "close").unbind("click");
-		$("span#" + query_id + "csvexport").unbind("click");
-		//$("div#"+ query_id +"legend input.dataseries").die("click");
+		$('#' + query_id + 'stats').unbind('plotselected');
+		$('#' + query_id + 'statsoverview').unbind('plotselected');
+		$('img#' + query_id + 'reset').unbind('click');
+		$('img#' + query_id + 'print').unbind('click');
+		$('img#' + query_id + 'email').unbind('click');
+		$('img#' + query_id + 'close').unbind('click');
+		$('span#' + query_id + 'csvexport').unbind('click');
+		$('div#' + query_id +'legend input.dataseries').unbind('click');
 		return true;
 	}
 	function destroy_all_globals() {
@@ -990,8 +990,8 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		var options, overview_options, overview;
 		options = {
 			xaxis: {
-				mode: "time",
-				minTickSize: [1, "day"]
+				mode: 'time',
+				minTickSize: [1, 'day']
 			},
 			yaxis: {
 				tickFormatter: function(v, axis) {
@@ -1004,14 +1004,14 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				}
 			},
 			legend: {
-				container: "#" + query_id + "legend"
+				container: '#' + query_id + 'legend'
 			},
 			points: {
 				show: true,
 				drawCall: drawPoint
 			},
 			selection: {
-				mode: "xy"
+				mode: 'xy'
 			}
 		};
 		if (user_logged_in) {
@@ -1033,21 +1033,21 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			shadowSize: 0,
 			xaxis: {
 				ticks: [],
-				mode: "time"
+				mode: 'time'
 			},
 			yaxis: {
 				ticks: []
 			},
 			selection: {
-				mode: "xy"
+				mode: 'xy'
 			}
 		};
-		plot = $.plot($("#" + query_id + "stats"), graphs, options);
+		plot = $.plot($('#' + query_id + 'stats'), graphs, options);
 		options.legend={show:false};
-		overview = $.plot($("#" + query_id + "statsoverview"), graphs, overview_options);
-		graph_height = $("#" + query_id).height();
+		overview = $.plot($('#' + query_id + 'statsoverview'), graphs, overview_options);
+		graph_height = $('#' + query_id).height();
 		correct_graphheight();
-		$("#" + query_id + "stats").bind("plotselected",function(event, ranges) {
+		$('#' + query_id + 'stats').bind('plotselected',function(event, ranges) {
 			reset_comments();
 			// clamp the zooming to prevent eternal zoom
 			if (ranges.xaxis.to - ranges.xaxis.from < 0.00001) {
@@ -1079,20 +1079,20 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				};
 			}
 
-			plot = $.plot($("#" + query_id + "stats"), graphs, $.extend(true, {},
+			plot = $.plot($('#' + query_id + 'stats'), graphs, $.extend(true, {},
 			options, axis_dic));
 			// don't fire event on the overview to prevent eternal loop
 			overview.clearSelection(true);
 			overview.setSelection(ranges, true);
 			correct_graphheight();
 		});
-		$("#" + query_id + "statsoverview").bind("plotselected",
+		$('#' + query_id + 'statsoverview').bind('plotselected',
 		function(event, ranges) {
 			reset_comments();
 			plot.setSelection(ranges);
 			correct_graphheight();
 		});
-		$("div#"+ query_id +"legend input.dataseries").bind("click",function() {
+		$('div#'+ query_id +'legend input.dataseries').bind('click',function() {
 			var state=$(this).attr('checked');
 			var color_value=parseInt($(this).attr('name'));
 			for (i in graphs) {
@@ -1103,28 +1103,28 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			//current_graphs=graphs;
 			//redraw_graph();
 			reset_comments();
-			plot = $.plot($("#" + query_id + "stats"), graphs, options);
+			plot = $.plot($('#' + query_id + 'stats'), graphs, options);
 			//overview.clearSelection(true);
-			overview = $.plot($("#" + query_id + "statsoverview"), graphs, overview_options);
+			overview = $.plot($('#' + query_id + 'statsoverview'), graphs, overview_options);
 			correct_graphheight();
 			//alert(color_value+': '+state);
 		});
-		$("img#" + query_id + "reset").click(function() {
+		$('img#' + query_id + 'reset').click(function() {
 			reset_comments();
-			plot = $.plot($("#" + query_id + "stats"), graphs, options);
+			plot = $.plot($('#' + query_id + 'stats'), graphs, options);
 			overview.clearSelection(true);
 			correct_graphheight();
 		});
-		$("img#" + query_id + "close").click(function() {
+		$('img#' + query_id + 'close').click(function() {
 			reset_comments();
 			unbind_all();
-			$("#" + query_id).fadeOut(300,
+			$('#' + query_id).fadeOut(300,
 			function() {
 				$(this).remove();
 			});
 			destroy_all_globals();
 		});
-		$("span#" + query_id + "csvexport").click(function(e) {
+		$('span#' + query_id + 'csvexport').click(function(e) {
 			// si el usuario ha utilizado una tecla de control
 			// no hacemos nada
 			if (e.ctrlKey || e.shiftKey || e.metaKey) {
@@ -1133,7 +1133,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			// abrimos la ventana
 			var w = window.open('', '_blank', '');
 			if (w && !w.closed) {
-				w.document.open("text/csv", "replace");
+				w.document.open('text/csv', 'replace');
 				w.document.write(csv_export(raw_graphs));
 				w.document.close();
 				// si efectivamente hemos logrado abrirla
@@ -1145,7 +1145,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			}
 
 		});
-		$("img#" + query_id + "print").click(function(e) {
+		$('img#' + query_id + 'print').click(function(e) {
 			// si el usuario ha utilizado una tecla de control
 			// no hacemos nada
 			if (e.ctrlKey || e.shiftKey || e.metaKey) {
@@ -1165,7 +1165,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			}
 
 		});
-		$("#" + query_id + "stats").bind("plotclick",
+		$('#' + query_id + 'stats').bind('plotclick',
 		function(event, pos, item) {
 			if ((item) && (!(comment_form_open))) {
 				create_comment_form(item.datapoint[2]);

@@ -1,10 +1,10 @@
 $.preloadImages = function() {
 	for (var i = 0; i < arguments.length; i++) {
-		$("<img>").attr("src", arguments[i]);
+		$('<img>').attr('src', arguments[i]);
 	}
 };
 
-$.preloadImages("/media/icons/ajax-loader.gif", "/media/icons/reset.png", "/media/icons/close.png");
+$.preloadImages('/media/icons/ajax-loader.gif', '/media/icons/reset.png', '/media/icons/close.png');
 
 $(function() {
 	$('#id_StartDate').datePicker({
@@ -38,36 +38,36 @@ $(document).ready(function() {
 	var producto_height = $('#producto-chooser').height();
 	var mercado_height = $('#mercado-chooser').height();
 	var mercado_width = $('#mercado-chooser').width();
-	var producto_width = $("#producto-chooser").width();
-	var submit_height = $("#form-submitter").height();
-	//var contents_width = $("#contents").width();
-	$("#mercado-chooser").css({
-		"left": (producto_width + 10) + "px"
+	var producto_width = $('#producto-chooser').width();
+	var submit_height = $('#form-submitter').height();
+	//var contents_width = $('#contents').width();
+	$('#mercado-chooser').css({
+		'left': (producto_width + 10) + 'px'
 	});
-	$("#from-chooser").css({
-		"left": (producto_width + mercado_width + 20) + "px"
+	$('#from-chooser').css({
+		'left': (producto_width + mercado_width + 20) + 'px'
 	});
-	$("#until-chooser").css({
-		"left": (producto_width + mercado_width + 20) + "px"
+	$('#until-chooser').css({
+		'left': (producto_width + mercado_width + 20) + 'px'
 	});
-	$("#form-submitter").css({
-		"left": (producto_width + 10) + "px",
-		"top": (mercado_height + 10) + "px"
+	$('#form-submitter').css({
+		'left': (producto_width + 10) + 'px',
+		'top': (mercado_height + 10) + 'px'
 	});
-	$("#dbformfiller").css({
-		"height": (Math.max(mercado_height + submit_height + 10, producto_height) + 10) + "px"
+	$('#dbformfiller').css({
+		'height': (Math.max(mercado_height + submit_height + 10, producto_height) + 10) + 'px
 	});
 
 });
 
 function beforeForm() {
-	$('#AjaxFormSubmit').attr("disabled", "disabled"); //Disable the submit button - can't click twice
+	$('#AjaxFormSubmit').attr('disabled', 'disabled'); //Disable the submit button - can't click twice
 	$('.errorlist').remove(); //Get rid of any old error uls
 	//$('#AjaxFormWarning').fadeOut('slow'); //Get rid of the main error message
-	$('#AjaxFormWarning').html("<img src=\"/media/icons/ajax-loader.gif\" />").fadeIn('slow');
-	$("#AjaxFormWarning").ajaxError(function() {
-		$(this).html("Hay problemas con el red!").fadeIn('slow');
-		$('#AjaxFormSubmit').attr("disabled", "");
+	$('#AjaxFormWarning').html('<img src="/media/icons/ajax-loader.gif" />').fadeIn('slow');
+	$('#AjaxFormWarning').ajaxError(function() {
+		$(this).html('Hay problemas con el red!').fadeIn('slow');
+		$('#AjaxFormSubmit').attr('disabled', '');
 
 	});
 	return true;
@@ -90,14 +90,14 @@ $(document).ready(function() {
 function processJson(jsondata) {
 	//Do we have any data at all?
 	if (jsondata) {
-		//		e_msg = "We received your form, thank you.";
-		//		$('#AjaxFormWarning').text( e_msg ).fadeIn("slow");
+		//		e_msg = 'We received your form, thank you.';
+		//		$('#AjaxFormWarning').text( e_msg ).fadeIn('slow');
 		if (eval(jsondata.bad)) {
-			e_msg = "Please check your form.";
+			e_msg = 'Please check your form.';
 			errors = eval(jsondata.errs); //Again with the eval :)
 			$.each(errors,
 			function(fieldname, errmsg) {
-				id = "#id_" + fieldname;
+				id = '#id_' + fieldname;
 				$(id).parent().after(errmsg); //I want the error above the <p> holding the field
 			});
 		} else {
@@ -106,9 +106,9 @@ function processJson(jsondata) {
 		}
 	} else {
 		//DON'T PANIC :D
-		$('#AjaxFormWarning').text("Ajax error : no data received. ").fadeIn("slow");
+		$('#AjaxFormWarning').text('Ajax error : no data received. ').fadeIn('slow');
 	}
 	// re-enable the submit button, coz user has to fix stuff.
-	$('#AjaxFormSubmit').attr("disabled", "");
+	$('#AjaxFormSubmit').attr('disabled', '');
 
 }
