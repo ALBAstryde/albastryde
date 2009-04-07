@@ -788,7 +788,9 @@ function create_graphs(jsondata,close_button,graphsheader) {
 	graph_margin_bottom = 0;
 	function correct_graphheight() {
 		var comments_height;
-		comments_height = $("#" + query_id + "comments").height();
+		header_height = $("#" + query_id + "header").height();
+		comments_height = $("#" + query_id + "comments").height() + header_height;
+		$("#" + query_id+"comments").css('top', header_height + 'px');
 		if (comments_height > graph_height) {
 			graph_margin_bottom = comments_height - graph_height;
 			$("#" + query_id).css('margin-bottom', graph_margin_bottom + 'px');
@@ -824,11 +826,12 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		var comment_list = '';
 		if (eval(has_comments) || user_can_add) {
 			graph_margin = "200";
-			comment_list = "<table id=\"" + query_id + "comments\" style=\"width:200px; position:absolute;right:0;top:0;\"><tr>";
+			comment_list = "<table id=\"" + query_id + "comments\" style=\"width:200px; position:absolute;right:0;top:50px;\"><tr>";
 			comment_list += "<th style=\"width:15px;\">&nbsp;</th><th style=\"width:185px;\">Comentarios</th></tr></table>";
 		}
 		var graph_html = '';
 		graph_html += '<div id="' + query_id + '" class="graph" style="position:relative;">';
+		graph_html += '<div id="' + query_id + 'header">';
 		graph_html += '<h2 id="' + query_id + 'headline" >';
 		if (close_button) {
 			graph_html += '<img id="' + query_id + 'close" src="/media/icons/close.png" /> ';
@@ -853,6 +856,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		//			icon_width+=18;
 		//		}
 		//		icon_width+=18;
+		graph_html += '</div>';
 		graph_html += "<div id=\"" + query_id + "stats\" style=\"height:400px; margin-right:" + graph_margin + "px;\"></div>";
 		graph_html += comment_list;
 		graph_html += "<div id=\"" + query_id + "statsoverview\" style=\"height:50px; margin-right:" + graph_margin + "px;\"></div>";
