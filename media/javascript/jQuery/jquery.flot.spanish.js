@@ -244,6 +244,9 @@
                 s.points = $.extend(true, {}, options.points, s.points);
                 s.bars = $.extend(true, {}, options.bars, s.bars);
 
+		// turn on series in case nothing is set
+		if (s.show == null)
+		    s.show = true;
                 // turn on lines automatically in case nothing is set
                 if (s.lines.show == null && !s.bars.show && !s.points.show)
                     s.lines.show = true;
@@ -282,6 +285,7 @@
             }
             
             for (var i = 0; i < series.length; ++i) {
+	      if (series[i].show) {
                 var data = series[i].data,
                     axisx = series[i].xaxis,
                     axisy = series[i].yaxis,
@@ -319,6 +323,7 @@
                     if (x == null || y == null || isNaN(x) || isNaN(y))
                         data[j] = null; // mark this point as invalid
                 }
+	      } 
             }
 
             for (axis in axes) {
@@ -1027,12 +1032,14 @@
         }
 
         function drawSeries(series) {
-            if (series.lines.show)
-                drawSeriesLines(series);
-            if (series.bars.show)
-                drawSeriesBars(series);
-            if (series.points.show)
-                drawSeriesPoints(series);
+	    if (series.show) {
+                if (series.lines.show)
+                    drawSeriesLines(series);
+                if (series.bars.show)
+                    drawSeriesBars(series);
+                if (series.points.show)
+                    drawSeriesPoints(series);
+	    }
         }
         
         function drawSeriesLines(series) {
@@ -1506,8 +1513,14 @@
                 if (options.legend.labelFormatter != null)
                     label = options.legend.labelFormatter(label);
                 
+		var checkbox;
+		if (series[i].show) {
+		    checkbox = '<input type="checkbox" class="dataseries" name="'+current_graphs[i].color+'" checked="checked" />';
+		} else {
+		    checkbox = '<input type="checkbox" class="dataseries" name="'+current_graphs[i].color+'" />';
+		}
                 fragments.push(
-                    '<td class="legendColorBox"><div style="border:1px solid ' + options.legend.labelBoxBorderColor + ';padding:1px"><div style="width:4px;height:0;border:5px solid ' + series[i].color + ';overflow:hidden"></div></div></td>' +
+                    '<td class="legendCheckBox">'+checkbox+'</td><td class="legendColorBox"><div style="border:1px solid ' + options.legend.labelBoxBorderColor + ';padding:1px"><div style="width:4px;height:0;border:5px solid ' + series[i].color + ';overflow:hidden"></div></div></td>' +
                     '<td class="legendLabel">' + label + '</td>');
             }
             if (rowStarted)
@@ -1584,6 +1597,9 @@
             for (var i = 0; i < series.length; ++i) {
                 if (!seriesFilter(series[i]))
                     continue;
+		if (series[i].show==false) {
+		    break;
+		} 
                 
                 var data = series[i].data,
                     axisx = series[i].xaxis,

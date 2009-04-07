@@ -982,7 +982,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		reset_comments(query_id);
 		//first unbind all earlier bindings
 		unbind_all(query_id);
-
+		current_graphs=graphs;
 		var options, overview;
 		options = {
 			xaxis: {
@@ -1017,7 +1017,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			};
 		}
 		plot = $.plot($("#" + query_id + "stats"), graphs, options);
-		overview = $.plot($("#" + query_id + "statsoverview"), graphs, {
+		overview_options = {
 			lines: {
 				lineWidth: 1
 			},
@@ -1038,7 +1038,8 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			selection: {
 				mode: "xy"
 			}
-		});
+		};
+		overview = $.plot($("#" + query_id + "statsoverview"), graphs, overview_options);
 		graph_height = $("#" + query_id).height();
 		correct_graphheight();
 		$("#" + query_id + "stats").bind("plotselected",
@@ -1086,6 +1087,22 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			reset_comments(query_id);
 			plot.setSelection(ranges);
 			correct_graphheight();
+		});
+		$("div#"+ query_id +"legend input.dataseries").live("click",function() {
+			var state=$(this).attr('checked');
+			var color_value=parseInt($(this).attr('name'));
+			for (i in graphs) {
+				if (graphs[i].color==color_value) {
+					graphs[i].show=state;
+				}
+			}
+			//current_graphs=graphs;
+			reset_comments(query_id);
+			plot = $.plot($("#" + query_id + "stats"), graphs, options);
+			overview.clearSelection(true);
+			overview = $.plot($("#" + query_id + "statsoverview"), graphs, overview_options);
+			correct_graphheight();
+			//alert(color_value+': '+state);
 		});
 		$("img#" + query_id + "reset").click(function() {
 			reset_comments(query_id);
