@@ -972,6 +972,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		$("img#" + query_id + "email").unbind("click");
 		$("img#" + query_id + "close").unbind("click");
 		$("span#" + query_id + "csvexport").unbind("click");
+		$("div#"+ query_id +"legend input.dataseries").die("click");
 		return true;
 	}
 	function destroy_all_globals() {
