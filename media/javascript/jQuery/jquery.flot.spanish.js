@@ -187,11 +187,13 @@
                 var sc = series[i].color;
                 if (sc != null) {
                     --neededColors;
-                    if (typeof sc == "number")
+                    if (typeof sc == "number") {
                         assignedColors.push(sc);
-                    else
+			series[i].color_number=sc;	
+                    } else {
                         usedColors.push(parseColor(series[i].color));
-                }
+		    } 
+               }
             }
             
             // we might need to generate more colors if higher indices
@@ -1515,9 +1517,9 @@
                 
 		var checkbox;
 		if (series[i].show) {
-		    checkbox = '<input type="checkbox" class="dataseries" name="'+current_graphs[i].color+'" checked="checked" />';
+		    checkbox = '<input type="checkbox" class="dataseries" name="'+series[i].color_number+'" checked="checked" />';
 		} else {
-		    checkbox = '<input type="checkbox" class="dataseries" name="'+current_graphs[i].color+'" />';
+		    checkbox = '<input type="checkbox" class="dataseries" name="'+series[i].color_number+'" />';
 		}
                 fragments.push(
                     '<td class="legendCheckBox">'+checkbox+'</td><td class="legendColorBox"><div style="border:1px solid ' + options.legend.labelBoxBorderColor + ';padding:1px"><div style="width:4px;height:0;border:5px solid ' + series[i].color + ';overflow:hidden"></div></div></td>' +

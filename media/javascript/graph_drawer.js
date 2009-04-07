@@ -799,15 +799,15 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			$("#" + query_id).css('margin-bottom', 0);
 		}
 	}
-	function reset_comments(query_id) {
-		labelCanvas = false;
+	function reset_comments() {
+		//labelCanvas = false;
 		comment_counter = 0;
 		$("#" + query_id + " tr.comment").remove();
-		$("#" + query_id + "labelcanvas").remove();
+		//$("#" + query_id + "labelcanvas").remove();
 		$("#" + query_id + " div.pointLabel").remove();
 	}
 	function redraw_graph() {
-		reset_comments(query_id);
+		reset_comments();
 		plot.draw();
 		correct_graphheight();
 	}
@@ -968,7 +968,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		}
 		return html;
 	}
-	function unbind_all(query_id) {
+	function unbind_all() {
 		$("#" + query_id + "stats").unbind("plotselected");
 		$("#" + query_id + "statsoverview").unbind("plotselected");
 		$("img#" + query_id + "reset").unbind("click");
@@ -976,19 +976,18 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		$("img#" + query_id + "email").unbind("click");
 		$("img#" + query_id + "close").unbind("click");
 		$("span#" + query_id + "csvexport").unbind("click");
-		$("div#"+ query_id +"legend input.dataseries").die("click");
+		//$("div#"+ query_id +"legend input.dataseries").die("click");
 		return true;
 	}
 	function destroy_all_globals() {
-		query_id = id = headline = comment_counter = has_comments = plot = comment_form_open = comments = datapoint_dictionary = graph_height = graph_margin_bottom = null;
+		query_id = id = headline = comment_counter = plot = has_comments = comment_form_open = comments = datapoint_dictionary = graph_height = graph_margin_bottom = null;
 		raw_graphs = converted_graphs = dollargraphs = eurographs = normalized_graphs = normalized_dollargraphs = normalized_eurographs = null;
 	}
 	function make_graphs(graphs) {
-		reset_comments(query_id);
+		reset_comments();
 		//first unbind all earlier bindings
-		unbind_all(query_id);
-		current_graphs=graphs;
-		var options, overview;
+		unbind_all();
+		var options, overview_options, overview;
 		options = {
 			xaxis: {
 				mode: "time",
@@ -1021,7 +1020,6 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				clickable: true
 			};
 		}
-		plot = $.plot($("#" + query_id + "stats"), graphs, options);
 		overview_options = {
 			lines: {
 				lineWidth: 1
@@ -1044,12 +1042,13 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				mode: "xy"
 			}
 		};
+		plot = $.plot($("#" + query_id + "stats"), graphs, options);
+		options.legend={show:false};
 		overview = $.plot($("#" + query_id + "statsoverview"), graphs, overview_options);
 		graph_height = $("#" + query_id).height();
 		correct_graphheight();
-		$("#" + query_id + "stats").bind("plotselected",
-		function(event, ranges) {
-			reset_comments(query_id);
+		$("#" + query_id + "stats").bind("plotselected",function(event, ranges) {
+			reset_comments();
 			// clamp the zooming to prevent eternal zoom
 			if (ranges.xaxis.to - ranges.xaxis.from < 0.00001) {
 				ranges.xaxis.to = ranges.xaxis.from + 0.00001;
@@ -1057,11 +1056,11 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			if (ranges.yaxis.to - ranges.yaxis.from < 0.00001) {
 				ranges.yaxis.to = ranges.yaxis.from + 0.00001;
 			}
-			if ('y2axis' in ranges) {
-				if (ranges.y2axis.to - ranges.y2axis.from < 0.00001) {
-					ranges.yaxis.to = ranges.yaxis.from + 0.00001;
-				}
-			}
+			//if ('y2axis' in ranges) {
+			//	if (ranges.y2axis.to - ranges.y2axis.from < 0.00001) {
+			//		ranges.yaxis.to = ranges.yaxis.from + 0.00001;
+			//	}
+			//}
 			// do the zooming
 			var axis_dic = {
 				xaxis: {
@@ -1089,11 +1088,11 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		});
 		$("#" + query_id + "statsoverview").bind("plotselected",
 		function(event, ranges) {
-			reset_comments(query_id);
+			reset_comments();
 			plot.setSelection(ranges);
 			correct_graphheight();
 		});
-		$("div#"+ query_id +"legend input.dataseries").live("click",function() {
+		$("div#"+ query_id +"legend input.dataseries").bind("click",function() {
 			var state=$(this).attr('checked');
 			var color_value=parseInt($(this).attr('name'));
 			for (i in graphs) {
@@ -1102,22 +1101,23 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				}
 			}
 			//current_graphs=graphs;
-			reset_comments(query_id);
+			//redraw_graph();
+			reset_comments();
 			plot = $.plot($("#" + query_id + "stats"), graphs, options);
-			overview.clearSelection(true);
+			//overview.clearSelection(true);
 			overview = $.plot($("#" + query_id + "statsoverview"), graphs, overview_options);
 			correct_graphheight();
 			//alert(color_value+': '+state);
 		});
 		$("img#" + query_id + "reset").click(function() {
-			reset_comments(query_id);
+			reset_comments();
 			plot = $.plot($("#" + query_id + "stats"), graphs, options);
 			overview.clearSelection(true);
 			correct_graphheight();
 		});
 		$("img#" + query_id + "close").click(function() {
-			reset_comments(query_id);
-			unbind_all(query_id);
+			reset_comments();
+			unbind_all();
 			$("#" + query_id).fadeOut(300,
 			function() {
 				$(this).remove();
