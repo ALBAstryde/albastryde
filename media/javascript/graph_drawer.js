@@ -1,9 +1,9 @@
 var e_msg, errors;
 
 function create_graphs(jsondata,close_button,graphsheader) {
-	var query_id, id, headline, comment_counter, has_comments, plot, comment_form_open, comments, datapoint_dictionary, graph_height, graph_margin_bottom;
+	var query_id, id, headline, comment_counter, has_comments, plot, comments, datapoint_dictionary, graph_height,graph_wiki=false,graph_close=false,graph_link=false,graph_export=false;
 	var raw_graphs, converted_graphs, dollargraphs, eurographs, normalized_graphs, normalized_dollargraphs, normalized_eurographs,color_counter=0,all_lluvias,all_mercados,all_productos;
-	comment_form_open = false;
+	var labelCanvas = false;
 	if (jsondata.comments) {
 		comments = jsondata.comments;
 		has_comments = true;
@@ -48,12 +48,62 @@ function create_graphs(jsondata,close_button,graphsheader) {
 	query_id = String(new Date().getTime());
 	var graph_html = draw_graph_structure(query_id, headline, has_comments, user_can_add, user_logged_in);
 	$(graphsheader).after(graph_html);
-
 	make_graphs(converted_graphs);
 	e_msg = 'Nuevo gráfico generado.';
 
 	//Show the message
 	$('#AjaxFormWarning').text(e_msg).fadeIn('slow');
+
+	//$('#'+query_id+'comments').accordion();
+
+	if (graph_wiki) {
+		$('span#' + query_id + 'graph_wiki').click(function(e) {
+			var dialog_id=Date.now();
+			var dialog_text = '<div id="'+dialog_id+'">Codigo para incluir en pagina de wiki:<br /><b>_estadisticas['+jsondata.wiki_code+']</b></div>';
+			var dialog_options={};
+			dialog_options.title='Codigo para la wiki';
+			$('#' + query_id).append(dialog_text);
+			$('#'+dialog_id).dialog(dialog_options);	
+		});
+	}
+	if (graph_link) {
+		$('span#' + query_id + 'graph_link').click(function(e) {
+			var dialog_id=Date.now();
+			var dialog_text = '<div id="'+dialog_id+'">Para compatir este gráfico, manda <a href="/estadisticas/'+jsondata.query_link+'">este enlace</a></div>';
+			var dialog_options={};
+			dialog_options.title='Enlace permanente';
+			$('#' + query_id).append(dialog_text);
+			$('#'+dialog_id).dialog(dialog_options);	
+		});
+	}
+	if (graph_export) {
+		$('span#' + query_id + 'graph_export').click(function(e) {
+			var export_data = csv_export(raw_graphs);
+			var dialog_id=Date.now();
+			var dialog_text = '<div id="'+dialog_id+'">';
+			dialog_text += 'Para usar estos datos en otros programas, copiar el texto abajo a un editor de archivos de texto. Guardar lo como un archivo del tipo ".csv". Este archivo se puede abrir en Open Office y otros programas.';
+			dialog_text += '<textarea rows="10" cols="80">';
+			dialog_text += export_data;
+			dialog_text += '</textarea>';
+			dialog_text += '</div>';
+			var dialog_options={};
+			dialog_options.title='Exportar datos';
+			dialog_options.width=700;
+			$('#' + query_id).append(dialog_text);
+			$('#'+dialog_id).dialog(dialog_options);	
+		});
+	}
+	if (graph_close) {
+		$('span#' + query_id + 'graph_close').click(function(e) {
+			reset_comments();
+			unbind_all();
+			$('#' + query_id).fadeOut(300,
+			function() {
+				$(this).remove();
+			});
+			destroy_all_globals();
+		});
+	}
 
 	//Calculate other graphs	
 	normalized_graphs = calculate_normalizedgraphs(converted_graphs);
@@ -286,8 +336,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 	function calculate_currencygraphs(currency_dic, cordobagraphs) {
 		var new_graphs = [];
 		var tipos_graficos = {};
-		$.each(cordobagraphs,
-		function() {
+		$.each(cordobagraphs,function() {
 			var label = '',
 			mercado, producto, lluvia, current_data, current_unit;
 			var data = this.data;
@@ -390,6 +439,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		new_graphs.y2axis = y2axis;
 		return new_graphs.sort();
 	}
+
 	function calculate_mediangraphs(cordobagraphs,median_variable) {
 		var graph_dic= {};
 		$.each(cordobagraphs, function() {
@@ -538,8 +588,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				}
 
 			}
-			$.each(data,
-			function() {
+			$.each(data,function() {
 				var time = this[0];
 				var unit_value = this[1];
 				var pk = this[2];
@@ -577,11 +626,10 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		}
 		return c;
 	}
-	var labelCanvas = false;
 	function drawPoint(ctx, x, y, radius, fillStyle, plotOffset, dataitem, series) {
 		var unique_pk = dataitem[2];
 		if (eval(has_comments) && unique_pk in comments) {
-			if (! (labelCanvas)) {
+			if (!(labelCanvas)) {
 				var canvasHeight = $('#' + query_id + 'stats canvas:first').outerHeight();
 				var canvasWidth = $('#' + query_id + 'stats canvas:first').outerWidth();
 				var canvas = $(makeLabelCanvas(canvasWidth, canvasHeight)).css({
@@ -611,31 +659,27 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			comment_counter += 1;
 			var comments_text = '';
 			for (var comment_pk in comments[unique_pk]) {
-				if (comments[unique_pk][comment_pk][3] === true) {
-					comments_text += '<div class="publicComment">';
-				} else {
-					comments_text += '<div class="nonpublicComment">';
-				}
+				//if (comments[unique_pk][comment_pk][3] === true) {
+				//	comments_text += '<div class="publicComment">';
+				//} else {
+				//	comments_text += '<div class="nonpublicComment">';
+				//}
+				comments_text += comments[unique_pk][comment_pk][0];
+				comments_text += '<br /><span class="signature">' + comments[unique_pk][comment_pk][1]+'</span>';
 				if (comments[unique_pk][comment_pk][2] === true) {
-					comments_text += '<p class="editline"><span class="link" id="' + unique_pk + '+' + comment_pk + '+' + query_id + '">Editar</span></p>';
+					comments_text += '<span class="editline" id="'+query_id+'_'+unique_pk+'editline"><span class="link" id="' + unique_pk + '+' + comment_pk + '+' + query_id + '"><span class="ui-icon ui-icon-pencil"></span></span></span>';
 				}
-				comments_text += '<p>' + comments[unique_pk][comment_pk][0] + '</p>';
-				comments_text += '<p class="signature">' + comments[unique_pk][comment_pk][1] + '</p>';
-				comments_text += '</div>';
 			}
 
-			$('#' + query_id + 'comments').append('<tr class="comment" id="' + query_id + '_' + unique_pk + 'comments"><td valign="top"><b>' + label + '</b></td><td valign="top">' + comments_text + '</td></tr>');
+			$('#' + query_id + 'comments').append('<h3><a href="#">' + label + '</a></h3><div>' + comments_text + '</div>');
 			$('<div class="pointLabel" id="' + query_id + '_' + unique_pk + 'label">' + label + '</div>').insertAfter('#' + query_id + 'labelcanvas');
-			var editButtons = $('#' + query_id + '_' + unique_pk + 'comments p.editline span');
-			editButtons.bind('click',
-			function() {
+			var editButtons = $('span.editline#' + query_id + '_' + unique_pk + 'editline span');
+			editButtons.bind('click',function() {
 				var total_pk, this_unique_pk, this_comment_pk;
-				if (! (comment_form_open)) {
-					total_pk = $(this).attr('id').split('+');
-					this_unique_pk = total_pk[0];
-					this_comment_pk = total_pk[1];
-					create_comment_form(this_unique_pk, this_comment_pk);
-				}
+				total_pk = $(this).attr('id').split('+');
+				this_unique_pk = total_pk[0];
+				this_comment_pk = total_pk[1];
+				create_comment_form(this_unique_pk, this_comment_pk);
 			});
 			var pointDiv = $('#' + query_id + '_' + unique_pk + 'label');
 			var labelwidth = pointDiv.outerWidth();
@@ -663,9 +707,11 @@ function create_graphs(jsondata,close_button,graphsheader) {
 	}
 
 	function create_comment_form(unique_pk, comment_pk) {
-		var comment, content_type, form_info, object_pk, pk_array, timestamp;
-		comment_form_open = true;
-		timestamp = parseInt(new Date().getTime().toString().substring(0, 10), 10);
+		var comment, form_info;
+		var pk_array = unique_pk.split('_');
+		var content_type = pk_array[0];
+		var object_pk = pk_array[1];
+		var timestamp = parseInt(new Date().getTime().toString().substring(0, 10), 10);
 		if (comment_pk) {
 			var comment_text = comments[unique_pk][comment_pk][0];
 		}
@@ -677,80 +723,65 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		var raw_date = datapoint_dictionary[unique_pk][0];
 		var date = date_string(raw_date);
 
-		var s = '';
-		s += '<div class="formDiv" id="' + query_id + 'formDiv">';
+		var dialog_options={}
+		var dialog_id=Date.now();
+		var dialog_text = '';
+
+		dialog_options.width=700;		
+		dialog_text += '<div id="' + dialog_id + '">';
 		if (comment_pk) {
-			s += '  <strong>Editar Comentario</strong><br /><br />';
+			dialog_options.title= 'Editar Comentario: ';
 		} else {
-			s += '  <strong>Nuevo Comentario</strong><br /><br />';
+			dialog_options.title= 'Nuevo Comentario: ';
 		}
-		s += '<strong>' + label + ': ' + value + ' (' + date + ')</strong><br /><br />';
-		s += '<form name="newcomment" id="' + query_id + 'newcomment" method="post">';
+		dialog_options.title += label + ': ' + value + ' (' + date + ')';
+		dialog_text += '<form name="newcomment" id="' + dialog_id + 'newcomment" method="post">';
 		if (comment_pk) {
-			s += '<input type="hidden" name="comment_pk" id="' + query_id + 'comment_pk" value="' + comment_pk + '">';
+			dialog_text += '<input type="hidden" name="comment_pk" id="' + dialog_id + 'comment_pk" value="' + comment_pk + '">';
 		}
-		s += '<input type="hidden" name="timestamp" id="' + query_id + 'timestamp_field" value="' + timestamp + '">';
-		s += '<input type="hidden" name="honeypot" id="' + query_id + 'honeypot_field" value="">';
-		s += '<textarea id="' + query_id + 'comment_field" name="comment" rows="10" cols="40" name="comment" class="vLargeTextField">';
+		dialog_text += '<input type="hidden" name="timestamp" id="' + dialog_id + 'timestamp_field" value="' + timestamp + '">';
+		dialog_text += '<input type="hidden" name="honeypot" id="' + dialog_id + 'honeypot_field" value="">';
+		dialog_text += '<textarea id="' + dialog_id + 'comment_field" name="comment" rows="10" cols="80" name="comment" class="vLargeTextField">';
 		if (comment_text) {
-			s += comment_text;
+			dialog_text += comment_text;
 		}
-		s += '</textarea>';
-		s += '<div id ="' + query_id + 'formDivMessage">&nbsp;</div>';
-		s += '<input type="button" name="btnSave" id="' + query_id + 'btnSave" value="Guardar"><input type="button" name="btnCancel" id="' + query_id + 'btnCancel" value="Cancelar">';
+		dialog_text += '</textarea>';
+		dialog_text += '<div id ="' + dialog_id + 'formDivMessage">&nbsp;</div></form></div>';
+		dialog_options.buttons = { 
+			'Guardar' : function() {
+				comment = $('#' + dialog_id + 'comment_field').val();
+				form_info = {
+					object_pk: object_pk,
+					content_type: content_type,
+					comment: comment
+				};
+				if (comment_pk) {
+					form_info.comment_pk = comment_pk;
+				}
+				form_info.timestamp = $('#' + dialog_id + 'timestamp_field').val();
+				form_info.honeypot = $('#' + dialog_id + 'honeypot_field').val();
+				returnFormResponse(form_info, 'Guardando...', 'Guardado con exito!');
+			}
+		};
 		if (comment_pk) {
-			s += '<input type="button" name="btnDelete" id="' + query_id + 'btnDelete" value="Borrar">';
-		}
-		s += '</form>';
-		s += '</div>';
-		pk_array = unique_pk.split('_');
-		content_type = pk_array[0];
-		object_pk = pk_array[1];
-		$('#' + query_id).append(s);
-		$('#' + query_id + 'btnSave').unbind(); // so other form doesn't get submitted
-		form_info = {};
-		$('#' + query_id + 'btnCancel').click(function() {
-			$('#' + query_id + 'formDivMessage').html('Cancelando...');
-			$('#' + query_id + 'formDiv').fadeOut(300,
-			function() {
-				$(this).remove();
-			});
-			comment_form_open = false;
-		});
-		if (comment_pk) {
-			$('#' + query_id + 'btnDelete').click(function() {
+			dialog_options.buttons.Borrar = function() {
 				form_info = {
 					object_pk: object_pk,
 					content_type: content_type,
 					remove: true,
 					comment_pk: comment_pk
 				};
-				form_info.timestamp = $('#' + query_id + 'timestamp_field').val();
-				form_info.honeypot = $('#' + query_id + 'honeypot_field').val();
+				form_info.timestamp = $('#' + dialog_id + 'timestamp_field').val();
+				form_info.honeypot = $('#' + dialog_id + 'honeypot_field').val();
 				returnFormResponse(form_info, 'Borrando...', 'Borrado con exito!');
-			});
-
-		}
-		$('#' + query_id + 'btnSave').click(function() {
-			comment = $('#' + query_id + 'comment_field').val();
-			form_info = {
-				object_pk: object_pk,
-				content_type: content_type,
-				comment: comment
 			};
-			if (comment_pk) {
-				form_info.comment_pk = comment_pk;
-			}
-			form_info.timestamp = $('#' + query_id + 'timestamp_field').val();
-			form_info.honeypot = $('#' + query_id + 'honeypot_field').val();
-			returnFormResponse(form_info, 'Guardando...', 'Guardado con exito!');
-		});
+		}
+		$('#' + query_id).append(dialog_text);
+		$('#' + dialog_id).dialog(dialog_options);
+		form_info = {};
 		function returnFormResponse(fI, processMessage, successMessage) {
-			$('#' + query_id + 'btnSave').attr('disabled', 'disabled');
-			$('#' + query_id + 'btnDelete').attr('disabled', 'disabled');
-			$('#' + query_id + 'formDivMessage').html(processMessage);
-			$.post('/ajax/comment/post/', fI,
-			function(data) {
+			$('#' + dialog_id + 'formDivMessage').html(processMessage);
+			$.post('/ajax/comment/post/', fI, function(data) {
 				if (data.status == 'success') {
 					if ('remove' in data) {
 						delete comments[unique_pk][data.pk];
@@ -769,48 +800,41 @@ function create_graphs(jsondata,close_button,graphsheader) {
 						comments[unique_pk][data.pk] = [comment, user_name, true, data.public];
 					}
 					redraw_graph();
-					$('#' + query_id + 'formDivMessage').html(successMessage);
-					$('#' + query_id + 'formDiv').fadeOut(300,
-					function() {
-						$(this).remove();
+					$('#' + dialog_id + 'formDivMessage').html(successMessage);
+					$('#' + dialog_id).fadeOut(300, function() {
+						$('#'+dialog_id).dialog('close');
 					});
-					comment_form_open = false;
 				} else {
-					$('#' + query_id + 'formDivMessage').html('Hubo un error!');
-					$('#' + query_id + 'btnSave').attr('disabled', '');
-					$('#' + query_id + 'btnDelete').attr('disabled', '');
+					$('#' + dialog_id + 'formDivMessage').html('Hubo un error!');
+					//$('#' + dialog_id + 'btnSave').attr('disabled', '');
+					//$('#' + dialog_id + 'btnDelete').attr('disabled', '');
 				}
 				// The success or failure check will go here. . .
-			},
-			'json');
+			},'json');
 		}
 	}
-	graph_margin_bottom = 0;
-	function correct_graphheight() {
-		var comments_height;
-		header_height = $('#' + query_id + 'header').height();
-		comments_height = $('#' + query_id + 'comments').height() + header_height;
-		$('#' + query_id+'comments').css('top', header_height + 'px');
-		if (comments_height > graph_height) {
-			graph_margin_bottom = comments_height - graph_height;
-			$('#' + query_id).css('margin-bottom', graph_margin_bottom + 'px');
-		} else if (graph_margin_bottom > 0) {
-			graph_margin_bottom = 0;
-			$('#' + query_id).css('margin-bottom', 0);
-		}
+
+	function build_comment_accordion() {
+		$('#'+query_id+'comments').accordion();
 	}
+
 	function reset_comments() {
-		//labelCanvas = false;
+		labelCanvas = false;
 		comment_counter = 0;
-		$('#' + query_id + ' tr.comment').remove();
-		//$('#' + query_id + 'labelcanvas').remove();
+		//$('#' + query_id + 'comments').replaceWith('<div id='+query_id+'comments"></div>');
+		$('#' + query_id + 'comments').accordion('destroy');
+		//$('#' + query_id + 'comments').attr('class','');
+		$('#' + query_id + 'comments').empty();
+		$('#' + query_id + 'labelcanvas').remove();
 		$('#' + query_id + ' div.pointLabel').remove();
 	}
+
 	function redraw_graph() {
 		reset_comments();
 		plot.draw();
-		correct_graphheight();
+		build_comment_accordion();
 	}
+
 	function calculate_datapoint_dictionary(graphs) {
 		var new_datapoint_dictionary = {};
 		for (var series = 0; series < graphs.length; ++series) {
@@ -821,66 +845,64 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		}
 		return new_datapoint_dictionary;
 	}
+
 	function draw_graph_structure(query_id, headline, has_comments, user_can_add, user_logged_in) {
+		var show_comments=false;
 		var graph_margin = '';
 		var comment_list = '';
+		var total_width=$('#Graphs').innerWidth()-20;
+		var graph_width=total_width;
 		if (eval(has_comments) || user_can_add) {
-			graph_margin = '200';
-			comment_list = '<table id="' + query_id + 'comments" style="width:200px; position:absolute;right:0;top:50px;"><tr>';
-			comment_list += '<th style="width:15px;">&nbsp;</th><th style="width:185px;">Comentarios</th></tr></table>';
+			show_comments=true;
+			graph_width=total_width-240;
 		}
 		var graph_html = '';
-		graph_html += '<div id="' + query_id + '" class="graph" style="position:relative;">';
-		graph_html += '<div id="' + query_id + 'header">';
-		graph_html += '<h2 id="' + query_id + 'headline" >';
-		if (close_button) {
-			graph_html += '<img id="' + query_id + 'close" src="/media/icons/close.png" /> ';
-		}
+		graph_html += 'total width: '+total_width+', graph_width: '+graph_width;
+		graph_html += '<div class="ui-dialog ui-widget ui-widget-content ui-corner-all undefined" style="width:'+total_width+'px;" id="'+query_id+'">';
+		graph_html += '<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">';
+		graph_html += '<span id="ui-dialog-title-dialog" class="ui-dialog-title">';
 		graph_html += headline;
-		//                graph_html+='<img id="'+query_id+'tablelink" src="/media/icons/spreadsheet.png" />';
-		//		graph_html+='<img src="/media/icons/print.png" />';
-		graph_html += '</h2>';
-		if (jsondata.query_link) {
-			graph_html += '<p><a href="/estadisticas/'+jsondata.query_link+'" target+"_blank">enlace permanente</a></p>';
-		}
+		graph_html += '</span>';
 		if (jsondata.wiki_code) {
 			if (can_edit_wiki) {
-				graph_html += '<p>Codigo para incluir en pagina de wiki:<br /><b>_estadisticas['+jsondata.wiki_code+']</b></p>';
+				graph_html += '<span class="ui-dialog-titlebar-script ui-corner-all link" id="'+query_id+'graph_wiki"><span class="ui-icon ui-icon-script">wiki code</span></span>';
+				graph_wiki=true;
 			}
 		}
-		//		var icon_width=0;
-		//                graph_html+='<img id="'+query_id+'print" src="/media/icons/print.png"/ style="position:absolute;left:'+icon_width+'px;top:0px;" />';
-		//		icon_width+=18;
-		//		if (user_logged_in) {
-		//                	graph_html+='<img id="'+query_id+'email" src="/media/icons/email.png"/ style="position:absolute;left:'+icon_width+'px;top:0px;" />';
-		//			icon_width+=18;
-		//		}
-		//		icon_width+=18;
+		if (jsondata.query_link) {
+			graph_html += '<span class="ui-dialog-titlebar-mail ui-corner-all link" id="'+query_id+'graph_link"><span class="ui-icon ui-icon-mail-closed">enlace</span></span>';
+			graph_link=true;
+		}
+		graph_html += '<span class="ui-dialog-titlebar-download ui-corner-all link" id="'+query_id+'graph_export"><span class="ui-icon ui-icon-document">exportar</span></span>';
+		graph_export=true;
+		if (close_button) {
+			graph_html += '<span class="ui-dialog-titlebar-close ui-corner-all link" id="'+query_id+'graph_close"><span class="ui-icon ui-icon-closethick">cerrar</span></span>';
+			graph_close=true;
+		}
 		graph_html += '</div>';
+		graph_html += '<div style="height: auto; min-height: 400px; width: auto;" class="ui-dialog-content ui-widget-content" id="'+query_id+'body">';
+		graph_html +='<table cellspacing="0" cellpadding="0" class="layout-grid">';
+		graph_html +='<tr><td valign="top" width="'+graph_width+'px">';
 		graph_html += '<div id="' + query_id + 'stats" style="height:400px; margin-right:' + graph_margin + 'px;"></div>';
-		graph_html += comment_list;
+		graph_html += '<span id="' + query_id + 'reset" class="link" ><span class="ui-icon ui-icon-arrow-4-diag"></span></span>';
 		graph_html += '<div id="' + query_id + 'statsoverview" style="height:50px; margin-right:' + graph_margin + 'px;"></div>';
-		graph_html += '<img id="' + query_id + 'reset" src="/media/icons/reset.png" />';
 		graph_html += '<select id="' + query_id + 'xtype" class="' + query_id + 'graphkind">';
 		graph_html += '<option selected="selected" value="real">Real</option>';
 		graph_html += '<option value="normalized">Normalizado</option></select>';
-		graph_html += '<span id="' + query_id + 'csvexport" class="link">Exportar datos</span>';
 		if (all_productos.length>0) {
-			graph_html += '<br />Precios: ';
 			graph_html += '<select id="' + query_id + 'xunits" class="' + query_id + 'graphkind"><option selected="selected" value="cordobas">Cordobas</option>';
 			graph_html += '<option value="dollars">USD</option><option value="euros">Euros</option></select>';
-			//if (all_productos.length>1) {
-			//graph_html += '<input type="checkbox" id="'+query_id+'show_median_productos" class="graphkind" /> mediano de todos los productos';
-			//}	
-			//if (all_mercados.length>1) {
-			//graph_html += '<input type="checkbox" id="'+query_id+'show_median_mercados" class="graphkind" /> mediano de todos los mercados';
-			//}	
-			//if ((all_mercados.length>1) && (all_productos.length>1)) {
-			//graph_html += '<input type="checkbox" id="'+query_id+'show_median_productos_and_mercados" class="graphkind" /> mediano de todos los mercados y productos';
-			//}	
-			//graph_html += '<br />';
 		}
-		graph_html += '<div id="' + query_id + 'legend" style="margin-right:' + graph_margin + 'px;"></div></div>';
+		graph_html += '<div id="' + query_id + 'legend" style="margin-right:' + graph_margin + 'px;"></div>';
+		graph_html += '</td>';
+		if (show_comments) {
+			graph_html += '<td width="200px" valign="top">';
+			graph_html += '<b>Comentarios</b>';
+			graph_html += '<div id="'+query_id+'comments"></div>';
+			graph_html += '</td>';
+		}
+		graph_html += '</tr></table>';
+		graph_html += '</div></div>';
 		return graph_html;
 	}
 
@@ -897,9 +919,6 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		var year = raw_date.getUTCFullYear();
 		var formated_date_string = year + '-' + month + '-' + day;
 		return formated_date_string;
-	}
-	function print_html(graphs) {
-		return '';
 	}
 
 	function csv_export(graphs) {
@@ -971,16 +990,16 @@ function create_graphs(jsondata,close_button,graphsheader) {
 	function unbind_all() {
 		$('#' + query_id + 'stats').unbind('plotselected');
 		$('#' + query_id + 'statsoverview').unbind('plotselected');
-		$('img#' + query_id + 'reset').unbind('click');
-		$('img#' + query_id + 'print').unbind('click');
-		$('img#' + query_id + 'email').unbind('click');
-		$('img#' + query_id + 'close').unbind('click');
-		$('span#' + query_id + 'csvexport').unbind('click');
+		$('#' + query_id + 'reset').unbind('click');
+		$('#' + query_id + 'graph_wiki').unbind('click');
+		$('#' + query_id + 'graph_link').unbind('click');
+		$('#' + query_id + 'graph_close').unbind('click');
+		$('#' + query_id + 'graph_export').unbind('click');
 		$('div#' + query_id +'legend input.dataseries').unbind('click');
 		return true;
 	}
 	function destroy_all_globals() {
-		query_id = id = headline = comment_counter = plot = has_comments = comment_form_open = comments = datapoint_dictionary = graph_height = graph_margin_bottom = null;
+		query_id = id = headline = comment_counter = plot = has_comments = comments = datapoint_dictionary = graph_height = null;
 		raw_graphs = converted_graphs = dollargraphs = eurographs = normalized_graphs = normalized_dollargraphs = normalized_eurographs = null;
 	}
 	function make_graphs(graphs) {
@@ -1046,7 +1065,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		options.legend={show:false};
 		overview = $.plot($('#' + query_id + 'statsoverview'), graphs, overview_options);
 		graph_height = $('#' + query_id).height();
-		correct_graphheight();
+		build_comment_accordion();
 		$('#' + query_id + 'stats').bind('plotselected',function(event, ranges) {
 			reset_comments();
 			// clamp the zooming to prevent eternal zoom
@@ -1084,13 +1103,12 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			// don't fire event on the overview to prevent eternal loop
 			overview.clearSelection(true);
 			overview.setSelection(ranges, true);
-			correct_graphheight();
+			build_comment_accordion();
 		});
-		$('#' + query_id + 'statsoverview').bind('plotselected',
-		function(event, ranges) {
+		$('#' + query_id + 'statsoverview').bind('plotselected',function(event, ranges) {
 			reset_comments();
 			plot.setSelection(ranges);
-			correct_graphheight();
+			build_comment_accordion();
 		});
 		$('div#'+ query_id +'legend input.dataseries').bind('click',function() {
 			var state=$(this).attr('checked');
@@ -1106,68 +1124,16 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			plot = $.plot($('#' + query_id + 'stats'), graphs, options);
 			//overview.clearSelection(true);
 			overview = $.plot($('#' + query_id + 'statsoverview'), graphs, overview_options);
-			correct_graphheight();
-			//alert(color_value+': '+state);
+			build_comment_accordion();
 		});
-		$('img#' + query_id + 'reset').click(function() {
+		$('#' + query_id + 'reset').click(function() {
 			reset_comments();
 			plot = $.plot($('#' + query_id + 'stats'), graphs, options);
 			overview.clearSelection(true);
-			correct_graphheight();
+			build_comment_accordion();
 		});
-		$('img#' + query_id + 'close').click(function() {
-			reset_comments();
-			unbind_all();
-			$('#' + query_id).fadeOut(300,
-			function() {
-				$(this).remove();
-			});
-			destroy_all_globals();
-		});
-		$('span#' + query_id + 'csvexport').click(function(e) {
-			// si el usuario ha utilizado una tecla de control
-			// no hacemos nada
-			if (e.ctrlKey || e.shiftKey || e.metaKey) {
-				return;
-			}
-			// abrimos la ventana
-			var w = window.open('', '_blank', '');
-			if (w && !w.closed) {
-				w.document.open('text/csv', 'replace');
-				w.document.write(csv_export(raw_graphs));
-				w.document.close();
-				// si efectivamente hemos logrado abrirla
-				// la ponemos en foco
-				w.focus();
-				// y cancelamos el comportamiento por defecto
-				// del enlace
-				e.preventDefault();
-			}
-
-		});
-		$('img#' + query_id + 'print').click(function(e) {
-			// si el usuario ha utilizado una tecla de control
-			// no hacemos nada
-			if (e.ctrlKey || e.shiftKey || e.metaKey) {
-				return;
-			}
-			// abrimos la ventana
-			var w = window.open('', query_id + '.csv', '');
-			if (w && !w.closed) {
-				w.document.write(print_html(graphs));
-				w.document.close();
-				// si efectivamente hemos logrado abrirla
-				// la ponemos en foco
-				w.focus();
-				// y cancelamos el comportamiento por defecto
-				// del enlace
-				e.preventDefault();
-			}
-
-		});
-		$('#' + query_id + 'stats').bind('plotclick',
-		function(event, pos, item) {
-			if ((item) && (!(comment_form_open))) {
+		$('#' + query_id + 'stats').bind('plotclick',function(event, pos, item) {
+			if (item) {
 				create_comment_form(item.datapoint[2]);
 			}
 		});

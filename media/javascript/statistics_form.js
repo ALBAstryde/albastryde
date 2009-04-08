@@ -4,38 +4,34 @@ $.preloadImages = function() {
 	}
 };
 
-$.preloadImages('/media/icons/ajax-loader.gif', '/media/icons/reset.png', '/media/icons/close.png');
+$.preloadImages('/media/icons/ajax-loader.gif');
 
 $(function() {
-	$('#id_StartDate').datePicker({
-		startDate: '01/01/1920',
-		endDate: (new Date()).addDays( - 1).asString()
-	});
-	$('#id_EndDate').datePicker({
-		startDate: '02/01/1920',
-		endDate: (new Date()).asString()
-	});
-	$('#id_StartDate').bind('dpClosed',
-	function(e, selectedDates) {
-		var d = selectedDates[0];
-		if (d) {
-			d = new Date(d);
-			$('#id_EndDate').dpSetStartDate(d.addDays(1).asString());
+	$('#id_StartDate').datepicker({
+		dateFormat: 'dd.mm.yy',
+		changeYear: true,
+		minDate: new Date('01/01/1920'),
+		maxDate: (new Date()).addDays( - 1),
+		onSelect : function(selectedDate) {
+			d = new Date(selectedDate.substring(3,5)+'/'+selectedDate.substring(0,2)+'/'+selectedDate.substring(6,10)).addDays(1);
+			$('#id_EndDate').datepicker('option','minDate',d);			
 		}
 	});
-	$('#id_EndDate').bind('dpClosed',
-	function(e, selectedDates) {
-		var d = selectedDates[0];
-		if (d) {
-			d = new Date(d);
-			$('#id_StartDate').dpSetEndDate(d.addDays( - 1).asString());
+	$('#id_EndDate').datepicker({
+		dateFormat: 'dd.mm.yy',
+		changeYear: true,
+		minDate: new Date('01/02/1920'),
+		maxDate: new Date(),
+		onSelect : function(selectedDate) {
+			d = new Date(selectedDate.substring(3,5)+'/'+selectedDate.substring(0,2)+'/'+selectedDate.substring(6,10)).addDays(-1);
+			$('#id_StartDate').datepicker('option','maxDate',d);			
 		}
 	});
-
 });
 
 $(document).ready(function() {
 	var producto_height = $('#producto-chooser').height();
+	var from_width = $('#from-chooser').width();
 	var mercado_height = $('#mercado-chooser').height();
 	var mercado_width = $('#mercado-chooser').width();
 	var producto_width = $('#producto-chooser').width();
@@ -47,6 +43,9 @@ $(document).ready(function() {
 	$('#from-chooser').css({
 		'left': (producto_width + mercado_width + 20) + 'px'
 	});
+	$('#lluvia-chooser').css({
+		'left': (producto_width + mercado_width + from_width + 30) + 'px'
+	});
 	$('#until-chooser').css({
 		'left': (producto_width + mercado_width + 20) + 'px'
 	});
@@ -55,7 +54,7 @@ $(document).ready(function() {
 		'top': (mercado_height + 10) + 'px'
 	});
 	$('#dbformfiller').css({
-		'height': (Math.max(mercado_height + submit_height + 10, producto_height) + 10) + 'px
+		'height': (Math.max(mercado_height + submit_height + 10, producto_height) + 10) + 'px'
 	});
 
 });
