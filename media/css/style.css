@@ -2,19 +2,24 @@ body {
 	font:12px Verdana, Arial, Helvetica, sans-serif;
 	background: #738040;
 }
+.ui-dialog .ui-dialog-titlebar-one { position: absolute; right: 0.3em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
+.ui-dialog .ui-dialog-titlebar-one span { display: block; margin: 1px; }
+.ui-dialog .ui-dialog-titlebar-one:hover, .ui-dialog .ui-dialog-titlebar-one:focus { padding: 0; }
 
+.ui-dialog .ui-dialog-titlebar-two { position: absolute; right: 1.5em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
+.ui-dialog .ui-dialog-titlebar-two span { display: block; margin: 1px; }
+.ui-dialog .ui-dialog-titlebar-two:hover, .ui-dialog .ui-dialog-titlebar-two:focus { padding: 0; }
 
-.ui-dialog .ui-dialog-titlebar-script { position: absolute; right: 3.9em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
-.ui-dialog .ui-dialog-titlebar-script span { display: block; margin: 1px; }
-.ui-dialog .ui-dialog-titlebar-script:hover, .ui-dialog .ui-dialog-titlebar-script:focus { padding: 0; }
+.ui-dialog .ui-dialog-titlebar-three { position: absolute; right: 2.7em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
+.ui-dialog .ui-dialog-titlebar-three span { display: block; margin: 1px; }
+.ui-dialog .ui-dialog-titlebar-three:hover, .ui-dialog .ui-dialog-titlebar-three:focus { padding: 0; }
 
-.ui-dialog .ui-dialog-titlebar-download { position: absolute; right: 1.5em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
-.ui-dialog .ui-dialog-titlebar-download span { display: block; margin: 1px; }
-.ui-dialog .ui-dialog-titlebar-download:hover, .ui-dialog .ui-dialog-titlebar-download:focus { padding: 0; }
+.ui-dialog .ui-dialog-titlebar-four { position: absolute; right: 3.9em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
+.ui-dialog .ui-dialog-titlebar-four span { display: block; margin: 1px; }
+.ui-dialog .ui-dialog-titlebar-four:hover, .ui-dialog .ui-dialog-titlebar-four:focus { padding: 0; }
 
-.ui-dialog .ui-dialog-titlebar-mail { position: absolute; right: 2.7em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
-.ui-dialog .ui-dialog-titlebar-mail span { display: block; margin: 1px; }
-.ui-dialog .ui-dialog-titlebar-mail:hover, .ui-dialog .ui-dialog-titlebar-mail:focus { padding: 0; }
+.resetbutton { position: absolute; top: 10px; z-index: 100px; padding: 1px; }
+.resetbutton:hover, resetbutton:focus { padding: 0; }
 
 
 span.link {

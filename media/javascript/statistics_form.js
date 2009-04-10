@@ -92,7 +92,8 @@ function processJson(jsondata) {
 		//		e_msg = 'We received your form, thank you.';
 		//		$('#AjaxFormWarning').text( e_msg ).fadeIn('slow');
 		if (eval(jsondata.bad)) {
-			e_msg = 'Please check your form.';
+			e_msg = 'Por favor compruebe su formulario.';
+			$('#AjaxFormWarning').text( e_msg ).fadeIn('slow');
 			errors = eval(jsondata.errs); //Again with the eval :)
 			$.each(errors,
 			function(fieldname, errmsg) {

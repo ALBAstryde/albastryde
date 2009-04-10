@@ -12,61 +12,69 @@
 <!-- jquery.datePicker.js -->
 <script type="text/javascript" src="/media/javascript/jQuery/jquery.datePicker.js"></script>
 <script type="text/javascript" src="/media/javascript/statistics_form.js"></script>
+<script type="text/javascript">
+
+$(function() {
+	$("#variables").accordion();
+});
+
+</script>
 {% endblock %}
 {% block contents %}
 
 {% if form %} 
 
 
-<div id="dbformfiller" style="height:350px;width:800px;z-index:10;"></div>
-<div id="dbform" style="position:absolute;top:110px;left:40px;height:350px;width:800px;"> 
+<div id="dbform"> 
 <form action="." method="POST" id="AjaxForm"> 
 
-<div style="position: absolute;top:0px;left:0px;" id="producto-chooser">
-<p>
-Producto:<br /> {{ form.Producto|safe }}
-</p>
-</div>
-<div style="position: absolute;top:0px;left:170px;" id="mercado-chooser">
-<p>
-Mercado:<br /> {{ form.Mercado|safe }} 
-</p>
-</div>
 
-<div style="position: absolute;top:0px;left:350px;" id="from-chooser">
-<p>
-Desde:<br /> {{ form.StartDate|safe }} 
-<br />
-</p>
-</div>
+<table>
 
-<div style="position: absolute;top:80px;left:350px;" id="until-chooser">
+<tr>
+<td valign="top">
 <p>
+Desde:<br /> {{ form.StartDate|safe }}<br />
 Hasta:<br /> {{ form.EndDate|safe }}
-<br />
 </p>
-</div>
 
-<div style="position: absolute;top:0px;left:570px;" id="lluvia-chooser">
-<p>
-Estacion de lluvia:<br /> {{ form.EstacionDeLluvia|safe }}
-<br />
-</p>
-</div>
+<p>&nbsp;</p>
 
-<div style="position: absolute;top:200px;left:300px;" id="form-submitter">
 <p>
 <input type="submit" value="Enviar" id="AjaxFormSubmit" /> 
 </p>
+
+</td>
+<td>
+<div id="variables">
+<h3><a href="#">Variables mercantiles</a></h3>
+<div>
+<table>
+<tr>
+<td valign="top">
+Producto:<br /> {{ form.Producto|safe }}
+</td><td valign="top">
+Mercado:<br /> {{ form.Mercado|safe }} 
+</td>
+</tr>
+</table>
 </div>
-</form>
-</div> 
-
-<div id="AjaxFormWarning" style="height:32px;" >&nbsp;</div> 
-
+<h3><a href="#">Variables climaticos</a></h3>
+<div>
+Estacion de lluvia:<br /> {{ form.EstacionDeLluvia|safe }}
+</div>
+</div>
+</td>
+<td>&nbsp;</td>
+<td valign="top">
+<div id="AjaxFormWarning"> </div>
+</td>
+</tr>
+</table>
+</form></div>
 <div id="Graphs" >
 <div id="GraphsHeader">&nbsp;</div>
 </div>
-
+</div>
 
 {% endif %} {% endblock %}

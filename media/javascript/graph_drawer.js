@@ -81,7 +81,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			var export_data = csv_export(raw_graphs);
 			var dialog_id=Date.now();
 			var dialog_text = '<div id="'+dialog_id+'">';
-			dialog_text += 'Para usar estos datos en otros programas, copiar el texto abajo a un editor de archivos de texto. Guardar lo como un archivo del tipo ".csv". Este archivo se puede abrir en Open Office y otros programas.';
+			dialog_text += 'Para usar estos datos en otros programas, copia el texto abajo a un editor de archivos de texto. Guardalo como un archivo del tipo ".csv". Este archivo se puede abrir en Open Office y otros programas parecidos.<br />';
 			dialog_text += '<textarea rows="10" cols="80">';
 			dialog_text += export_data;
 			dialog_text += '</textarea>';
@@ -667,13 +667,13 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				comments_text += comments[unique_pk][comment_pk][0];
 				comments_text += '<br /><span class="signature">' + comments[unique_pk][comment_pk][1]+'</span>';
 				if (comments[unique_pk][comment_pk][2] === true) {
-					comments_text += '<span class="editline" id="'+query_id+'_'+unique_pk+'editline"><span class="link" id="' + unique_pk + '+' + comment_pk + '+' + query_id + '"><span class="ui-icon ui-icon-pencil"></span></span></span>';
+					comments_text += '<span class="editline" id="'+query_id+'_'+unique_pk+'"><span class="link" id="' + unique_pk + '+' + comment_pk + '+' + query_id + '"><span class="ui-icon ui-icon-pencil"></span></span></span>';
 				}
 			}
 
 			$('#' + query_id + 'comments').append('<h3><a href="#">' + label + '</a></h3><div>' + comments_text + '</div>');
 			$('<div class="pointLabel" id="' + query_id + '_' + unique_pk + 'label">' + label + '</div>').insertAfter('#' + query_id + 'labelcanvas');
-			var editButtons = $('span.editline#' + query_id + '_' + unique_pk + 'editline span');
+			var editButtons = $('span.editline#' + query_id + '_' + unique_pk + ' span.link');
 			editButtons.bind('click',function() {
 				var total_pk, this_unique_pk, this_comment_pk;
 				total_pk = $(this).attr('id').split('+');
@@ -715,7 +715,11 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		if (comment_pk) {
 			var comment_text = comments[unique_pk][comment_pk][0];
 		}
+		//if (unique_pk in datapoint_dictionary) {
 		var label = datapoint_dictionary[unique_pk][3];
+		//} else {
+		//	testoutout = datapoint_dictionary;
+		//}
 		if (label.length === 0) {
 			label = 'producto';
 		}
@@ -850,41 +854,46 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		var show_comments=false;
 		var graph_margin = '';
 		var comment_list = '';
-		var total_width=$('#Graphs').innerWidth()-20;
+		var total_width=$(graphsheader).innerWidth()-20;
 		var graph_width=total_width;
 		if (eval(has_comments) || user_can_add) {
 			show_comments=true;
 			graph_width=total_width-240;
 		}
 		var graph_html = '';
-		graph_html += 'total width: '+total_width+', graph_width: '+graph_width;
+		//graph_html += 'total width: '+total_width+', graph_width: '+graph_width;
 		graph_html += '<div class="ui-dialog ui-widget ui-widget-content ui-corner-all undefined" style="width:'+total_width+'px;" id="'+query_id+'">';
 		graph_html += '<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">';
 		graph_html += '<span id="ui-dialog-title-dialog" class="ui-dialog-title">';
 		graph_html += headline;
 		graph_html += '</span>';
+		var iconpositions=['one','two','three','four'];
+		var current_icon=0;
+		if (close_button) {
+			graph_html += '<span class="ui-dialog-titlebar-'+iconpositions[current_icon]+' ui-corner-all link" id="'+query_id+'graph_close"><span class="ui-icon ui-icon-closethick">cerrar</span></span>';
+			current_icon++;
+			graph_close=true;
+		}
 		if (jsondata.wiki_code) {
 			if (can_edit_wiki) {
-				graph_html += '<span class="ui-dialog-titlebar-script ui-corner-all link" id="'+query_id+'graph_wiki"><span class="ui-icon ui-icon-script">wiki code</span></span>';
+				graph_html += '<span class="ui-dialog-titlebar-'+iconpositions[current_icon]+' ui-corner-all link" id="'+query_id+'graph_wiki"><span class="ui-icon ui-icon-script">wiki code</span></span>';
+				current_icon++;
 				graph_wiki=true;
 			}
 		}
 		if (jsondata.query_link) {
-			graph_html += '<span class="ui-dialog-titlebar-mail ui-corner-all link" id="'+query_id+'graph_link"><span class="ui-icon ui-icon-mail-closed">enlace</span></span>';
+			graph_html += '<span class="ui-dialog-titlebar-'+iconpositions[current_icon]+' ui-corner-all link" id="'+query_id+'graph_link"><span class="ui-icon ui-icon-mail-closed">enlace</span></span>';
+			current_icon++;
 			graph_link=true;
 		}
-		graph_html += '<span class="ui-dialog-titlebar-download ui-corner-all link" id="'+query_id+'graph_export"><span class="ui-icon ui-icon-document">exportar</span></span>';
+		graph_html += '<span class="ui-dialog-titlebar-'+iconpositions[current_icon]+' ui-corner-all link" id="'+query_id+'graph_export"><span class="ui-icon ui-icon-document">exportar</span></span>';
+		current_icon++;
 		graph_export=true;
-		if (close_button) {
-			graph_html += '<span class="ui-dialog-titlebar-close ui-corner-all link" id="'+query_id+'graph_close"><span class="ui-icon ui-icon-closethick">cerrar</span></span>';
-			graph_close=true;
-		}
 		graph_html += '</div>';
 		graph_html += '<div style="height: auto; min-height: 400px; width: auto;" class="ui-dialog-content ui-widget-content" id="'+query_id+'body">';
 		graph_html +='<table cellspacing="0" cellpadding="0" class="layout-grid">';
 		graph_html +='<tr><td valign="top" width="'+graph_width+'px">';
 		graph_html += '<div id="' + query_id + 'stats" style="height:400px; margin-right:' + graph_margin + 'px;"></div>';
-		graph_html += '<span id="' + query_id + 'reset" class="link" ><span class="ui-icon ui-icon-arrow-4-diag"></span></span>';
 		graph_html += '<div id="' + query_id + 'statsoverview" style="height:50px; margin-right:' + graph_margin + 'px;"></div>';
 		graph_html += '<select id="' + query_id + 'xtype" class="' + query_id + 'graphkind">';
 		graph_html += '<option selected="selected" value="real">Real</option>';
@@ -989,16 +998,17 @@ function create_graphs(jsondata,close_button,graphsheader) {
 	}
 	function unbind_all() {
 		$('#' + query_id + 'stats').unbind('plotselected');
+		$('#' + query_id + 'stats').unbind('plotclick');
 		$('#' + query_id + 'statsoverview').unbind('plotselected');
-		$('#' + query_id + 'reset').unbind('click');
-		$('#' + query_id + 'graph_wiki').unbind('click');
-		$('#' + query_id + 'graph_link').unbind('click');
-		$('#' + query_id + 'graph_close').unbind('click');
-		$('#' + query_id + 'graph_export').unbind('click');
+		$('#' + query_id + 'reset').die('click');
 		$('div#' + query_id +'legend input.dataseries').unbind('click');
 		return true;
 	}
 	function destroy_all_globals() {
+		$('#' + query_id + 'graph_wiki').unbind('click');
+		$('#' + query_id + 'graph_link').unbind('click');
+		$('#' + query_id + 'graph_close').unbind('click');
+		$('#' + query_id + 'graph_export').unbind('click');
 		query_id = id = headline = comment_counter = plot = has_comments = comments = datapoint_dictionary = graph_height = null;
 		raw_graphs = converted_graphs = dollargraphs = eurographs = normalized_graphs = normalized_dollargraphs = normalized_eurographs = null;
 	}
@@ -1104,6 +1114,15 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			overview.clearSelection(true);
 			overview.setSelection(ranges, true);
 			build_comment_accordion();
+			//find position of tick labels:
+			var reset_button_right;
+			$('#'+query_id+' .tickLabels .tickLabel').each(function() {
+        			if($(this).css('text-align') == 'right') {
+					reset_button_right = parseInt($(this).css('right'))-25;
+				}//not perfect, because I'm going through all tick labels
+			});
+			$('#'+query_id+'stats').append('<span id="' + query_id + 'reset" class="resetbutton link" style="right:'+reset_button_right+'px;" ><span class="ui-icon ui-icon-arrow-4-diag"></span></span>');
+
 		});
 		$('#' + query_id + 'statsoverview').bind('plotselected',function(event, ranges) {
 			reset_comments();
@@ -1126,7 +1145,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			overview = $.plot($('#' + query_id + 'statsoverview'), graphs, overview_options);
 			build_comment_accordion();
 		});
-		$('#' + query_id + 'reset').click(function() {
+		$('#' + query_id + 'reset').live('click',function() {
 			reset_comments();
 			plot = $.plot($('#' + query_id + 'stats'), graphs, options);
 			overview.clearSelection(true);
