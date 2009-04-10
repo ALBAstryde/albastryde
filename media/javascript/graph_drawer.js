@@ -628,7 +628,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 	}
 	function drawPoint(ctx, x, y, radius, fillStyle, plotOffset, dataitem, series) {
 		var unique_pk = dataitem[2];
-		if (eval(has_comments) && unique_pk in comments) {
+		if ((has_comments) && unique_pk in comments) {
 			if (!(labelCanvas)) {
 				var canvasHeight = $('#' + query_id + 'stats canvas:first').outerHeight();
 				var canvasWidth = $('#' + query_id + 'stats canvas:first').outerWidth();
@@ -854,11 +854,11 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		var show_comments=false;
 		var graph_margin = '';
 		var comment_list = '';
-		var total_width=$(graphsheader).innerWidth()-20;
-		var graph_width=total_width;
-		if (eval(has_comments) || user_can_add) {
+		var total_width=$(graphsheader).innerWidth()-5;
+		var graph_width=total_width-90;
+		if (has_comments || user_can_add) {
 			show_comments=true;
-			graph_width=total_width-240;
+			graph_width=total_width-200;
 		}
 		var graph_html = '';
 		//graph_html += 'total width: '+total_width+', graph_width: '+graph_width;
