@@ -7,7 +7,22 @@ $.preloadImages = function() {
 $.preloadImages('/media/icons/ajax-loader.gif');
 
 $(function() {
+	var dayNames = ['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];
+	var dayNamesShort = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
+	var dayNamesMin = ['Do','Lu','Ma','Mi','Ju','Vi','Sa'];
+
+	var monthNames = ['Enero','Fevrero','Marzo','Avril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+	var monthNamesShort = ['Ene','Fev','Mar','Avr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+	var monthNamesMin = ['En','Fe','Mar','Av','May','Jun','Jul','Ag','Se','Oc','No','Di'];
+
 	$('#id_StartDate').datepicker({
+		dayNames: dayNames,
+		dayNamesShort: dayNamesShort,
+		dayNamesMin: dayNamesMin,
+		monthNames: monthNames,
+		monthNamesShort: monthNamesShort,
+		monthNamesMin: monthNamesMin,
+		
 		dateFormat: 'dd.mm.yy',
 		changeYear: true,
 		minDate: new Date('01/01/1920'),
@@ -18,6 +33,13 @@ $(function() {
 		}
 	});
 	$('#id_EndDate').datepicker({
+		dayNames: dayNames,
+		dayNamesShort: dayNamesShort,
+		dayNamesMin: dayNamesMin,
+		monthNames: monthNames,
+		monthNamesShort: monthNamesShort,
+		monthNamesMin: monthNamesMin,
+
 		dateFormat: 'dd.mm.yy',
 		changeYear: true,
 		minDate: new Date('01/02/1920'),
@@ -29,35 +51,6 @@ $(function() {
 	});
 });
 
-$(document).ready(function() {
-	var producto_height = $('#producto-chooser').height();
-	var from_width = $('#from-chooser').width();
-	var mercado_height = $('#mercado-chooser').height();
-	var mercado_width = $('#mercado-chooser').width();
-	var producto_width = $('#producto-chooser').width();
-	var submit_height = $('#form-submitter').height();
-	//var contents_width = $('#contents').width();
-	$('#mercado-chooser').css({
-		'left': (producto_width + 10) + 'px'
-	});
-	$('#from-chooser').css({
-		'left': (producto_width + mercado_width + 20) + 'px'
-	});
-	$('#lluvia-chooser').css({
-		'left': (producto_width + mercado_width + from_width + 30) + 'px'
-	});
-	$('#until-chooser').css({
-		'left': (producto_width + mercado_width + 20) + 'px'
-	});
-	$('#form-submitter').css({
-		'left': (producto_width + 10) + 'px',
-		'top': (mercado_height + 10) + 'px'
-	});
-	$('#dbformfiller').css({
-		'height': (Math.max(mercado_height + submit_height + 10, producto_height) + 10) + 'px'
-	});
-
-});
 
 function beforeForm() {
 	$('#AjaxFormSubmit').attr('disabled', 'disabled'); //Disable the submit button - can't click twice
