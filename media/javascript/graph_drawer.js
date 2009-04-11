@@ -1,7 +1,7 @@
 var e_msg, errors;
 
 function create_graphs(jsondata,close_button,graphsheader) {
-	var query_id, id, headline, comment_counter, has_comments, plot, comments, datapoint_dictionary, graph_height,graph_wiki=false,graph_close=false,graph_link=false,graph_export=false;
+	var query_id, id, headline, comment_counter=0, has_comments, plot, comments, datapoint_dictionary, graph_height,graph_wiki=false,graph_close=false,graph_link=false,graph_export=false;
 	var raw_graphs, converted_graphs, dollargraphs, eurographs, normalized_graphs, normalized_dollargraphs, normalized_eurographs,color_counter=0,all_lluvias,all_mercados,all_productos;
 	var labelCanvas = false;
 	if (jsondata.comments) {
@@ -48,7 +48,6 @@ function create_graphs(jsondata,close_button,graphsheader) {
 	query_id = String(new Date().getTime());
 	var graph_html = draw_graph_structure(query_id, headline, has_comments, user_can_add, user_logged_in);
 	$(graphsheader).after(graph_html);
-	make_graphs(converted_graphs);
 	e_msg = 'Nuevo gráfico generado.';
 
 	//Show the message
@@ -115,31 +114,8 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		normalized_eurographs = calculate_normalizedgraphs(eurographs);
 	}
 
-	$('select.' + query_id + 'graphkind').change(function() {
-		var xunits;
-		var xunits_selector = $('select#' + query_id + 'xunits');
-		if (xunits_selector.length > 0) {
-			xunits = xunits_selector.val();
-		} else {
-			xunits = 'other';
-		}
-		var xtype = $('select#' + query_id + 'xtype').val();
-		if ((xunits == 'cordobas' || xunits == 'other') && xtype == 'real') {
-			make_graphs(converted_graphs);
-		} else if (xunits == 'dollars' && xtype == 'real') {
-			make_graphs(dollargraphs);
-		} else if (xunits == 'euros' && xtype == 'real') {
-			make_graphs(eurographs);
-		} else if ((xunits == 'cordobas' || xunits == 'other') && xtype == 'normalized') {
-			make_graphs(normalized_graphs);
-		} else if (xunits == 'dollars' && xtype == 'normalized') {
-			make_graphs(normalized_dollargraphs);
-		} else if (xunits == 'euros' && xtype == 'normalized') {
-			make_graphs(normalized_eurographs);
-		} else {
-			make_graphs(converted_graphs);
-		}
-	});
+	make_graphs();
+
 
 	if ($.browser.msie) {
 		$('div.graph').remove();
@@ -338,7 +314,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		var tipos_graficos = {};
 		$.each(cordobagraphs,function() {
 			var label = '',
-			mercado, producto, lluvia, current_data, current_unit;
+			mercado, producto, lluvia, current_data, current_unit, start_value;
 			var data = this.data;
 			var unit = this.unit;
 			var tipo = this.tipo;
@@ -351,8 +327,8 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			var hoverable = this.hoverable;
 			var shadowSize = this.shadowSize;
 			var start_date = this.start_date;
-			var start_value = currency_dic[String(start_date)] * this.start_value;
 			if (unit == 'cordoba') {
+				start_value = currency_dic[String(start_date)] * this.start_value;
 				var currency_data = [];
 				$.each(data,
 				function() {
@@ -367,6 +343,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				current_data = currency_data;
 				current_unit = currency_dic.unit;
 			} else {
+				start_value=this.start_value;
 				current_data = data;
 				current_unit = unit;
 			}
@@ -1001,9 +978,10 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		$('#' + query_id + 'stats').unbind('plotclick');
 		$('#' + query_id + 'statsoverview').unbind('plotselected');
 		$('#' + query_id + 'reset').die('click');
-		$('div#' + query_id +'legend input.dataseries').unbind('click');
+		$('div#' + query_id +'legend input.dataseries').die('click');
 		return true;
 	}
+
 	function destroy_all_globals() {
 		$('#' + query_id + 'graph_wiki').unbind('click');
 		$('#' + query_id + 'graph_link').unbind('click');
@@ -1012,10 +990,52 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		query_id = id = headline = comment_counter = plot = has_comments = comments = datapoint_dictionary = graph_height = null;
 		raw_graphs = converted_graphs = dollargraphs = eurographs = normalized_graphs = normalized_dollargraphs = normalized_eurographs = null;
 	}
-	function make_graphs(graphs) {
-		reset_comments();
-		//first unbind all earlier bindings
-		unbind_all();
+
+	function ranges_to_axis_dic(ranges) {
+		var axis_dic = {
+			xaxis: {
+				min: ranges.xaxis.from,
+				max: ranges.xaxis.to
+			},
+			yaxis: {
+				min: ranges.yaxis.from,
+				max: ranges.yaxis.to
+			}
+		};
+		if ('y2axis' in ranges) {
+			axis_dic.y2axis = {
+				min: ranges.y2axis.from,
+				max: ranges.y2axis.to
+			};
+		}
+		return axis_dic;
+	}
+
+	function axis_dic_to_ranges(axis_dic) {
+		var ranges = {
+			xaxis: {
+				from: axis_dic.xaxis.min,
+				to: axis_dic.xaxis.max
+			}
+		};
+		if ('yaxis' in axis_dic) {
+			ranges.yaxis = {
+				from: axis_dic.yaxis.min,
+				to: axis_dic.yaxis.max
+			};
+		}
+		if ('y2axis' in axis_dic) {
+			ranges.y2axis = {
+				from: axis_dic.y2axis.min,
+				to: axis_dic.y2axis.max
+			};
+		}
+		return ranges;
+	}
+
+
+	function make_graphs() {
+		var axis_dic=false, graphs=converted_graphs, plot;
 		var options, overview_options, overview;
 		options = {
 			xaxis: {
@@ -1067,15 +1087,30 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			yaxis: {
 				ticks: []
 			},
+			y2axis: {
+				ticks: []
+			},
 			selection: {
 				mode: 'xy'
 			}
 		};
 		plot = $.plot($('#' + query_id + 'stats'), graphs, options);
-		options.legend={show:false};
+		options.legend={show:false}; // don't redraw legend on graph redraw
 		overview = $.plot($('#' + query_id + 'statsoverview'), graphs, overview_options);
 		graph_height = $('#' + query_id).height();
 		build_comment_accordion();
+
+		function draw_resetbutton() {
+			var reset_button_right;
+			//find position of tick labels:
+			$('#'+query_id+' .tickLabels .tickLabel').each(function() {
+        			if($(this).css('text-align') == 'right') {
+					reset_button_right = parseInt($(this).css('right'))-25;
+				}//not perfect, because I'm going through all tick labels
+			});
+			$('#'+query_id+'stats').append('<span id="' + query_id + 'reset" class="resetbutton link" style="right:'+reset_button_right+'px;" ><span class="ui-icon ui-icon-arrow-4-diag"></span></span>');
+		}
+
 		$('#' + query_id + 'stats').bind('plotselected',function(event, ranges) {
 			reset_comments();
 			// clamp the zooming to prevent eternal zoom
@@ -1085,68 +1120,102 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			if (ranges.yaxis.to - ranges.yaxis.from < 0.00001) {
 				ranges.yaxis.to = ranges.yaxis.from + 0.00001;
 			}
-			//if ('y2axis' in ranges) {
-			//	if (ranges.y2axis.to - ranges.y2axis.from < 0.00001) {
-			//		ranges.yaxis.to = ranges.yaxis.from + 0.00001;
-			//	}
-			//}
 			// do the zooming
-			var axis_dic = {
-				xaxis: {
-					min: ranges.xaxis.from,
-					max: ranges.xaxis.to
-				},
-				yaxis: {
-					min: ranges.yaxis.from,
-					max: ranges.yaxis.to
-				}
-			};
-			if ('y2axis' in ranges) {
-				axis_dic.y2axis = {
-					min: ranges.y2axis.from,
-					max: ranges.y2axis.to
-				};
-			}
-
-			plot = $.plot($('#' + query_id + 'stats'), graphs, $.extend(true, {},
-			options, axis_dic));
+			axis_dic=ranges_to_axis_dic(ranges);
+			plot = $.plot($('#' + query_id + 'stats'), graphs, $.extend(true, {},options, axis_dic));
 			// don't fire event on the overview to prevent eternal loop
 			overview.clearSelection(true);
 			overview.setSelection(ranges, true);
 			build_comment_accordion();
-			//find position of tick labels:
-			var reset_button_right;
-			$('#'+query_id+' .tickLabels .tickLabel').each(function() {
-        			if($(this).css('text-align') == 'right') {
-					reset_button_right = parseInt($(this).css('right'))-25;
-				}//not perfect, because I'm going through all tick labels
-			});
-			$('#'+query_id+'stats').append('<span id="' + query_id + 'reset" class="resetbutton link" style="right:'+reset_button_right+'px;" ><span class="ui-icon ui-icon-arrow-4-diag"></span></span>');
-
+			draw_resetbutton();
 		});
+		$('select.' + query_id + 'graphkind').change(function() {
+			var xunits;
+			var xunits_selector = $('select#' + query_id + 'xunits');
+			if (xunits_selector.length > 0) {
+				xunits = xunits_selector.val();
+			} else {
+				xunits = 'other';
+			}
+			var xtype = $('select#' + query_id + 'xtype').val();
+			if ((xunits == 'cordobas' || xunits == 'other') && xtype == 'real') {
+				graphs=converted_graphs;
+			} else if (xunits == 'dollars' && xtype == 'real') {
+				graphs=dollargraphs;
+			} else if (xunits == 'euros' && xtype == 'real') {
+				graphs=eurographs;
+			} else if ((xunits == 'cordobas' || xunits == 'other') && xtype == 'normalized') {
+				graphs=normalized_graphs;
+			} else if (xunits == 'dollars' && xtype == 'normalized') {
+				graphs=normalized_dollargraphs;
+			} else if (xunits == 'euros' && xtype == 'normalized') {
+				graphs=normalized_eurographs;
+			} else {
+				graphs=converted_graphs;
+			}
+
+
+			options.legend= {container: '#' + query_id + 'legend'}; //redraw legend for new type graph
+			reset_comments();
+			overview = $.plot($('#' + query_id + 'statsoverview'), graphs, overview_options);
+			if (axis_dic) {
+				delete axis_dic.yaxis;
+				if ('y2axis' in axis_dic) {
+					delete axis_dic.y2axis;
+				}		
+				plot = $.plot($('#' + query_id + 'stats'), graphs, $.extend(true, {},options, axis_dic));
+				axis_dic=plot.getAxes();
+				overview.setSelection(axis_dic_to_ranges(axis_dic));
+			} else {
+				plot = $.plot($('#' + query_id + 'stats'), graphs, options);
+			}
+			build_comment_accordion();
+			options.legend={show:false}; // don't redraw legend on graph redraw
+		});
+
 		$('#' + query_id + 'statsoverview').bind('plotselected',function(event, ranges) {
 			reset_comments();
 			plot.setSelection(ranges);
 			build_comment_accordion();
 		});
-		$('div#'+ query_id +'legend input.dataseries').bind('click',function() {
+
+		$('div#'+ query_id +'legend input.dataseries').live('click',function() {
 			var state=$(this).attr('checked');
 			var color_value=parseInt($(this).attr('name'));
-			for (i in graphs) {
-				if (graphs[i].color==color_value) {
-					graphs[i].show=state;
+			for (i in converted_graphs) {
+				if (converted_graphs[i].color==color_value) {
+					converted_graphs[i].show=state;
+					eurographs[i].show=state;
+					dollargraphs[i].show=state;
+				}
+			}
+			for (i in normalized_graphs) {
+				if (normalized_graphs[i].color==color_value) {
+					normalized_graphs[i].show=state;
+					normalized_eurographs[i].show=state;
+					normalized_dollargraphs[i].show=state;
 				}
 			}
 			//current_graphs=graphs;
 			//redraw_graph();
 			reset_comments();
-			plot = $.plot($('#' + query_id + 'stats'), graphs, options);
-			//overview.clearSelection(true);
 			overview = $.plot($('#' + query_id + 'statsoverview'), graphs, overview_options);
+			if (axis_dic) {
+				plot = $.plot($('#' + query_id + 'stats'), graphs, $.extend(true, {},options, axis_dic));
+				var ranges=axis_dic_to_ranges(axis_dic);
+				overview.setSelection(ranges, true);
+			} else {
+				plot = $.plot($('#' + query_id + 'stats'), graphs, options);
+			}
+			//overview.clearSelection(true);
 			build_comment_accordion();
+			if (axis_dic) {
+				draw_resetbutton();
+			}
 		});
 		$('#' + query_id + 'reset').live('click',function() {
 			reset_comments();
+			axis_dic=false;
 			plot = $.plot($('#' + query_id + 'stats'), graphs, options);
 			overview.clearSelection(true);
 			build_comment_accordion();
