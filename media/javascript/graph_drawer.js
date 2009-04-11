@@ -642,7 +642,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				//	comments_text += '<div class="nonpublicComment">';
 				//}
 				comments_text += comments[unique_pk][comment_pk][0];
-				comments_text += '<br /><span class="signature">' + comments[unique_pk][comment_pk][1]+'</span>';
+				comments_text += '<br /><span class="signature">' + comments[unique_pk][comment_pk][1]+'</span><br />';
 				if (comments[unique_pk][comment_pk][2] === true) {
 					comments_text += '<span class="editline" id="'+query_id+'_'+unique_pk+'"><span class="link" id="' + unique_pk + '+' + comment_pk + '+' + query_id + '"><span class="ui-icon ui-icon-pencil"></span></span></span>';
 				}
