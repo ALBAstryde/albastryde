@@ -1278,10 +1278,17 @@
                 // draw shadow in two steps
                 var w = sw / 2;
                 ctx.lineWidth = w;
-                ctx.strokeStyle = "rgba(0,0,0,0.1)";
-                plotLine(series.data, lw/2 + w + w/2, series.xaxis, series.yaxis);
-                ctx.strokeStyle = "rgba(0,0,0,0.2)";
-                plotLine(series.data, lw/2 + w/2, series.xaxis, series.yaxis);
+		if ('minData' in series) { // put shadow only on minimum line
+	                ctx.strokeStyle = "rgba(0,0,0,0.1)";
+                	plotLine(series.minData, lw/2 + w + w/2, series.xaxis, series.yaxis);
+                	ctx.strokeStyle = "rgba(0,0,0,0.2)";
+                	plotLine(series.minData, lw/2 + w/2, series.xaxis, series.yaxis);
+		} else {
+	                ctx.strokeStyle = "rgba(0,0,0,0.1)";
+                	plotLine(series.data, lw/2 + w + w/2, series.xaxis, series.yaxis);
+                	ctx.strokeStyle = "rgba(0,0,0,0.2)";
+                	plotLine(series.data, lw/2 + w/2, series.xaxis, series.yaxis);
+		}
             }
 
             ctx.lineWidth = lw;
@@ -1289,11 +1296,21 @@
             var fillStyle = getFillStyle(series.lines, series.color, 0, plotHeight);
             if (fillStyle) {
                 ctx.fillStyle = fillStyle;
-                plotLineArea(series.data, series.xaxis, series.yaxis);
+		if ('minData' in series) {
+			var fillLine = series.minData.concat(series.data.reverse());
+                	plotLineArea(fillLine, series.xaxis, series.yaxis);
+			series.data.reverse();//FIX: no need to reverse data twice!
+		} else {
+                	plotLineArea(series.data, series.xaxis, series.yaxis);
+		}
             }
 
-            if (lw > 0)
+            if (lw > 0) {
+		if ('minData' in series) {
+            	    plotLine(series.minData, 0, series.xaxis, series.yaxis);
+	        }
                 plotLine(series.data, 0, series.xaxis, series.yaxis);
+	    }
             ctx.restore();
         }
 

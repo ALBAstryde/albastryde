@@ -1,5 +1,4 @@
 var e_msg, errors;
-
 function create_graphs(jsondata,close_button,graphsheader) {
 	var query_id, id, headline, comment_counter=0, has_comments, plot, comments, datapoint_dictionary, graph_height,graph_wiki=false,graph_close=false,graph_link=false,graph_export=false;
 	var raw_graphs, converted_graphs, dollargraphs, eurographs, normalized_graphs, normalized_dollargraphs, normalized_eurographs,color_counter=0,all_lluvias,all_mercados,all_productos;
@@ -32,9 +31,11 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		if (all_productos.length>1) {
 			for (i in median_mercado_graphs) {
 				median_mercado_graphs[i].producto='1';
-				median_mercado_graphs[i].relevance='main';
 			}
 			var median_mercado_producto_graphs=calculate_mediangraphs(median_mercado_graphs,'producto');
+			for (i in median_mercado_graphs) {
+				delete median_mercado_graphs[i].producto;
+			}
 			if (median_mercado_producto_graphs.length>0) {
 				median_mercado_producto_graphs[0].advanced_label='mediano de todos los mercados y todos los productos';
 				median_mercado_producto_graphs[0].label='mediano de todos los mercados y todos los productos (cordoba)';
@@ -52,8 +53,6 @@ function create_graphs(jsondata,close_button,graphsheader) {
 
 	//Show the message
 	$('#AjaxFormWarning').text(e_msg).fadeIn('slow');
-
-	//$('#'+query_id+'comments').accordion();
 
 	if (graph_wiki) {
 		$('span#' + query_id + 'graph_wiki').click(function(e) {
@@ -123,6 +122,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 
 	function convert_graphs_after_transport(graphs) {
 		var new_graphs, tipos_graficos;
+		var minData;
 		new_graphs = [];
 		tipos_graficos = {};
 		all_productos = [];
@@ -136,6 +136,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			new_shadow_data = [],
 			max_data = [],
 			min_data_dic = {},
+			top_value=0,
 			tipo,
 			unit,
 			producto,
@@ -144,12 +145,6 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			label,
 			start_value,
 			start_date;
-			if ('data' in this) {
-				data = this.data;
-			} else {
-				max_data = this.max_data;
-				min_data_dic = this.min_data_dic;
-			}
 			unit = this.unit;
 			tipo = this.tipo;
 			if (tipo == 'precio') {
@@ -174,42 +169,47 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			if (! (tipo in tipos_graficos)) {
 				tipos_graficos[tipo] = unit;
 			}
-			if (data.length > 0) {
-				start_value = data[0][1];
-				start_date = data[0][0];
-				$.each(data,
-				function() {
-					var pk, value, time, new_time;
-					time = this[0];
-					new_time = time * 1000000; //add 7 zeroes to end of time string
-					value = this[1];
-					pk = this[2];
-					new_data.push([new_time, value, pk]);
-				});
-			} else {
-				start_value = max_data[0][1];
-				start_date = max_data[0][0];
-				var new_max_data = [],
-				new_min_data = [];
+			if ('min_data_dic' in this) {
+				max_data = this.max_data;
+				min_data_dic = this.min_data_dic;
+				var new_max_data = [];
+				minData=[];
 				$.each(max_data,
 				function() {
 					var pk, max_value, min_value, time, new_time;
 					time = this[0];
 					new_time = time * 1000000; //add 7 zeroes to end of time string
-					max_value = this[1];
+					max_value = parseFloat(this[1]);
+					if (max_value > top_value) {
+						top_value=max_value;
+					}
 					pk = this[2];
 					if (String(time) in min_data_dic) {
 						min_value = min_data_dic[String(time)];
 					} else {
 						min_value = max_value;
 					}
-					new_min_data.push([new_time, min_value, pk]);
+					minData.push([new_time, min_value]);
 					new_max_data.push([new_time, max_value, pk]);
 				});
-				new_fill_data = new_min_data.concat(new_max_data.reverse());
-				new_shadow_data = new_min_data;
-				new_data = new_max_data.reverse();
+				new_data = new_max_data;//.reverse();
+			} else {
+				data = this.data;
+				minData=false;
+				$.each(data,
+				function() {
+					var pk, value, time, new_time;
+					time = this[0];
+					new_time = time * 1000000; //add 7 zeroes to end of time string
+					value = parseFloat(this[1]);
+					if (value > top_value) {
+						top_value=value;
+					}
+					pk = this[2];
+					new_data.push([new_time, value, pk]);
+				});
 			}
+			start_date=new_data[0][0];
 			var graph_yaxis = 1;
 			var yaxis_finder = 1;
 			for (var item in tipos_graficos) {
@@ -231,64 +231,26 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				'bars': {},
 				'lines': {},
 				'points': {},
-				'start_value': start_value,
 				'start_date': start_date
 			};
 			if (tipo == 'precio') {
+				new_graph.start_value=new_data[0][1];
 				new_graph.lines = {
-					'show': true
+					'show': true,
 				};
+				if (minData) {
+					new_graph.minData=minData;
+					new_graph.lines.fill=true;
+				}
 				new_graph.producto = producto;
 				new_graph.mercado = mercado;
 			} else if (tipo == 'lluvia') {
+				new_graph.start_value=top_value;
 				new_graph.bars = {
 					'show': true,
 					'barWidth': 86400000
 				};
 				new_graph.lluvia = lluvia;
-			}
-			if (new_fill_data.length > 0) {
-				new_graph.shadowSize = 0;
-				var new_fill_graph = {
-					'data': new_fill_data,
-					'unit': unit,
-					'yaxis': yaxis,
-					'tipo': tipo,
-					'relevance': 'fill',
-					'color': color_counter,
-					'hoverable': false,
-					'clickable': false,
-					'shadowSize': 0,
-					'bars': {},
-					'points': {
-						'show': false
-					},
-					'lines': {
-						'fill': true
-					},
-					'start_value': start_value,
-					'start_date': start_date
-				};
-				new_graphs.push(new_fill_graph);
-				var new_shadow_graph = {
-					'data': new_shadow_data,
-					'unit': unit,
-					'yaxis': yaxis,
-					'tipo': tipo,
-					'relevance': 'shadow',
-					'color': color_counter,
-					'hoverable': false,
-					'clickable': false,
-					'bars': {},
-					'points': {
-						'show': false
-					},
-					'lines': {},
-					'shadowSize': 3,
-					'start_value': start_value,
-					'start_date': start_date
-				};
-				new_graphs.push(new_shadow_graph);
 			}
 			new_graphs.push(new_graph);
 			color_counter += 1;
@@ -314,90 +276,71 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		var tipos_graficos = {};
 		$.each(cordobagraphs,function() {
 			var label = '',
-			mercado, producto, lluvia, current_data, current_unit, start_value;
-			var data = this.data;
-			var unit = this.unit;
-			var tipo = this.tipo;
-			var color = this.color;
-			var lines = this.lines;
-			var points = this.points;
-			var bars = this.bars;
-			var relevance = this.relevance;
-			var clickable = this.clickable;
-			var hoverable = this.hoverable;
-			var shadowSize = this.shadowSize;
-			var start_date = this.start_date;
-			if (unit == 'cordoba') {
-				start_value = currency_dic[String(start_date)] * this.start_value;
-				var currency_data = [];
-				$.each(data,
+			new_data, new_unit, start_value;
+			var new_graph = {
+				'tipo': this.tipo,
+				'yaxis': this.yaxis,
+				'points': this.points,
+				'lines': this.lines,
+				'bars': this.bars,
+				'color': this.color,
+				'relevance': this.relevance,
+				'start_date': this.start_date,
+				'shadowSize': this.shadowSize,
+				'clickable': this.clickable,
+				'hoverable': this.hoverable,
+			};
+			if ('advanced_label' in this) {
+				new_graph.advanced_label=this.advanced_label;
+			}
+			if (this.unit == 'cordoba') {
+				new_graph.start_value = currency_dic[String(this.start_date / 1000000)] * this.start_value;
+				var new_data = [];
+				$.each(this.data,
 				function() {
 					var time = this[0];
 					var cordoba = this[1];
 					var pk = this[2];
 					var currency = currency_dic[String(time / 1000000)]; //convert to transfer time format to get currency timestamp
 					var currency_value = parseFloat(cordoba) * parseFloat(currency);
-					currency_data.push([time, currency_value, pk]);
+					new_data.push([time, currency_value, pk]);
 				});
-
-				current_data = currency_data;
-				current_unit = currency_dic.unit;
+				new_graph.data = new_data;
+				if ('minData' in this) {
+					var minData=[];
+					$.each(this.minData,
+					function() {
+						var time = this[0];
+						var cordoba = this[1];
+						var pk = this[2];
+						var currency = currency_dic[String(time / 1000000)]; //convert to transfer time format to get currency timestamp
+						var currency_value = parseFloat(cordoba) * parseFloat(currency);
+						minData.push([time, currency_value, pk]);
+					});
+				new_graph.minData=minData;
+				}
+				new_graph.unit = currency_dic.unit;
 			} else {
-				start_value=this.start_value;
-				current_data = data;
-				current_unit = unit;
+				new_graph.start_value=this.start_value;
+				new_graph.data = this.data;
+				if ('minData' in this) {
+					new_graph.minData=this.minData;
+				}
+				new_graph.unit = this.unit;
 			}
-			if (tipo == 'precio') {
-				producto = this.producto;
-				mercado = this.mercado;
-				if (relevance == 'main') {
-					label = producto + ' en ' + mercado + ' (' + current_unit + ')';
-				}
-			} else if (tipo == 'lluvia') {
-				lluvia = this.lluvia;
-				if (relevance == 'main') {
-					label = 'lluvia en ' + lluvia + ' (' + current_unit + ')';
-				}
+			if (this.tipo == 'precio') {
+				new_graph.producto = this.producto;
+				new_graph.mercado = this.mercado;
+				new_graph.label = this.producto + ' en ' + this.mercado + ' (' + new_graph.unit + ')';
+			} else if (this.tipo == 'lluvia') {
+				new_graph.lluvia = this.lluvia;
+				new_graph.label = 'lluvia en ' + this.lluvia + ' (' + new_graph.unit + ')';
 			}
 			if ('advanced_label' in this) {
-				label = this.advanced_label+' ('+current_unit+')';
+				new_graph.label = this.advanced_label + ' (' + new_graph.unit + ')';
 			}
-			if (! (tipo in tipos_graficos)) {
-				tipos_graficos[tipo] = current_unit;
-			}
-			var yaxis = 1;
-			var yaxis_finder = 1;
-			for (var item in tipos_graficos) {
-				if (item == tipo) {
-					yaxis = yaxis_finder;
-				}
-				yaxis_finder += 1;
-			}
-			var new_graph = {
-				'label': label,
-				'data': current_data,
-				'unit': current_unit,
-				'tipo': tipo,
-				'yaxis': yaxis,
-				'points': points,
-				'lines': lines,
-				'bars': bars,
-				'color': color,
-				'relevance': relevance,
-				'start_date': start_date,
-				'start_value': start_value,
-				'shadowSize': shadowSize,
-				'clickable': clickable,
-				'hoverable': hoverable
-			};
-			if (tipo == 'precio') {
-				new_graph.producto = producto;
-				new_graph.mercado = mercado;
-			} else if (tipo == 'lluvia') {
-				new_graph.lluvia = lluvia;
-			}
-			if ('advanced_label' in this) {
-				new_graph.advanced_label=this.advanced_label;
+			if (! (this.tipo in tipos_graficos)) {
+				tipos_graficos[this.tipo] = new_graph.unit;
 			}
 			new_graphs.push(new_graph);
 		});
@@ -406,32 +349,36 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		var yaxis_finder = 1;
 		for (var item in tipos_graficos) {
 			if (yaxis_finder == 1) {
-				yaxis = tipos_graficos[item];
+				new_graphs.yaxis = tipos_graficos[item];
 			} else if (yaxis_finder == 2) {
-				y2axis = tipos_graficos[item];
+				new_graphs.y2axis = tipos_graficos[item];
 			}
 			yaxis_finder += 1;
 		}
-		new_graphs.yaxis = yaxis;
-		new_graphs.y2axis = y2axis;
 		return new_graphs.sort();
 	}
 
 	function calculate_mediangraphs(cordobagraphs,median_variable) {
 		var graph_dic= {};
+		var to_time,from_time,from_value,to_value,last_time,last_value,search_from_counter,search_to_counter,slope,current_time,current_slope_list,time_delta;
 		$.each(cordobagraphs, function() {
-			if ((median_variable in this) && (this.relevance=='main')) {
+			if (median_variable in this) {
 				if (this[median_variable] in graph_dic) {
-					graph_dic[this[median_variable]].push(this);
+					graph_dic[this[median_variable]].push({'unit':this.unit,'data':this.data});
 				} else {
-					graph_dic[this[median_variable]]=[this];
+					graph_dic[this[median_variable]]=[{'unit':this.unit,'data':this.data}];
+				}
+				if ('minData' in this) {
+					graph_dic[this[median_variable]].push({'unit':this.unit,'data':this.minData});
+				} else {
+					graph_dic[this[median_variable]].push({'unit':this.unit,'data':this.data});
 				}
 			}
 		});
 		var new_graphs_list=[],graph_time_dic,graph_counter,empty_values,data_string,value_string,graph_counter,time_item,counter,search_counter,i,median_value,start_value,start_date;
 		var graph_time_data,graph_time_data_list,date_item,graph_item,median_variable_item,new_graph,total_value;
 		for (median_variable_item in graph_dic) {
-			if (graph_dic[median_variable_item].length > 1) {
+			if (graph_dic[median_variable_item].length > 2) {
 				graph_time_dic={};
 				graph_counter=0;
 				empty_values=0;
@@ -470,6 +417,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 				for (time_item in graph_time_dic) {
 					graph_time_data_list.push([time_item,graph_time_dic[time_item]]);
 				}
+				current_slope_list=new Array();
 				graph_time_data_list=graph_time_data_list.sort();
 				graph_time_data=[];
 				for ( counter = 0 ; counter < graph_time_data_list.length ; counter++ ) {
@@ -477,23 +425,61 @@ function create_graphs(jsondata,close_button,graphsheader) {
 					for (i in graph_time_data_list[counter][1]) {
 						if (graph_time_data_list[counter][1][i]==null) {
 							if (counter===0) {
-								for ( search_counter = 0; search_counter < graph_time_data_list.length ; search_counter++) {
-									if (!(graph_time_data_list[search_counter][1][i]==null)) {
-										graph_time_data_list[0][1][i]=graph_time_data_list[search_counter][1][i];									
+								from_time=to_time=from_value=to_value=null;
+								for ( search_from_counter = 0; search_from_counter < graph_time_data_list.length ; search_from_counter++) {
+									if (!(graph_time_data_list[search_from_counter][1][i]==null)) {
+										from_time=graph_time_data_list[search_from_counter][0];
+										from_value=graph_time_data_list[search_from_counter][1][i];
+										for ( search_to_counter = search_from_counter+1; search_to_counter < graph_time_data_list.length ; search_to_counter++) {
+											if (!(graph_time_data_list[search_to_counter][1][i]==null)) {
+												to_time=graph_time_data_list[search_to_counter][0];
+												to_value=graph_time_data_list[search_to_counter][1][i];
+												break;
+											}
+										}
 										break;
 									}
 								}
+								slope=current_slope_list[i]=(to_value-from_value)/(to_time-from_time);
+								time_delta=from_time-(graph_time_data_list[0][0]);
+								graph_time_data_list[0][1][i]=from_value-(time_delta*slope);
 							} else {
-								graph_time_data_list[counter][1][i]=graph_time_data_list[counter-1][1][i];
+								if ((!(current_slope_list[i])) || (current_slope_list[i]==null)) {
+									var from_time=graph_time_data_list[counter-1][0];
+									var from_value=graph_time_data_list[counter-1][1][i];
+									to_time=to_value=null;
+									for (var finder = counter; finder < graph_time_data_list.length; finder++) {
+										if (!(graph_time_data_list[finder][1][i]==null)) {
+											to_time=graph_time_data_list[finder][0];
+											to_value=graph_time_data_list[finder][1][i];
+											break;
+										}
+									}
+									if (to_value==null) {
+										from_time=graph_time_data_list[counter-2][0];
+                                                                        	from_value=graph_time_data_list[counter-2][1][i];
+										to_time=graph_time_data_list[counter-1][0];
+                                                                        	to_value=graph_time_data_list[counter-1][1][i];
+									}
+									current_slope_list[i]=(to_value-from_value)/(to_time-from_time);
+								} 
+								last_time=graph_time_data_list[counter-1][0];
+								current_time=graph_time_data_list[counter][0];
+								time_delta=current_time-last_time;
+								last_value=graph_time_data_list[counter-1][1][i];
+								slope=current_slope_list[i];
+								graph_time_data_list[counter][1][i]=last_value+(time_delta*slope);								
 							}
-						} 
+						} else {
+							current_slope_list[i]=null;
+						}
 						total_value+=graph_time_data_list[counter][1][i];						
 					} 
 					median_value=total_value/(graph_counter+1);
 					graph_time_data.push([parseInt(graph_time_data_list[counter][0]),median_value]);
 					if (counter===0) {
 						start_value=median_value;
-						start_date=parseInt(graph_time_data_list[counter][0])/1000000;
+						start_date=parseInt(graph_time_data_list[counter][0]);
 					}
 				}
 				var model_graph=graph_dic[median_variable_item][0];
@@ -531,62 +517,50 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		var new_graphs = [];
 		$.each(unitgraphs,
 		function() {
-			var new_data = [],
-			producto,
-			mercado,
-			lluvia;
-			var label = '';
-			var data = this.data;
-			var unit = this.unit;
-			var tipo = this.tipo;
-			var color = this.color;
-			var bars = this.bars;
-			var lines = this.lines;
-			var points = this.points;
-			var relevance = this.relevance;
-			var shadowSize = this.shadowSize;
-			var clickable = this.clickable;
-			var hoverable = this.hoverable;
+			var new_data = [];
 			var start_value = this.start_value;
-			if ((relevance == 'main') || (relevance == 'mediano')){
-				if ('advanced_label' in this) {
-					label = this.advanced_label+' (1 = ' + String(start_value) + ' ' + unit +'s)';
-				} else if (tipo == 'precio') {
-					producto = this.producto;
-					mercado = this.mercado;
-					if (relevance == 'main') {
-						label = producto + ' en ' + mercado + ' (1 = ' + String(start_value) + ' ' + unit + 's)';
-					}
-				} else if (tipo == 'lluvia') {
-					lluvia = this.lluvia;
-					if (relevance == 'main') {
-						label = 'lluvia en ' + lluvia + ' (1 = ' + String(start_value) + ' ' + unit + 's)';
-					}
-				}
-
+			var new_graph = {
+				'unit': '%',
+				'tipo': 'normalizado',
+				'yaxis': 1,
+				'bars': this.bars,
+				'points': this.points,
+				'lines': this.lines,
+				'color': this.color,
+				'relevance': this.relevance,
+				'shadowSize': this.shadowSize,
+				'clickable': this.clickable,
+				'hoverable': this.hoverable
+			};
+			if ('advanced_label' in this) {
+				new_graph.label = this.advanced_label+' (1 = ' + String(start_value) + ' ' + this.unit +'s)';
+			} else if (this.tipo == 'precio') {
+				new_graph.producto = this.producto;
+				new_graph.mercado = this.mercado;
+				new_graph.label = this.producto + ' en ' + this.mercado + ' (1 = ' + String(start_value) + ' ' + this.unit + 's)';
+			} else if (this.tipo == 'lluvia') {
+				new_graph.lluvia = this.lluvia;
+				new_graph.label = 'lluvia en ' + this.lluvia + ' (1 = ' + String(start_value) + ' ' + this.unit + 's)';
 			}
-			$.each(data,function() {
+			$.each(this.data,function() {
 				var time = this[0];
 				var unit_value = this[1];
 				var pk = this[2];
 				var normalized_value = parseFloat(unit_value) / parseFloat(start_value) * 100;
 				new_data.push([time, normalized_value, pk]);
 			});
-			var new_graph = {
-				'label': label,
-				'data': new_data,
-				'unit': '%',
-				'tipo': 'normalizado',
-				'yaxis': 1,
-				'bars': bars,
-				'points': points,
-				'lines': lines,
-				'color': color,
-				'relevance': relevance,
-				'shadowSize': shadowSize,
-				'clickable': clickable,
-				'hoverable': hoverable
-			};
+			new_graph.data=new_data;
+			if ('minData' in this) {
+				var minData=[];
+				$.each(this.minData,function() {
+					var time = this[0];
+					var unit_value = this[1];
+					var pk = this[2];
+					var normalized_value = parseFloat(unit_value) / parseFloat(start_value) * 100;
+					minData.push([time, normalized_value, pk]);
+				});
+				new_graph.minData=minData;
+			}
 			new_graphs.push(new_graph);
 		});
 		new_graphs.yaxis = '%';
@@ -636,11 +610,6 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			comment_counter += 1;
 			var comments_text = '';
 			for (var comment_pk in comments[unique_pk]) {
-				//if (comments[unique_pk][comment_pk][3] === true) {
-				//	comments_text += '<div class="publicComment">';
-				//} else {
-				//	comments_text += '<div class="nonpublicComment">';
-				//}
 				comments_text += comments[unique_pk][comment_pk][0];
 				comments_text += '<br /><span class="signature">' + comments[unique_pk][comment_pk][1]+'</span><br />';
 				if (comments[unique_pk][comment_pk][2] === true) {
@@ -692,11 +661,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 		if (comment_pk) {
 			var comment_text = comments[unique_pk][comment_pk][0];
 		}
-		//if (unique_pk in datapoint_dictionary) {
 		var label = datapoint_dictionary[unique_pk][3];
-		//} else {
-		//	testoutout = datapoint_dictionary;
-		//}
 		if (label.length === 0) {
 			label = 'producto';
 		}
@@ -787,8 +752,6 @@ function create_graphs(jsondata,close_button,graphsheader) {
 					});
 				} else {
 					$('#' + dialog_id + 'formDivMessage').html('Hubo un error!');
-					//$('#' + dialog_id + 'btnSave').attr('disabled', '');
-					//$('#' + dialog_id + 'btnDelete').attr('disabled', '');
 				}
 				// The success or failure check will go here. . .
 			},'json');
@@ -802,9 +765,7 @@ function create_graphs(jsondata,close_button,graphsheader) {
 	function reset_comments() {
 		labelCanvas = false;
 		comment_counter = 0;
-		//$('#' + query_id + 'comments').replaceWith('<div id='+query_id+'comments"></div>');
 		$('#' + query_id + 'comments').accordion('destroy');
-		//$('#' + query_id + 'comments').attr('class','');
 		$('#' + query_id + 'comments').empty();
 		$('#' + query_id + 'labelcanvas').remove();
 		$('#' + query_id + ' div.pointLabel').remove();
@@ -838,7 +799,6 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			graph_width=total_width-200;
 		}
 		var graph_html = '';
-		//graph_html += 'total width: '+total_width+', graph_width: '+graph_width;
 		graph_html += '<div class="ui-dialog ui-widget ui-widget-content ui-corner-all undefined" style="width:'+total_width+'px;" id="'+query_id+'">';
 		graph_html += '<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">';
 		graph_html += '<span id="ui-dialog-title-dialog" class="ui-dialog-title">';
@@ -1185,14 +1145,30 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			for (i in converted_graphs) {
 				if (converted_graphs[i].color==color_value) {
 					converted_graphs[i].show=state;
+				}
+			}
+			for (i in eurographs) {
+				if (eurographs[i].color==color_value) {
 					eurographs[i].show=state;
+				}
+			}
+			for (i in dollargraphs) {
+				if (dollargraphs[i].color==color_value) {
 					dollargraphs[i].show=state;
 				}
 			}
 			for (i in normalized_graphs) {
 				if (normalized_graphs[i].color==color_value) {
 					normalized_graphs[i].show=state;
+				}
+			}
+			for (i in normalized_eurographs) {
+				if (normalized_eurographs[i].color==color_value) {
 					normalized_eurographs[i].show=state;
+				}
+			}
+			for (i in normalized_dollargraphs) {
+				if (normalized_dollargraphs[i].color==color_value) {
 					normalized_dollargraphs[i].show=state;
 				}
 			}
@@ -1207,7 +1183,6 @@ function create_graphs(jsondata,close_button,graphsheader) {
 			} else {
 				plot = $.plot($('#' + query_id + 'stats'), graphs, options);
 			}
-			//overview.clearSelection(true);
 			build_comment_accordion();
 			if (axis_dic) {
 				draw_resetbutton();
