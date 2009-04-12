@@ -21,6 +21,10 @@ body {
 .resetbutton { position: absolute; top: 10px; z-index: 100px; padding: 1px; }
 .resetbutton:hover, resetbutton:focus { padding: 0; }
 
+#contents img {
+	float:right;
+	margin-right: 0.5em;
+}
 
 span.link {
 	cursor:pointer;

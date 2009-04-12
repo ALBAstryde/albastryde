@@ -249,6 +249,12 @@
 		// turn on series in case nothing is set
 		if (s.show == null)
 		    s.show = true;
+		// turn off checkboxes in legend in case nothing is set
+		if (s.legend == null)
+		    s.legend = {};
+		if (s.legend.checkboxes == null)
+		    s.legend.checkboxes = false;
+
                 // turn on lines automatically in case nothing is set
                 if (s.lines.show == null && !s.bars.show && !s.points.show)
                     s.lines.show = true;
@@ -1297,9 +1303,8 @@
             if (fillStyle) {
                 ctx.fillStyle = fillStyle;
 		if ('minData' in series) {
-			var fillLine = series.minData.concat(series.data.reverse());
+			var fillLine = series.minData.concat(series.data.slice().reverse());
                 	plotLineArea(fillLine, series.xaxis, series.yaxis);
-			series.data.reverse();//FIX: no need to reverse data twice!
 		} else {
                 	plotLineArea(series.data, series.xaxis, series.yaxis);
 		}
@@ -1532,15 +1537,25 @@
                 if (options.legend.labelFormatter != null)
                     label = options.legend.labelFormatter(label);
                 
-		var checkbox;
-		if (series[i].show) {
-		    checkbox = '<input type="checkbox" class="dataseries" name="'+series[i].color_number+'" checked="checked" />';
+		var checkbox='';
+		if (options.legend.checkboxes) {
+			checkbox += '<td class="legendCheckBox">';
+			if (series[i].show) {
+		    		checkbox += '<input type="checkbox" class="dataseries" name="'+series[i].color_number+'" checked="checked" />';
+			} else {
+		    		checkbox += '<input type="checkbox" class="dataseries" name="'+series[i].color_number+'" />';
+			}
+			checkbox += '</td>';
+	                fragments.push(
+        	            checkbox+'<td class="legendColorBox"><div style="border:1px solid ' + options.legend.labelBoxBorderColor + ';padding:1px"><div style="width:4px;height:0;border:5px solid ' + series[i].color + ';overflow:hidden"></div></div></td>' +
+                	    '<td class="legendLabel">' + label + '</td>');
 		} else {
-		    checkbox = '<input type="checkbox" class="dataseries" name="'+series[i].color_number+'" />';
+			if (series[i].show) {
+	                	fragments.push(
+        	        	    '<td class="legendColorBox"><div style="border:1px solid ' + options.legend.labelBoxBorderColor + ';padding:1px"><div style="width:4px;height:0;border:5px solid ' + series[i].color + ';overflow:hidden"></div></div></td>' +
+                		    '<td class="legendLabel">' + label + '</td>');
+			}
 		}
-                fragments.push(
-                    '<td class="legendCheckBox">'+checkbox+'</td><td class="legendColorBox"><div style="border:1px solid ' + options.legend.labelBoxBorderColor + ';padding:1px"><div style="width:4px;height:0;border:5px solid ' + series[i].color + ';overflow:hidden"></div></div></td>' +
-                    '<td class="legendLabel">' + label + '</td>');
             }
             if (rowStarted)
                 fragments.push('</tr>');

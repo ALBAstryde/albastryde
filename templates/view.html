@@ -11,7 +11,7 @@ $(document).ready(function() {
 	$('div.graph').each(function (index,domEle) {
 		var graph_name=$(domEle).attr('id');
 		var graph_data=eval(graph_name);
-		create_graphs(graph_data,false,'#'+graph_name);
+		create_graphs(graph_data,true,'#'+graph_name);
 	});
 });
 
