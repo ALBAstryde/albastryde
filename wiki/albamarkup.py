@@ -31,7 +31,7 @@ class albamarkup:
 	def StatisticsPattern(self,pattern):
 		query = pattern.group(1)
 		translated_query=QueryDict(translate_query_string(query))
-		text='<div id="graph'+str(self.graph_counter)+'" class="graph"></div>'
+		text='[div id="graph'+str(self.graph_counter)+'" class="graph"][/div]'
 		rdict = build_graph(translated_query,self.user)
 		json = simplejson.dumps(rdict, ensure_ascii=False)
  		self.json_data+='graph'+str(self.graph_counter)+'='+json+';'

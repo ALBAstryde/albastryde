@@ -42,7 +42,7 @@ class Pagina(models.Model):
         		markdownText=markdownText.replace(image_ref,image_md)
     		albatranslator=albamarkup(markdownText)
     		markdownText = albatranslator.returntext
-    		html = markdown.markdown( markdownText )
+    		html = markdown.markdown( markdownText ).replace('[div','<div').replace('][/div]','></div>')
 		self.json_data = albatranslator.json_data
 		self.body_html = html
     		return True
