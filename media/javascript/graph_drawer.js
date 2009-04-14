@@ -380,6 +380,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		});
 		var new_graphs_list=[],graph_time_dic,graph_counter,empty_values,data_string,value_string,time_item,counter,search_counter,i,median_value,start_value,start_date;
 		var graph_time_data,graph_time_data_list,date_item,graph_item,median_variable_item,new_graph,total_value;
+		var from_time,from_value;
 		for (median_variable_item in graph_dic) {
 			if (graph_dic[median_variable_item].length > 2) {
 				graph_time_dic={};
@@ -434,7 +435,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 										from_time=graph_time_data_list[search_from_counter][0];
 										from_value=graph_time_data_list[search_from_counter][1][i];
 										for ( search_to_counter = search_from_counter+1; search_to_counter < graph_time_data_list.length ; search_to_counter++) {
-											if (!(graph_time_data_list[search_to_counter][1][i]==null)) {
+											if (!(graph_time_data_list[search_to_counter][1][i]===null)) {
 												to_time=graph_time_data_list[search_to_counter][0];
 												to_value=graph_time_data_list[search_to_counter][1][i];
 												break;
@@ -447,12 +448,12 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 								time_delta=from_time-(graph_time_data_list[0][0]);
 								graph_time_data_list[0][1][i]=from_value-(time_delta*slope);
 							} else {
-								if ((!(current_slope_list[i])) || (current_slope_list[i]==null)) {
-									var from_time=graph_time_data_list[counter-1][0];
-									var from_value=graph_time_data_list[counter-1][1][i];
+								if ((!(current_slope_list[i])) || (current_slope_list[i]===null)) {
+									from_time=graph_time_data_list[counter-1][0];+
+									from_value=graph_time_data_list[counter-1][1][i];
 									to_time=to_value=null;
 									for (var finder = counter; finder < graph_time_data_list.length; finder++) {
-										if (!(graph_time_data_list[finder][1][i]==null)) {
+										if (!(graph_time_data_list[finder][1][i]===null)) {
 											to_time=graph_time_data_list[finder][0];
 											to_value=graph_time_data_list[finder][1][i];
 											break;
@@ -581,7 +582,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		return c;
 	}
 	function drawPoint(ctx, x, y, radius, fillStyle, plotOffset, dataitem, series) {
-		var unique_pk = dataitem[2];
+		var unique_pk = dataitem[2],comment_pk;
 		if ((has_comments) && unique_pk in comments) {
 			if (!(labelCanvas)) {
 				var canvasHeight = $('#' + query_id + 'stats canvas:first').outerHeight();
@@ -622,9 +623,9 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 				$('#' + query_id + 'comments').append('<h3><a href="#">' + label + '</a></h3><div>' + comments_text + '</div>');
 				}
 			} else {
-				comments_text+='<tr><td valign="top"><b>'+label+'</b></td>'//JOHANNES
+				comments_text+='<tr><td valign="top"><b>'+label+'</b></td>';
 				var first_comment=true;
-				for (var comment_pk in comments[unique_pk]) {
+				for (comment_pk in comments[unique_pk]) {
 					if (!(first_comment)) {
 						comments_text+='<tr><td>&nbsp;</td>';
 					}
@@ -685,7 +686,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		var raw_date = datapoint_dictionary[unique_pk][0];
 		var date = date_string(raw_date);
 
-		var dialog_options={}
+		var dialog_options={};
 		var dialog_id=Date.now();
 		var dialog_text = '';
 
