@@ -378,7 +378,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 				}
 			}
 		});
-		var new_graphs_list=[],graph_time_dic,graph_counter,empty_values,data_string,value_string,graph_counter,time_item,counter,search_counter,i,median_value,start_value,start_date;
+		var new_graphs_list=[],graph_time_dic,graph_counter,empty_values,data_string,value_string,time_item,counter,search_counter,i,median_value,start_value,start_date;
 		var graph_time_data,graph_time_data_list,date_item,graph_item,median_variable_item,new_graph,total_value;
 		for (median_variable_item in graph_dic) {
 			if (graph_dic[median_variable_item].length > 2) {
