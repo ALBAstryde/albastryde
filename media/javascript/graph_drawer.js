@@ -136,7 +136,6 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 			var data = [],
 			new_data = [],
 			new_fill_data = [],
-			new_shadow_data = [],
 			max_data = [],
 			min_data_dic = {},
 			top_value=0,
@@ -884,7 +883,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		var total_width=(($(graphsheader).innerWidth()-95)/2);
 		var graph_html = '';
 		graph_html += '<div class="ui-dialog ui-widget ui-widget-content ui-corner-all undefined" style="width:'+total_width+'px;float: right; margin-right: 0.5em;" id="'+query_id+'">';
-		graph_html += draw_small_inner_graph_structure(query_id, headline, has_comments, user_can_add, user_logged_in, total_width)
+		graph_html += draw_small_inner_graph_structure(query_id, headline, has_comments, user_can_add, user_logged_in, total_width);
 		graph_html += '</div>';
 		return graph_html;
 	}
