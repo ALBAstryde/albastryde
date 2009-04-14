@@ -239,7 +239,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 			if (tipo == 'precio') {
 				new_graph.start_value=new_data[0][1];
 				new_graph.lines = {
-					'show': true,
+					'show': true
 				};
 				if (minData) {
 					new_graph.minData=minData;
@@ -275,7 +275,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 	}
 
 	function calculate_currencygraphs(currency_dic, cordobagraphs) {
-		var new_graphs = [];
+		var new_graphs = [],new_data;
 		var tipos_graficos = {};
 		$.each(cordobagraphs,function() {
 			var label = '',
@@ -291,14 +291,14 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 				'start_date': this.start_date,
 				'shadowSize': this.shadowSize,
 				'clickable': this.clickable,
-				'hoverable': this.hoverable,
+				'hoverable': this.hoverable
 			};
 			if ('advanced_label' in this) {
 				new_graph.advanced_label=this.advanced_label;
 			}
 			if (this.unit == 'cordoba') {
 				new_graph.start_value = currency_dic[String(this.start_date / 1000000)] * this.start_value;
-				var new_data = [];
+				new_data = [];
 				$.each(this.data,
 				function() {
 					var time = this[0];
