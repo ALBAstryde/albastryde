@@ -448,7 +448,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 								graph_time_data_list[0][1][i]=from_value-(time_delta*slope);
 							} else {
 								if ((!(current_slope_list[i])) || (current_slope_list[i]===null)) {
-									from_time=graph_time_data_list[counter-1][0];+
+									from_time=graph_time_data_list[counter-1][0];
 									from_value=graph_time_data_list[counter-1][1][i];
 									to_time=null;
 									to_value=null;
