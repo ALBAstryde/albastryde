@@ -380,7 +380,6 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		});
 		var new_graphs_list=[],graph_time_dic,graph_counter,empty_values,data_string,value_string,time_item,counter,search_counter,i,median_value,start_value,start_date;
 		var graph_time_data,graph_time_data_list,date_item,graph_item,median_variable_item,new_graph,total_value;
-		var from_time,from_value;
 		for (median_variable_item in graph_dic) {
 			if (graph_dic[median_variable_item].length > 2) {
 				graph_time_dic={};
@@ -451,7 +450,8 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 								if ((!(current_slope_list[i])) || (current_slope_list[i]===null)) {
 									from_time=graph_time_data_list[counter-1][0];+
 									from_value=graph_time_data_list[counter-1][1][i];
-									to_time=to_value=null;
+									to_time=null;
+									to_value=null;
 									for (var finder = counter; finder < graph_time_data_list.length; finder++) {
 										if (!(graph_time_data_list[finder][1][i]===null)) {
 											to_time=graph_time_data_list[finder][0];
