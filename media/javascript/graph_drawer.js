@@ -420,17 +420,17 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 				for (time_item in graph_time_dic) {
 					graph_time_data_list.push([time_item,graph_time_dic[time_item]]);
 				}
-				current_slope_list=new Array();
+				current_slope_list=[];
 				graph_time_data_list=graph_time_data_list.sort();
 				graph_time_data=[];
 				for ( counter = 0 ; counter < graph_time_data_list.length ; counter++ ) {
 					total_value=0;
 					for (i in graph_time_data_list[counter][1]) {
-						if (graph_time_data_list[counter][1][i]==null) {
+						if (graph_time_data_list[counter][1][i]===null) {
 							if (counter===0) {
 								from_time=to_time=from_value=to_value=null;
 								for ( search_from_counter = 0; search_from_counter < graph_time_data_list.length ; search_from_counter++) {
-									if (!(graph_time_data_list[search_from_counter][1][i]==null)) {
+									if (!(graph_time_data_list[search_from_counter][1][i]===null)) {
 										from_time=graph_time_data_list[search_from_counter][0];
 										from_value=graph_time_data_list[search_from_counter][1][i];
 										for ( search_to_counter = search_from_counter+1; search_to_counter < graph_time_data_list.length ; search_to_counter++) {

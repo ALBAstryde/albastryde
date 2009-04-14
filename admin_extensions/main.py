@@ -47,8 +47,7 @@ class AutopopulateModelForm(forms.ModelForm):
         # form that is missing fields involved in that check.
         unique_checks = []
         for check in self.instance._meta.unique_together[:]:
-            fields_on_form = [field for field in check if field in self.fields or field in 
-self._meta.autopopulate]
+            fields_on_form = [field for field in check if field in self.fields or field in self._meta.autopopulate]
             if len(fields_on_form) == len(check):
                 unique_checks.append(check)
         
@@ -69,8 +68,7 @@ self._meta.autopopulate]
                 unique_checks.append((name,))
             
         # Don't run unique checks on fields that already have an error.
-        unique_checks = [check for check in unique_checks if not [x in self._errors for x in check if 
-x in self._errors]]
+        unique_checks = [check for check in unique_checks if not [x in self._errors for x in check if x in self._errors]]
     
         for unique_check in unique_checks:
             # Try to look up an existing object with the same values as this
@@ -80,8 +78,7 @@ x in self._errors]]
             for field_name in unique_check:
                 if field_name in self._meta.autopopulate:
                     # if a autopopulated field call the associated function to get the lookup value
-                    lookup_kwargs[field_name] = self._meta.autopopulate[field_name](self.request, 
-self.instance)
+                    lookup_kwargs[field_name] = self._meta.autopopulate[field_name](self.request, self.instance)
                 else:
                     lookup_kwargs[field_name] = self.cleaned_data[field_name]
                 
@@ -155,8 +152,7 @@ self.autopopulate]
                 'form': AutopopulateModelForm,
                 'exclude': self.autopopulate.keys() + list(kwargs.pop('exclude', [])),
             }
-            # NOTE: exclude will override any self.exclude because of logic error in 
-ModelAdmin.get_form
+            # NOTE: exclude will override any self.exclude because of logic error in ModelAdmin.get_form
             # see django ticket #8999
             defaults.update(kwargs)
             
@@ -174,10 +170,8 @@ ModelAdmin.get_form
                 elif fieldname in Form.declared_fields:
                     field = Form.declared_fields[fieldname]
                 else:
-                    raise AttributeError("'%s' listed in autofilter_choices is not a valid field name" 
-% fieldname)
-                field.queryset = field.queryset.filter(**dict((fn, func(request, obj)) for fn, func in 
-filters.iteritems()))
+                    raise AttributeError("'%s' listed in autofilter_choices is not a valid field name" % fieldname)
+                field.queryset = field.queryset.filter(**dict((fn, func(request, obj)) for fn, func in filters.iteritems()))
         
         return Form
         
@@ -199,8 +193,7 @@ filters.iteritems()))
         """Filters change list queryset by autofilter fields."""
         qs = super(ModelAdmin, self).queryset(request)
         if self.autofilter and not request.user.is_superuser:
-            qs = qs.filter(**dict((field, func(request)) for field, func in 
-self.autofilter.iteritems()))
+            qs = qs.filter(**dict((field, func(request)) for field, func in self.autofilter.iteritems()))
         return qs
 
     def has_change_permission(self, request, obj=None):
@@ -254,8 +247,7 @@ class InlineModelAdmin(BaseInlineModelAdmin):
                 'formset': AutopopulateInlineFormSet,
                 'exclude': self.autopopulate.keys() + list(kwargs.pop('exclude', [])),
             }
-            # NOTE: exclude will override any self.exclude because of logic error in 
-ModelAdmin.get_formset 
+            # NOTE: exclude will override any self.exclude because of logic error in ModelAdmin.get_formset 
             # see django ticket #8999
             defaults.update(kwargs)
 
@@ -273,10 +265,8 @@ ModelAdmin.get_formset
                 elif fieldname in FormSet.form.declared_fields:
                     field = FormSet.form.declared_fields[fieldname]
                 else:
-                    raise AttributeError("'%s' listed in autofilter_choices is not a valid field name" 
-% fieldname)
-                field.queryset = field.queryset.filter(**dict((fn, func(request, obj)) for fn, func in 
-filters.iteritems()))            
+                    raise AttributeError("'%s' listed in autofilter_choices is not a valid field name" % fieldname)
+                field.queryset = field.queryset.filter(**dict((fn, func(request, obj)) for fn, func in filters.iteritems()))            
             
         return FormSet
 
