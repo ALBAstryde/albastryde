@@ -458,7 +458,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 											break;
 										}
 									}
-									if (to_value==null) {
+									if (to_value===null) {
 										from_time=graph_time_data_list[counter-2][0];
                                                                         	from_value=graph_time_data_list[counter-2][1][i];
 										to_time=graph_time_data_list[counter-1][0];
@@ -479,10 +479,10 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 						total_value+=graph_time_data_list[counter][1][i];						
 					} 
 					median_value=total_value/(graph_counter+1);
-					graph_time_data.push([parseInt(graph_time_data_list[counter][0]),median_value]);
+					graph_time_data.push([parseInt(graph_time_data_list[counter][0],10),median_value]);
 					if (counter===0) {
 						start_value=median_value;
-						start_date=parseInt(graph_time_data_list[counter][0]);
+						start_date=parseInt(graph_time_data_list[counter][0],10);
 					}
 				}
 				var model_graph=graph_dic[median_variable_item][0];
@@ -613,7 +613,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 			comment_counter += 1;
 			var comments_text = '';
 			if (editor_mode) {
-				for (var comment_pk in comments[unique_pk]) {
+				for (comment_pk in comments[unique_pk]) {
 					comments_text += comments[unique_pk][comment_pk][0];
 					comments_text += '<br /><span class="signature">' + comments[unique_pk][comment_pk][1]+'</span><br />';
 					if (comments[unique_pk][comment_pk][2] === true) {
@@ -1146,7 +1146,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 			//find position of tick labels:
 			$('#'+query_id+' .tickLabels .tickLabel').each(function() {
         			if($(this).css('text-align') == 'right') {
-					reset_button_right = parseInt($(this).css('right'))-25;
+					reset_button_right = parseInt($(this).css('right'),10)-25;
 				}//not perfect, because I'm going through all tick labels
 			});
 			$('#'+query_id+'stats').append('<span id="' + query_id + 'reset" class="resetbutton link" style="right:'+reset_button_right+'px;" ><span class="ui-icon ui-icon-arrow-4-diag"></span></span>');
@@ -1223,7 +1223,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 
 			$('div#'+ query_id +'legend input.dataseries').live('click',function() {
 				var state=$(this).attr('checked');
-				var color_value=parseInt($(this).attr('name'));
+				var color_value=parseInt($(this).attr('name'),10);
 				for (i in converted_graphs) {
 					if (converted_graphs[i].color==color_value) {
 						converted_graphs[i].show=state;
