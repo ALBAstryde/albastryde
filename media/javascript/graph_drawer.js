@@ -908,7 +908,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		graph_html += '<span class="ui-dialog-titlebar-'+iconpositions[current_icon]+' ui-corner-all link" id="'+query_id+'graph_switchmode"><span class="ui-icon ui-icon-arrowthick-2-ne-sw">editar</span></span>';
 		current_icon++;
 		graph_html += '</div>';
-		graph_html += '<div style="height: auto; min-height: 400px; width: auto;" class="ui-dialog-content ui-widget-content" id="'+query_id+'body">';
+		graph_html += '<div style="height: auto; min-height: 400px; width: '+(total_width-45)+'px;" class="ui-dialog-content ui-widget-content" id="'+query_id+'body">';
 		graph_html += '<div id="' + query_id + 'stats" style="height:400px"></div>';
 		graph_html += '<table class="legend">';
 		if (show_comments) {
