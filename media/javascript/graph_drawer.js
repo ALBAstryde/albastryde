@@ -444,9 +444,6 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 				for (time_item in graph_time_dic) {
 					graph_time_data_list.push([time_item,graph_time_dic[time_item]]);
 				}
-				if (independent_variable) {
-					table_data.push([median_variable,median_variable_item,header_list,graph_time_data_list]);
-				}
 				current_slope_list=[];
 				graph_time_data_list=graph_time_data_list.sort();
 				graph_time_data=[];
@@ -513,6 +510,9 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 						start_date=parseInt(graph_time_data_list[counter][0],10);
 					}
 				}
+				if (independent_variable) {
+					table_data.push([median_variable,median_variable_item,header_list,graph_time_data_list]);
+				}
 				var model_graph=graph_dic[median_variable_item][0];
 				new_graph={
 					'points': {
@@ -542,6 +542,138 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		}
 		return new_graphs_list;
 		
+	}
+
+	function calculate_estimated_data(cordobagraphs,median_variable,independent_variable) {
+		var filled_graph_list=[];
+		var graph_dic= {};
+		var to_time,from_time,from_value,to_value,last_time,last_value,search_from_counter,search_to_counter,slope,current_time,current_slope_list,time_delta,independet_value;
+		var graph_time_dic,graph_counter,empty_values,data_string,value_string,time_item,counter,search_counter,i,start_value,start_date;
+		var graph_time_data_list,date_item,graph_item,median_variable_item,new_graph,header_list;
+		$.each(cordobagraphs, function() {
+			if (median_variable in this) {
+				if (independent_variable) {
+					if (independent_variable in this) {
+						independent_value=this[independent_variable];
+					} else {
+						independent_value=null;
+					}
+				} else {
+					independent_value=null;
+				}
+				if (this[median_variable] in graph_dic) {
+					graph_dic[this[median_variable]].push({'unit':this.unit,'data':this.data,'datatype':'max','independent':independent_value});
+				} else {
+					graph_dic[this[median_variable]]=[{'unit':this.unit,'data':this.data, 'datatype':'max','independent':independent_value}];
+				}
+				if ('minData' in this) {
+					graph_dic[this[median_variable]].push({'unit':this.unit,'data':this.minData,'datatype':'min','independent':independent_value});
+				} else {
+					graph_dic[this[median_variable]].push({'unit':this.unit,'data':this.data,'datatype':'min','independent':independent_value});
+				}
+			}
+		});
+		for (median_variable_item in graph_dic) {
+				graph_time_dic={};
+				graph_counter=0;
+				empty_values=0;
+				header_list=[]
+				for (graph_item in graph_dic[median_variable_item]) {
+					header_list.push({'unit':graph_dic[median_variable_item][graph_item]['unit'],'datatype':graph_dic[median_variable_item][graph_item]['datatype'],'independent':graph_dic[median_variable_item][graph_item]['independent']})
+					for (date_item in graph_dic[median_variable_item][graph_item]['data']) {
+						data_string=graph_dic[median_variable_item][graph_item]['data'][date_item][0];
+						value_string=graph_dic[median_variable_item][graph_item]['data'][date_item][1];
+						if (data_string in graph_time_dic) {
+							empty_values=graph_counter - graph_time_dic[data_string].length;
+						} else {
+							if (graph_counter===0) {
+								graph_time_dic[data_string]=[[value_string,true]];
+								empty_values=-1;
+							} else {
+								graph_time_dic[data_string]=[[null,false]];
+								empty_values=graph_counter-1;
+							}
+						}
+						if (empty_values>-1) {
+							for ( i = 0 ; i < empty_values ; i++ ) {
+								graph_time_dic[data_string].push([null,false]);
+							}
+							graph_time_dic[data_string].push([value_string,true]);
+						}
+					}
+					graph_counter+=1;
+				}
+				graph_counter-=1;
+				for (time_item in graph_time_dic) { // filling in zeroes (null) at end
+					empty_values=(graph_counter+1)-graph_time_dic[time_item].length;
+					for ( i = 0 ; i < empty_values ; i++ ) {
+						graph_time_dic[time_item].push(null);
+					}
+				} 
+				graph_time_data_list=[];
+				for (time_item in graph_time_dic) {
+					graph_time_data_list.push([time_item,graph_time_dic[time_item]]);
+				}
+				current_slope_list=[];
+				graph_time_data_list=graph_time_data_list.sort();
+				for ( counter = 0 ; counter < graph_time_data_list.length ; counter++ ) {
+					for (i in graph_time_data_list[counter][1]) {
+						if (graph_time_data_list[counter][1][i][0]===null) {
+							if (counter===0) {
+								from_time=to_time=from_value=to_value=null;
+								for ( search_from_counter = 0; search_from_counter < graph_time_data_list.length ; search_from_counter++) {
+									if (!(graph_time_data_list[search_from_counter][1][i][0]===null)) {
+										from_time=graph_time_data_list[search_from_counter][0];
+										from_value=graph_time_data_list[search_from_counter][1][i][0];
+										for ( search_to_counter = search_from_counter+1; search_to_counter < graph_time_data_list.length ; search_to_counter++) {
+											if (!(graph_time_data_list[search_to_counter][1][i][0]===null)) {
+												to_time=graph_time_data_list[search_to_counter][0];
+												to_value=graph_time_data_list[search_to_counter][1][i];
+												break;
+											}
+										}
+										break;
+									}
+								}
+								slope=current_slope_list[i]=(to_value-from_value)/(to_time-from_time);
+								time_delta=from_time-(graph_time_data_list[0][0]);
+								graph_time_data_list[0][1][i][0]=from_value-(time_delta*slope);
+							} else {
+								if ((!(current_slope_list[i])) || (current_slope_list[i]===null)) {
+									from_time=graph_time_data_list[counter-1][0];
+									from_value=graph_time_data_list[counter-1][1][i][0];
+									to_time=null;
+									to_value=null;
+									for (var finder = counter; finder < graph_time_data_list.length; finder++) {
+										if (!(graph_time_data_list[finder][1][i][0]===null)) {
+											to_time=graph_time_data_list[finder][0];
+											to_value=graph_time_data_list[finder][1][i][0];
+											break;
+										}
+									}
+									if (to_value===null) {
+										from_time=graph_time_data_list[counter-2][0];
+                                                                        	from_value=graph_time_data_list[counter-2][1][i][0];
+										to_time=graph_time_data_list[counter-1][0];
+                                                                        	to_value=graph_time_data_list[counter-1][1][i][0];
+									}
+									current_slope_list[i]=(to_value-from_value)/(to_time-from_time);
+								} 
+								last_time=graph_time_data_list[counter-1][0];
+								current_time=graph_time_data_list[counter][0];
+								time_delta=current_time-last_time;
+								last_value=graph_time_data_list[counter-1][1][i][0];
+								slope=current_slope_list[i];
+								graph_time_data_list[counter][1][i][0]=last_value+(time_delta*slope);								
+							}
+						} else {
+							current_slope_list[i]=null;
+						}
+					} 
+				}
+				filled_graph_list.push([median_variable,median_variable_item,header_list,graph_time_data_list]);
+		}
+		return filled_graph_list;			
 	}
 
 	function calculate_normalizedgraphs(unitgraphs) {
@@ -986,7 +1118,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 			html+='</tr>';
 			for (data_variable=0; data_variable < table_data[variable][3].length; ++data_variable) {
 				html+='<tr>';
-				html+='<td>'+date_string(parseInt(table_data[variable][3][data_variable][0],10))+'</td>';
+				html+='<td><b>'+date_string(parseInt(table_data[variable][3][data_variable][0],10))+'</b></td>';
 				for (data_series_variable=0; data_series_variable < table_data[variable][3][data_variable][1].length; ++data_series_variable) {
 					if (table_data[variable][3][data_variable][1][data_series_variable][1]) {
 						html+='<td align="right">';
