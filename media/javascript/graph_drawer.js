@@ -924,9 +924,11 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			current_icon++;
 			graph_link = true;
 		}
-		graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_tables"><span class="ui-icon ui-icon-calculator">tablas</span></span>';
-		current_icon++;
-		graph_table = true;
+		if (table_data.length>0) {
+			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_tables"><span class="ui-icon ui-icon-calculator">tablas</span></span>';
+			current_icon++;
+			graph_table = true;
+		}
 		graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_export"><span class="ui-icon ui-icon-document">exportar</span></span>';
 		current_icon++;
 		graph_export = true;
