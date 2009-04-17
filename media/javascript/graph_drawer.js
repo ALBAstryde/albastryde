@@ -133,6 +133,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		eurographs = calculate_currencygraphs(eval(jsondata.euro), converted_graphs);
 		normalized_dollargraphs = calculate_normalizedgraphs(dollargraphs);
 		normalized_eurographs = calculate_normalizedgraphs(eurographs);
+		table_data=table_data.concat(calculate_currencytables(eval(jsondata.dollar),table_data));
+		table_data=table_data.concat(calculate_currencytables(eval(jsondata.euro),table_data));
 	}
 	var graph_html;
 	if (editor_mode) {
@@ -294,6 +296,40 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		new_graphs.yaxis = yaxis;
 		new_graphs.y2axis = y2axis;
 		return new_graphs;
+	}
+
+	function calculate_currencytables(currency_dic, cordobatables) {
+		var new_currencytables = [];
+		var new_unit=currency_dic.unit;
+		$.each(cordobatables,
+		function() {
+			var new_data, new_tablerow, i, j;
+			if (this[2][0]['unit']=='cordoba') {
+				new_tablerow=[];
+				new_tablerow[0]=this[0];
+				new_tablerow[1]=this[1];
+				new_tablerow[2]=[];
+				for (i in this[2]) {
+					new_tablerow[2][i]={};
+					new_tablerow[2][i]['datatype']=this[2][i]['datatype'];
+					new_tablerow[2][i]['independent']=this[2][i]['independent'];
+					new_tablerow[2][i]['unit']=new_unit;
+				}
+				new_tablerow[3]=[];
+				for (i in this[3]) {
+					new_tablerow[3][i]=[];
+					new_tablerow[3][i][0]=this[3][i][0];
+					new_tablerow[3][i][1]=[];
+					for (j in this[3][i][1]) {
+						new_tablerow[3][i][1][j]=[];
+						new_tablerow[3][i][1][j][0]=currency_dic[String(parseInt(this[3][i][0],10) / 1000000)] * this[3][i][1][j][0];
+						new_tablerow[3][i][1][j][1]=this[3][i][1][j][1];
+					}
+				}
+				new_currencytables.push(new_tablerow);
+			}
+		});
+		return new_currencytables;
 	}
 
 	function calculate_currencygraphs(currency_dic, cordobagraphs) {
@@ -526,7 +562,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			graph_time_data_list = graph_time_data_list.sort();
 			for (counter = 0; counter < graph_time_data_list.length; counter++) {
 				for (i in graph_time_data_list[counter][1]) {
-					JOHANNES=graph_time_data_list[counter][1];
 					if (graph_time_data_list[counter][1][i][0] === null) {
 						if (counter === 0) {
 							from_time = to_time = from_value = to_value = null;
@@ -1022,7 +1057,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		var html, header_variable, variable, data_variable, data_series_variable;
 		html = '<table style="position:absolute;right:0px;top:40px;font-size: smaller; color: rgb(84, 84, 84);"><tr><td><div style="border: 1px solid rgb(204, 204, 204); padding: 1px;"><div style="border: 5px solid #C1609D; overflow: hidden; width: 4px; height: 0pt;"/></div></td><td>valor estimado</td></tr></table>';
 		for (variable = 0; variable < table_data.length; ++variable) {
-			html += '<h3>' + table_data[variable][0] + ' ' + table_data[variable][1] + '</h3>';
+			html += '<h3>' + table_data[variable][0] + ' ' + table_data[variable][1] + ' ('+table_data[variable][2][0]['unit']+')</h3>';
 			html += '<table>';
 			html += '<tr>';
 			html += '<th>&nbsp;</th>';
@@ -1041,7 +1076,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					} else {
 						html += '<td align="right" style="background-color:#C1609D;">';
 					}
-					html += parseInt(table_data[variable][3][data_variable][1][data_series_variable][0], 10);
+					html += String(parseInt(table_data[variable][3][data_variable][1][data_series_variable][0]*100, 10)/100);
 					html += '</td>';
 				}
 				html += '</tr>';
