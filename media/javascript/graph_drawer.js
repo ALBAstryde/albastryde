@@ -1,14 +1,14 @@
 var e_msg, errors;
 function create_graphs(jsondata, wiki_mode, graphsheader) {
-	var query_id, id, headline, comment_counter = 0,
-	has_comments, plot, comments, datapoint_dictionary, graph_height, graph_wiki = false,
+	var query_id, id, headline, has_comments, plot, comments, datapoint_dictionary, graph_height, raw_graphs, converted_graphs, dollargraphs, eurographs, normalized_graphs, normalized_dollargraphs, normalized_eurographs, all_lluvias, all_mercados, all_productos, graphs;
+	var color_counter = 0,
+	comment_counter = 0,
+	graph_wiki = false,
 	graph_close = false,
 	graph_link = false,
-	graph_export = false;
-	var raw_graphs, converted_graphs, dollargraphs, eurographs, normalized_graphs, normalized_dollargraphs, normalized_eurographs, color_counter = 0,
-	all_lluvias, all_mercados, all_productos, graphs;
-	var labelCanvas = false;
-	var table_data = [];
+	graph_export = false,
+	labelCanvas = false,
+	table_data = {};
 	if (wiki_mode) {
 		editor_mode = false;
 	} else {
@@ -33,15 +33,16 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	headline = jsondata.headline;
 	var yaxis = converted_graphs.yaxis,
 	y2axis = converted_graphs.y2axis;
+	table_data.Cordoba=[];
 	if (all_productos.length > 1) {
 		var median_producto_data = calculate_estimated_data(converted_graphs, 'producto', 'mercado');
-		table_data = table_data.concat(median_producto_data);
+		table_data.Cordoba = table_data.Cordoba.concat(median_producto_data);
 		var median_producto_graphs = calculate_mediangraphs(median_producto_data);
 		converted_graphs = converted_graphs.concat(median_producto_graphs);
 	}
 	if (all_mercados.length > 1) {
 		var median_mercado_data = calculate_estimated_data(converted_graphs, 'mercado', 'producto');
-		table_data = table_data.concat(median_mercado_data);
+		table_data.Cordoba = table_data.Cordoba.concat(median_mercado_data);
 		var median_mercado_graphs = calculate_mediangraphs(median_mercado_data);
 		converted_graphs = converted_graphs.concat(median_mercado_graphs);
 		if (all_productos.length > 1) {
@@ -103,15 +104,17 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	});
 	$('span#' + query_id + 'graph_tables').live('click',
 	function(e) {
-		var table_html = create_tables();
 		var dialog_id = Date.now();
+		var table_html = create_tables(dialog_id);
 		var dialog_text = '<div id="' + dialog_id + '">';
 		dialog_text += table_html;
 		dialog_text += '</div>';
 		var dialog_options = {};
 		dialog_options.title = 'Tablas';
-		dialog_options.width = 700;
+		dialog_options.width = '100%';
 		$('#' + query_id).append(dialog_text);
+		$('#' + dialog_id+'currencytabs').tabs();
+		$('.' + dialog_id+'tabletabs').tabs();
 		$('#' + dialog_id).dialog(dialog_options);
 	});
 	$('span#' + query_id + 'graph_close').live('click',
@@ -133,8 +136,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		eurographs = calculate_currencygraphs(eval(jsondata.euro), converted_graphs);
 		normalized_dollargraphs = calculate_normalizedgraphs(dollargraphs);
 		normalized_eurographs = calculate_normalizedgraphs(eurographs);
-		table_data=table_data.concat(calculate_currencytables(eval(jsondata.dollar),table_data));
-		table_data=table_data.concat(calculate_currencytables(eval(jsondata.euro),table_data));
+		table_data.USD=calculate_currencytables(eval(jsondata.dollar),table_data.Cordoba);
+		table_data.Euro=calculate_currencytables(eval(jsondata.euro),table_data.Cordoba);
 	}
 	var graph_html;
 	if (editor_mode) {
@@ -959,7 +962,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			current_icon++;
 			graph_link = true;
 		}
-		if (table_data.length>0) {
+		if (table_data.Cordoba.length>0) {
 			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_tables"><span class="ui-icon ui-icon-calculator">tablas</span></span>';
 			current_icon++;
 			graph_table = true;
@@ -1053,36 +1056,57 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		return formated_date_string;
 	}
 
-	function create_tables() {
+	function create_tables(dialog_id) {
 		var html, header_variable, variable, data_variable, data_series_variable;
-		html = '<table style="position:absolute;right:0px;top:40px;font-size: smaller; color: rgb(84, 84, 84);"><tr><td><div style="border: 1px solid rgb(204, 204, 204); padding: 1px;"><div style="border: 5px solid #C1609D; overflow: hidden; width: 4px; height: 0pt;"/></div></td><td>valor estimado</td></tr></table>';
-		for (variable = 0; variable < table_data.length; ++variable) {
-			html += '<h3>' + table_data[variable][0] + ' ' + table_data[variable][1] + ' ('+table_data[variable][2][0]['unit']+')</h3>';
-			html += '<table>';
-			html += '<tr>';
-			html += '<th>&nbsp;</th>';
-			for (header_variable = 0; header_variable < table_data[variable][2].length; ++header_variable) {
-				html += '<th>';
-				html += table_data[variable][2][header_variable]['independent'] + ' (' + table_data[variable][2][header_variable]['datatype'] + ')';
-				html += '</th>';
+		html='';
+		html+='<div id="'+dialog_id+'currencytabs">';
+		html+='<ul>';
+		for (currency in table_data) {
+		html+='<li><a href="#'+dialog_id+currency+'">'+currency+'</li>';
+		}
+		html+='</ul>';
+		for (currency in table_data) {			
+			html +='<div id="'+dialog_id+currency+'">';		
+			html += '<div class="'+dialog_id+'tabletabs">';
+			html += '<ul>';
+			for (variable = 0; variable < table_data[currency].length; ++variable) {
+				html+='<li><a href="#'+dialog_id+currency+variable+'">'+table_data[currency][variable][0] + ': ' + table_data[currency][variable][1]+'</a></li>';
 			}
-			html += '</tr>';
-			for (data_variable = 0; data_variable < table_data[variable][3].length; ++data_variable) {
+			html += '</ul>';
+			for (variable = 0; variable < table_data[currency].length; ++variable) {
+//				html +='<li><a href="#'+dialog_id+currency+'">'+table_data[currency][variable][0] + ': ' + table_data[currency][variable][1]+'</a></li>';
+				html += '<div id="'+dialog_id+currency+variable+'">';
+				html += '<table style="font-size: smaller; color: rgb(84, 84, 84);"><tr><td><div style="border: 1px solid rgb(204, 204, 204); padding: 1px;"><div style="border: 5px solid #C1609D; overflow: hidden; width: 4px; height: 0pt;"/></div></div></td><td>valor estimado</td></tr></table>';
+				html += '<table>';
 				html += '<tr>';
-				html += '<td><b>' + date_string(parseInt(table_data[variable][3][data_variable][0], 10)) + '</b></td>';
-				for (data_series_variable = 0; data_series_variable < table_data[variable][3][data_variable][1].length; ++data_series_variable) {
-					if (table_data[variable][3][data_variable][1][data_series_variable][1]) {
-						html += '<td align="right">';
-					} else {
-						html += '<td align="right" style="background-color:#C1609D;">';
-					}
-					html += String(parseInt(table_data[variable][3][data_variable][1][data_series_variable][0]*100, 10)/100);
-					html += '</td>';
+				html += '<th>&nbsp;</th>';
+				for (header_variable = 0; header_variable < table_data[currency][variable][2].length; ++header_variable) {
+					html += '<th>';
+					html += table_data[currency][variable][2][header_variable]['independent'] + ' (' + table_data[currency][variable][2][header_variable]['datatype'] + ')';
+					html += '</th>';
 				}
 				html += '</tr>';
+				for (data_variable = 0; data_variable < table_data[currency][variable][3].length; ++data_variable) {
+					html += '<tr>';
+					html += '<td><b>' + date_string(parseInt(table_data[currency][variable][3][data_variable][0], 10)) + '</b></td>';
+					for (data_series_variable = 0; data_series_variable < table_data[currency][variable][3][data_variable][1].length; ++data_series_variable) {
+						if (table_data[currency][variable][3][data_variable][1][data_series_variable][1]) {
+							html += '<td align="right">';
+						} else {
+							html += '<td align="right" style="background-color:#C1609D;">';
+						}
+						html += String(parseInt(table_data[currency][variable][3][data_variable][1][data_series_variable][0]*100, 10)/100);
+						html += '</td>';
+					}
+					html += '</tr>';
+				}
+				html += '</table>';
+				html += '</div>';
 			}
-			html += '</table>';
+			html += '</div>';
+			html += '</div>';
 		}
+		html +='</div>';
 		return html;
 	}
 
