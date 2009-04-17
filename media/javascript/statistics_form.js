@@ -11,9 +11,9 @@ $(function() {
 	var dayNamesShort = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
 	var dayNamesMin = ['Do','Lu','Ma','Mi','Ju','Vi','Sa'];
 
-	var monthNames = ['Enero','Fevrero','Marzo','Avril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-	var monthNamesShort = ['Ene','Fev','Mar','Avr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-	var monthNamesMin = ['En','Fe','Mar','Av','May','Jun','Jul','Ag','Se','Oc','No','Di'];
+	var monthNames = ['Enero','Fevrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+	var monthNamesShort = ['Ene','Fev','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+	var monthNamesMin = ['En','Fe','Mar','Ab','May','Jun','Jul','Ag','Se','Oc','No','Di'];
 
 	$('#id_StartDate').datepicker({
 		dayNames: dayNames,

@@ -18,6 +18,10 @@ body {
 .ui-dialog .ui-dialog-titlebar-four span { display: block; margin: 1px; }
 .ui-dialog .ui-dialog-titlebar-four:hover, .ui-dialog .ui-dialog-titlebar-four:focus { padding: 0; }
 
+.ui-dialog .ui-dialog-titlebar-five { position: absolute; right: 5.1em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
+.ui-dialog .ui-dialog-titlebar-five span { display: block; margin: 1px; }
+.ui-dialog .ui-dialog-titlebar-five:hover, .ui-dialog .ui-dialog-titlebar-four:focus { padding: 0; }
+
 .resetbutton { position: absolute; top: 10px; z-index: 100px; padding: 1px; }
 .resetbutton:hover, resetbutton:focus { padding: 0; }
 

@@ -1,14 +1,18 @@
-
 var e_msg, errors;
-function create_graphs(jsondata,wiki_mode,graphsheader) {
-	var query_id, id, headline, comment_counter=0, has_comments, plot, comments, datapoint_dictionary, graph_height,graph_wiki=false,graph_close=false,graph_link=false,graph_export=false;
-	var raw_graphs, converted_graphs, dollargraphs, eurographs, normalized_graphs, normalized_dollargraphs, normalized_eurographs,color_counter=0,all_lluvias,all_mercados,all_productos,graphs;
+function create_graphs(jsondata, wiki_mode, graphsheader) {
+	var query_id, id, headline, comment_counter = 0,
+	has_comments, plot, comments, datapoint_dictionary, graph_height, graph_wiki = false,
+	graph_close = false,
+	graph_link = false,
+	graph_export = false;
+	var raw_graphs, converted_graphs, dollargraphs, eurographs, normalized_graphs, normalized_dollargraphs, normalized_eurographs, color_counter = 0,
+	all_lluvias, all_mercados, all_productos, graphs;
 	var labelCanvas = false;
-	var table_data=[];
+	var table_data = [];
 	if (wiki_mode) {
-		editor_mode=false; 
+		editor_mode = false;
 	} else {
-		editor_mode=true;
+		editor_mode = true;
 	}
 	if (jsondata.comments) {
 		comments = jsondata.comments;
@@ -27,95 +31,104 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 	}
 	datapoint_dictionary = calculate_datapoint_dictionary(converted_graphs);
 	headline = jsondata.headline;
-	var yaxis=converted_graphs.yaxis,y2axis=converted_graphs.y2axis;
-	if (all_productos.length>1) {
-		var median_producto_graphs=calculate_mediangraphs(converted_graphs,'producto','mercado');
-		converted_graphs=converted_graphs.concat(median_producto_graphs);
+	var yaxis = converted_graphs.yaxis,
+	y2axis = converted_graphs.y2axis;
+	if (all_productos.length > 1) {
+		var median_producto_data = calculate_estimated_data(converted_graphs, 'producto', 'mercado');
+		table_data = table_data.concat(median_producto_data);
+		var median_producto_graphs = calculate_mediangraphs(median_producto_data);
+		converted_graphs = converted_graphs.concat(median_producto_graphs);
 	}
-	if (all_mercados.length>1) {
-		var median_mercado_graphs=calculate_mediangraphs(converted_graphs,'mercado','producto');
-		converted_graphs=converted_graphs.concat(median_mercado_graphs);
-		if (all_productos.length>1) {
-			for (i in median_mercado_graphs) {
-				median_mercado_graphs[i].producto='1';
+	if (all_mercados.length > 1) {
+		var median_mercado_data = calculate_estimated_data(converted_graphs, 'mercado', 'producto');
+		table_data = table_data.concat(median_mercado_data);
+		var median_mercado_graphs = calculate_mediangraphs(median_mercado_data);
+		converted_graphs = converted_graphs.concat(median_mercado_graphs);
+		if (all_productos.length > 1) {
+			median_mercado_graphs_copy=median_mercado_graphs.slice();
+			for (i in median_mercado_graphs_copy) {
+				median_mercado_graphs_copy[i].producto = '1';
 			}
-			var median_mercado_producto_graphs=calculate_mediangraphs(median_mercado_graphs,'producto',null);
-			for (i in median_mercado_graphs) {
-				delete median_mercado_graphs[i].producto;
-			}
-			if (median_mercado_producto_graphs.length>0) {
-				median_mercado_producto_graphs[0].advanced_label='mediano de todos los mercados y todos los productos';
-				median_mercado_producto_graphs[0].label='mediano de todos los mercados y todos los productos (cordoba)';
-				median_mercado_producto_graphs[0].producto=null;
-				converted_graphs=converted_graphs.concat(median_mercado_producto_graphs);
+			var median_mercado_producto_data = calculate_estimated_data(median_mercado_graphs_copy, 'producto', null);
+			var median_mercado_producto_graphs = calculate_mediangraphs(median_mercado_producto_data);
+			if (median_mercado_producto_graphs.length > 0) {
+				median_mercado_producto_graphs[0].advanced_label = 'mediano de todos los mercados y todos los productos';
+				median_mercado_producto_graphs[0].label = 'mediano de todos los mercados y todos los productos (cordoba)';
+				median_mercado_producto_graphs[0].producto = null;
+				converted_graphs = converted_graphs.concat(median_mercado_producto_graphs);
 			}
 		}
 	}
-	converted_graphs.yaxis=yaxis;
-	converted_graphs.y2axis=y2axis;
+	converted_graphs.yaxis = yaxis;
+	converted_graphs.y2axis = y2axis;
 	query_id = String(new Date().getTime());
 	e_msg = 'Nuevo gráfico generado.';
 
 	//Show the message
 	$('#AjaxFormWarning').text(e_msg).fadeIn('slow');
 
-		$('span#' + query_id + 'graph_wiki').live('click',function(e) {
-			var dialog_id=Date.now();
-			var dialog_text = '<div id="'+dialog_id+'">Codigo para incluir en pagina de wiki:<br /><b>_estadisticas['+jsondata.wiki_code+']</b></div>';
-			var dialog_options={};
-			dialog_options.title='Codigo para la wiki';
-			$('#' + query_id).append(dialog_text);
-			$('#'+dialog_id).dialog(dialog_options);	
+	$('span#' + query_id + 'graph_wiki').live('click',
+	function(e) {
+		var dialog_id = Date.now();
+		var dialog_text = '<div id="' + dialog_id + '">Codigo para incluir en pagina de wiki:<br /><b>_estadisticas[' + jsondata.wiki_code + ']</b></div>';
+		var dialog_options = {};
+		dialog_options.title = 'Codigo para la wiki';
+		$('#' + query_id).append(dialog_text);
+		$('#' + dialog_id).dialog(dialog_options);
+	});
+	$('span#' + query_id + 'graph_link').live('click',
+	function(e) {
+		var dialog_id = Date.now();
+		var dialog_text = '<div id="' + dialog_id + '">Para compatir este grÃ¡fico, manda <a href="/estadisticas/' + jsondata.query_link + '">este enlace</a></div>';
+		var dialog_options = {};
+		dialog_options.title = 'Enlace permanente';
+		$('#' + query_id).append(dialog_text);
+		$('#' + dialog_id).dialog(dialog_options);
+	});
+	$('span#' + query_id + 'graph_export').live('click',
+	function(e) {
+		var export_data = csv_export(raw_graphs);
+		var dialog_id = Date.now();
+		var dialog_text = '<div id="' + dialog_id + '">';
+		dialog_text += 'Para usar estos datos en otros programas, copia el texto abajo a un editor de archivos de texto. Guardalo como un archivo del tipo ".csv". Este archivo se puede abrir en Open Office y otros programas parecidos.<br />';
+		dialog_text += '<textarea rows="10" cols="80">';
+		dialog_text += export_data;
+		dialog_text += '</textarea>';
+		dialog_text += '</div>';
+		var dialog_options = {};
+		dialog_options.title = 'Exportar datos';
+		dialog_options.width = 700;
+		$('#' + query_id).append(dialog_text);
+		$('#' + dialog_id).dialog(dialog_options);
+	});
+	$('span#' + query_id + 'graph_tables').live('click',
+	function(e) {
+		var table_html = create_tables();
+		var dialog_id = Date.now();
+		var dialog_text = '<div id="' + dialog_id + '">';
+		dialog_text += table_html;
+		dialog_text += '</div>';
+		var dialog_options = {};
+		dialog_options.title = 'Tablas';
+		dialog_options.width = 700;
+		$('#' + query_id).append(dialog_text);
+		$('#' + dialog_id).dialog(dialog_options);
+	});
+	$('span#' + query_id + 'graph_close').live('click',
+	function(e) {
+		reset_comments();
+		unbind_all();
+		$('#' + query_id).fadeOut(300,
+		function() {
+			$(this).remove();
 		});
-		$('span#' + query_id + 'graph_link').live('click',function(e) {
-			var dialog_id=Date.now();
-			var dialog_text = '<div id="'+dialog_id+'">Para compatir este gráfico, manda <a href="/estadisticas/'+jsondata.query_link+'">este enlace</a></div>';
-			var dialog_options={};
-			dialog_options.title='Enlace permanente';
-			$('#' + query_id).append(dialog_text);
-			$('#'+dialog_id).dialog(dialog_options);	
-		});
-		$('span#' + query_id + 'graph_export').live('click',function(e) {
-			var export_data = csv_export(raw_graphs);
-			var dialog_id=Date.now();
-			var dialog_text = '<div id="'+dialog_id+'">';
-			dialog_text += 'Para usar estos datos en otros programas, copia el texto abajo a un editor de archivos de texto. Guardalo como un archivo del tipo ".csv". Este archivo se puede abrir en Open Office y otros programas parecidos.<br />';
-			dialog_text += '<textarea rows="10" cols="80">';
-			dialog_text += export_data;
-			dialog_text += '</textarea>';
-			dialog_text += '</div>';
-			var dialog_options={};
-			dialog_options.title='Exportar datos';
-			dialog_options.width=700;
-			$('#' + query_id).append(dialog_text);
-			$('#'+dialog_id).dialog(dialog_options);	
-		});
-		$('span#' + query_id + 'graph_tables').live('click',function(e) {
-			var table_html = create_tables();
-			var dialog_id=Date.now();
-			var dialog_text = '<div id="'+dialog_id+'">';
-			dialog_text += table_html;
-			dialog_text += '</div>';
-			var dialog_options={};
-			dialog_options.title='Tablas';
-			dialog_options.width=700;
-			$('#' + query_id).append(dialog_text);
-			$('#'+dialog_id).dialog(dialog_options);	
-		});
-		$('span#' + query_id + 'graph_close').live('click',function(e) {
-			reset_comments();
-			unbind_all();
-			$('#' + query_id).fadeOut(300,
-			function() {
-				$(this).remove();
-			});
-			destroy_all_globals();
-		});
+		destroy_all_globals();
+	});
 
 	//Calculate other graphs	
 	normalized_graphs = calculate_normalizedgraphs(converted_graphs);
 
-	if (all_productos.length>0) {
+	if (all_productos.length > 0) {
 		dollargraphs = calculate_currencygraphs(eval(jsondata.dollar), converted_graphs);
 		eurographs = calculate_currencygraphs(eval(jsondata.euro), converted_graphs);
 		normalized_dollargraphs = calculate_normalizedgraphs(dollargraphs);
@@ -128,10 +141,8 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		graph_html = draw_small_graph_structure();
 	}
 	$(graphsheader).after(graph_html);
-	graphs=converted_graphs;
+	graphs = converted_graphs;
 	make_graphs();
-
-
 
 	if ($.browser.msie) {
 		$('div.graph').remove();
@@ -149,33 +160,31 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		function() {
 			var data = [],
 			new_data = [],
-			new_fill_data = [],
 			max_data = [],
 			min_data_dic = {},
-			top_value=0,
+			top_value = 0,
 			tipo,
 			unit,
 			producto,
 			mercado,
 			lluvia,
 			label,
-			start_value,
 			start_date;
 			unit = this.unit;
 			tipo = this.tipo;
 			if (tipo == 'precio') {
 				producto = this.producto;
 				mercado = this.mercado;
-				if (!(producto in all_productos)) {
+				if (! (producto in all_productos)) {
 					all_productos.push(producto);
 				}
-				if (!(mercado in all_mercados)) {
+				if (! (mercado in all_mercados)) {
 					all_mercados.push(mercado);
 				}
 				label = producto + ' en ' + mercado + ' (' + unit + ')';
 			} else if (tipo == 'lluvia') {
 				lluvia = this.lluvia;
-				if (!(lluvia in all_lluvias)) {
+				if (! (lluvia in all_lluvias)) {
 					all_lluvias.push(lluvia);
 				}
 				label = 'lluvia en ' + lluvia + ' (' + unit + ')';
@@ -189,7 +198,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 				max_data = this.max_data;
 				min_data_dic = this.min_data_dic;
 				var new_max_data = [];
-				minData=[];
+				minData = [];
 				$.each(max_data,
 				function() {
 					var pk, max_value, min_value, time, new_time;
@@ -197,7 +206,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 					new_time = time * 1000000; //add 7 zeroes to end of time string
 					max_value = parseFloat(this[1]);
 					if (max_value > top_value) {
-						top_value=max_value;
+						top_value = max_value;
 					}
 					pk = this[2];
 					if (String(time) in min_data_dic) {
@@ -208,10 +217,10 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 					minData.push([new_time, min_value]);
 					new_max_data.push([new_time, max_value, pk]);
 				});
-				new_data = new_max_data;//.reverse();
+				new_data = new_max_data; //.reverse();
 			} else {
 				data = this.data;
-				minData=false;
+				minData = false;
 				$.each(data,
 				function() {
 					var pk, value, time, new_time;
@@ -219,13 +228,13 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 					new_time = time * 1000000; //add 7 zeroes to end of time string
 					value = parseFloat(this[1]);
 					if (value > top_value) {
-						top_value=value;
+						top_value = value;
 					}
 					pk = this[2];
 					new_data.push([new_time, value, pk]);
 				});
 			}
-			start_date=new_data[0][0];
+			start_date = new_data[0][0];
 			var graph_yaxis = 1;
 			var yaxis_finder = 1;
 			for (var item in tipos_graficos) {
@@ -250,18 +259,18 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 				'start_date': start_date
 			};
 			if (tipo == 'precio') {
-				new_graph.start_value=new_data[0][1];
+				new_graph.start_value = new_data[0][1];
 				new_graph.lines = {
 					'show': true
 				};
 				if (minData) {
-					new_graph.minData=minData;
-					new_graph.lines.fill=true;
+					new_graph.minData = minData;
+					new_graph.lines.fill = true;
 				}
 				new_graph.producto = producto;
 				new_graph.mercado = mercado;
 			} else if (tipo == 'lluvia') {
-				new_graph.start_value=top_value;
+				new_graph.start_value = top_value;
 				new_graph.bars = {
 					'show': true,
 					'barWidth': 86400000
@@ -288,11 +297,11 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 	}
 
 	function calculate_currencygraphs(currency_dic, cordobagraphs) {
-		var new_graphs = [],new_data;
+		var new_graphs = [];
 		var tipos_graficos = {};
-		$.each(cordobagraphs,function() {
-			var label = '',
-			new_data, new_unit, start_value;
+		$.each(cordobagraphs,
+		function() {
+			var new_data;
 			var new_graph = {
 				'tipo': this.tipo,
 				'yaxis': this.yaxis,
@@ -307,7 +316,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 				'hoverable': this.hoverable
 			};
 			if ('advanced_label' in this) {
-				new_graph.advanced_label=this.advanced_label;
+				new_graph.advanced_label = this.advanced_label;
 			}
 			if (this.unit == 'cordoba') {
 				new_graph.start_value = currency_dic[String(this.start_date / 1000000)] * this.start_value;
@@ -323,7 +332,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 				});
 				new_graph.data = new_data;
 				if ('minData' in this) {
-					var minData=[];
+					var minData = [];
 					$.each(this.minData,
 					function() {
 						var time = this[0];
@@ -333,14 +342,14 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 						var currency_value = parseFloat(cordoba) * parseFloat(currency);
 						minData.push([time, currency_value, pk]);
 					});
-				new_graph.minData=minData;
+					new_graph.minData = minData;
 				}
 				new_graph.unit = currency_dic.unit;
 			} else {
-				new_graph.start_value=this.start_value;
+				new_graph.start_value = this.start_value;
 				new_graph.data = this.data;
 				if ('minData' in this) {
-					new_graph.minData=this.minData;
+					new_graph.minData = this.minData;
 				}
 				new_graph.unit = this.unit;
 			}
@@ -360,8 +369,6 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 			}
 			new_graphs.push(new_graph);
 		});
-		var yaxis = '',
-		y2axis = '';
 		var yaxis_finder = 1;
 		for (var item in tipos_graficos) {
 			if (yaxis_finder == 1) {
@@ -374,306 +381,208 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		return new_graphs.sort();
 	}
 
-	function calculate_mediangraphs(cordobagraphs,median_variable,independent_variable) {
-		var graph_dic= {};
-		var to_time,from_time,from_value,to_value,last_time,last_value,search_from_counter,search_to_counter,slope,current_time,current_slope_list,time_delta,independet_value;
-		var new_graphs_list=[],graph_time_dic,graph_counter,empty_values,data_string,value_string,time_item,counter,search_counter,i,median_value,start_value,start_date;
-		var graph_time_data,graph_time_data_list,date_item,graph_item,median_variable_item,new_graph,total_value,header_list;
-		$.each(cordobagraphs, function() {
-			if (median_variable in this) {
-				if (independent_variable) {
-					if (independent_variable in this) {
-						independent_value=this[independent_variable];
-					} else {
-						independent_value=null;
+	function calculate_mediangraphs(median_data) {
+		var graph_series, date_item, new_data, date_value, value_value, total_value, value_item, new_graph, new_graphs_list;
+		new_graphs_list = [];
+
+		for (graph_series in median_data) {
+			if ((median_data[graph_series].length > 0) && (median_data[graph_series][3][0][1].length > 2)) {
+				new_data = [];
+				for (date_item in median_data[graph_series][3]) {
+					date_value = parseInt(median_data[graph_series][3][date_item][0],10);
+					total_value = 0;
+					for (value_item in median_data[graph_series][3][date_item][1]) {
+						total_value += median_data[graph_series][3][date_item][1][value_item][0];
 					}
-				} else {
-					independent_value=null;
+					value_value = total_value / (median_data[graph_series][3][date_item][1].length);
+					new_data.push([date_value, value_value]);
 				}
-				if (this[median_variable] in graph_dic) {
-					graph_dic[this[median_variable]].push({'unit':this.unit,'data':this.data,'datatype':'max','independent':independent_value});
-				} else {
-					graph_dic[this[median_variable]]=[{'unit':this.unit,'data':this.data, 'datatype':'max','independent':independent_value}];
-				}
-				if ('minData' in this) {
-					graph_dic[this[median_variable]].push({'unit':this.unit,'data':this.minData,'datatype':'min','independent':independent_value});
-				} else {
-					graph_dic[this[median_variable]].push({'unit':this.unit,'data':this.data,'datatype':'min','independent':independent_value});
-				}
-			}
-		});
-		for (median_variable_item in graph_dic) {
-			if (graph_dic[median_variable_item].length > 2) {
-				graph_time_dic={};
-				graph_counter=0;
-				empty_values=0;
-				header_list=[]
-				for (graph_item in graph_dic[median_variable_item]) {
-					header_list.push({'datatype':graph_dic[median_variable_item][graph_item]['datatype'],'independent':graph_dic[median_variable_item][graph_item]['independent']})
-					for (date_item in graph_dic[median_variable_item][graph_item]['data']) {
-						data_string=graph_dic[median_variable_item][graph_item]['data'][date_item][0];
-						value_string=graph_dic[median_variable_item][graph_item]['data'][date_item][1];
-						if (data_string in graph_time_dic) {
-							empty_values=graph_counter - graph_time_dic[data_string].length;
-						} else {
-							if (graph_counter===0) {
-								graph_time_dic[data_string]=[[value_string,true]];
-								empty_values=-1;
-							} else {
-								graph_time_dic[data_string]=[[null,false]];
-								empty_values=graph_counter-1;
-							}
-						}
-						if (empty_values>-1) {
-							for ( i = 0 ; i < empty_values ; i++ ) {
-								graph_time_dic[data_string].push([null,false]);
-							}
-							graph_time_dic[data_string].push([value_string,true]);
-						}
-					}
-					graph_counter+=1;
-				}
-				graph_counter-=1;
-				for (time_item in graph_time_dic) { // filling in zeroes (null) at end
-					empty_values=(graph_counter+1)-graph_time_dic[time_item].length;
-					for ( i = 0 ; i < empty_values ; i++ ) {
-						graph_time_dic[time_item].push(null);
-					}
-				} 
-				graph_time_data_list=[];
-				for (time_item in graph_time_dic) {
-					graph_time_data_list.push([time_item,graph_time_dic[time_item]]);
-				}
-				current_slope_list=[];
-				graph_time_data_list=graph_time_data_list.sort();
-				graph_time_data=[];
-				for ( counter = 0 ; counter < graph_time_data_list.length ; counter++ ) {
-					total_value=0;
-					for (i in graph_time_data_list[counter][1]) {
-						if (graph_time_data_list[counter][1][i][0]===null) {
-							if (counter===0) {
-								from_time=to_time=from_value=to_value=null;
-								for ( search_from_counter = 0; search_from_counter < graph_time_data_list.length ; search_from_counter++) {
-									if (!(graph_time_data_list[search_from_counter][1][i][0]===null)) {
-										from_time=graph_time_data_list[search_from_counter][0];
-										from_value=graph_time_data_list[search_from_counter][1][i][0];
-										for ( search_to_counter = search_from_counter+1; search_to_counter < graph_time_data_list.length ; search_to_counter++) {
-											if (!(graph_time_data_list[search_to_counter][1][i][0]===null)) {
-												to_time=graph_time_data_list[search_to_counter][0];
-												to_value=graph_time_data_list[search_to_counter][1][i];
-												break;
-											}
-										}
-										break;
-									}
-								}
-								slope=current_slope_list[i]=(to_value-from_value)/(to_time-from_time);
-								time_delta=from_time-(graph_time_data_list[0][0]);
-								graph_time_data_list[0][1][i][0]=from_value-(time_delta*slope);
-							} else {
-								if ((!(current_slope_list[i])) || (current_slope_list[i]===null)) {
-									from_time=graph_time_data_list[counter-1][0];
-									from_value=graph_time_data_list[counter-1][1][i][0];
-									to_time=null;
-									to_value=null;
-									for (var finder = counter; finder < graph_time_data_list.length; finder++) {
-										if (!(graph_time_data_list[finder][1][i][0]===null)) {
-											to_time=graph_time_data_list[finder][0];
-											to_value=graph_time_data_list[finder][1][i][0];
-											break;
-										}
-									}
-									if (to_value===null) {
-										from_time=graph_time_data_list[counter-2][0];
-                                                                        	from_value=graph_time_data_list[counter-2][1][i][0];
-										to_time=graph_time_data_list[counter-1][0];
-                                                                        	to_value=graph_time_data_list[counter-1][1][i][0];
-									}
-									current_slope_list[i]=(to_value-from_value)/(to_time-from_time);
-								} 
-								last_time=graph_time_data_list[counter-1][0];
-								current_time=graph_time_data_list[counter][0];
-								time_delta=current_time-last_time;
-								last_value=graph_time_data_list[counter-1][1][i][0];
-								slope=current_slope_list[i];
-								graph_time_data_list[counter][1][i][0]=last_value+(time_delta*slope);								
-							}
-						} else {
-							current_slope_list[i]=null;
-						}
-						total_value+=graph_time_data_list[counter][1][i][0];						
-					} 
-					median_value=total_value/(graph_counter+1);
-					graph_time_data.push([parseInt(graph_time_data_list[counter][0],10),median_value]);
-					if (counter===0) {
-						start_value=median_value;
-						start_date=parseInt(graph_time_data_list[counter][0],10);
-					}
-				}
-				if (independent_variable) {
-					table_data.push([median_variable,median_variable_item,header_list,graph_time_data_list]);
-				}
-				var model_graph=graph_dic[median_variable_item][0];
-				new_graph={
+				new_graph = {
 					'points': {
-                                		'show': false
-                                	},
-                                	'lines': {
-						'show':true,
-                                		'fill': false
-                                	},
+						'show': false
+					},
+					'lines': {
+						'show': true,
+						'fill': false
+					},
 					'hoverable': false,
-					'clickable': false,		
-					'start_date': start_date,		
-					'start_value': start_value,		
-					'unit': model_graph.unit,
-					'tipo': model_graph.tipo,
-					'yaxis': model_graph.yaxis,
+					'clickable': false,
+					'start_date': new_data[0][0],
+					'start_value': new_data[0][1],
+					'unit': median_data[graph_series][2][0]['unit'],
+					'tipo': median_data[graph_series][2][0]['tipo'],
+					'yaxis': median_data[graph_series][2][0]['yaxis'],
 					'relevance': 'mediano',
-					'color': color_counter
+					'color': color_counter,
+					'data': new_data
 				};
 				color_counter += 1;
-				new_graph.data=graph_time_data;
-				new_graph[median_variable]=median_variable_item;
-				new_graph.label=median_variable_item+' mediano ('+model_graph.unit+')';
-				new_graph.advanced_label=median_variable_item+' mediano';
+				new_graph[median_data[graph_series][0]] = median_data[graph_series][1];
+				new_graph.label = median_data[graph_series][1] + ' mediano (' + new_graph.unit + ')';
+				new_graph.advanced_label = median_data[graph_series][1] + ' mediano';
 				new_graphs_list.push(new_graph);
 			}
 		}
 		return new_graphs_list;
-		
+
 	}
 
-	function calculate_estimated_data(cordobagraphs,median_variable,independent_variable) {
-		var filled_graph_list=[];
-		var graph_dic= {};
-		var to_time,from_time,from_value,to_value,last_time,last_value,search_from_counter,search_to_counter,slope,current_time,current_slope_list,time_delta,independet_value;
-		var graph_time_dic,graph_counter,empty_values,data_string,value_string,time_item,counter,search_counter,i,start_value,start_date;
-		var graph_time_data_list,date_item,graph_item,median_variable_item,new_graph,header_list;
-		$.each(cordobagraphs, function() {
+	function calculate_estimated_data(cordobagraphs, median_variable, independent_variable) {
+		var filled_graph_list = [];
+		var graph_dic = {};
+		var to_time, from_time, from_value, to_value, last_time, last_value, search_from_counter, search_to_counter, slope, current_time, current_slope_list, time_delta, independent_value;
+		var graph_time_dic, graph_counter, empty_values, data_string, value_string, time_item, counter, i;
+		var graph_time_data_list, date_item, graph_item, median_variable_item, header_list;
+		$.each(cordobagraphs,
+		function() {
 			if (median_variable in this) {
 				if (independent_variable) {
 					if (independent_variable in this) {
-						independent_value=this[independent_variable];
+						independent_value = this[independent_variable];
 					} else {
-						independent_value=null;
+						independent_value = null;
 					}
 				} else {
-					independent_value=null;
+					independent_value = null;
 				}
-				if (this[median_variable] in graph_dic) {
-					graph_dic[this[median_variable]].push({'unit':this.unit,'data':this.data,'datatype':'max','independent':independent_value});
-				} else {
-					graph_dic[this[median_variable]]=[{'unit':this.unit,'data':this.data, 'datatype':'max','independent':independent_value}];
+				if (! (this[median_variable] in graph_dic)) {
+					graph_dic[this[median_variable]] = [];
 				}
+				graph_dic[this[median_variable]].push({
+					'tipo': this.tipo,
+					'yaxis': this.yaxis,
+					'unit': this.unit,
+					'data': this.data,
+					'datatype': 'max',
+					'independent': independent_value
+				});
 				if ('minData' in this) {
-					graph_dic[this[median_variable]].push({'unit':this.unit,'data':this.minData,'datatype':'min','independent':independent_value});
+					graph_dic[this[median_variable]].push({
+						'tipo': this.tipo,
+						'yaxis': this.yaxis,
+						'unit': this.unit,
+						'data': this.minData,
+						'datatype': 'min',
+						'independent': independent_value
+					});
 				} else {
-					graph_dic[this[median_variable]].push({'unit':this.unit,'data':this.data,'datatype':'min','independent':independent_value});
+					graph_dic[this[median_variable]].push({
+						'tipo': this.tipo,
+						'yaxis': this.yaxis,
+						'unit': this.unit,
+						'data': this.data,
+						'datatype': 'ignore',
+						'independent': independent_value
+					});
 				}
 			}
 		});
 		for (median_variable_item in graph_dic) {
-				graph_time_dic={};
-				graph_counter=0;
-				empty_values=0;
-				header_list=[]
-				for (graph_item in graph_dic[median_variable_item]) {
-					header_list.push({'unit':graph_dic[median_variable_item][graph_item]['unit'],'datatype':graph_dic[median_variable_item][graph_item]['datatype'],'independent':graph_dic[median_variable_item][graph_item]['independent']})
-					for (date_item in graph_dic[median_variable_item][graph_item]['data']) {
-						data_string=graph_dic[median_variable_item][graph_item]['data'][date_item][0];
-						value_string=graph_dic[median_variable_item][graph_item]['data'][date_item][1];
-						if (data_string in graph_time_dic) {
-							empty_values=graph_counter - graph_time_dic[data_string].length;
+			graph_time_dic = {};
+			graph_counter = 0;
+			empty_values = 0;
+			header_list = [];
+			for (graph_item in graph_dic[median_variable_item]) {
+				header_list.push({
+					'unit': graph_dic[median_variable_item][graph_item]['unit'],
+					'datatype': graph_dic[median_variable_item][graph_item]['datatype'],
+					'independent': graph_dic[median_variable_item][graph_item]['independent']
+				});
+				for (date_item in graph_dic[median_variable_item][graph_item]['data']) {
+					data_string = graph_dic[median_variable_item][graph_item]['data'][date_item][0];
+					value_string = graph_dic[median_variable_item][graph_item]['data'][date_item][1];
+					if (data_string in graph_time_dic) {
+						empty_values = graph_counter - graph_time_dic[data_string].length;
+					} else {
+						if (graph_counter === 0) {
+							graph_time_dic[data_string] = [[value_string, true]];
+							empty_values = -1;
 						} else {
-							if (graph_counter===0) {
-								graph_time_dic[data_string]=[[value_string,true]];
-								empty_values=-1;
-							} else {
-								graph_time_dic[data_string]=[[null,false]];
-								empty_values=graph_counter-1;
-							}
-						}
-						if (empty_values>-1) {
-							for ( i = 0 ; i < empty_values ; i++ ) {
-								graph_time_dic[data_string].push([null,false]);
-							}
-							graph_time_dic[data_string].push([value_string,true]);
+							graph_time_dic[data_string] = [[null, false]];
+							empty_values = graph_counter - 1;
 						}
 					}
-					graph_counter+=1;
-				}
-				graph_counter-=1;
-				for (time_item in graph_time_dic) { // filling in zeroes (null) at end
-					empty_values=(graph_counter+1)-graph_time_dic[time_item].length;
-					for ( i = 0 ; i < empty_values ; i++ ) {
-						graph_time_dic[time_item].push(null);
+					if (empty_values > -1) {
+						for (i = 0; i < empty_values; i++) {
+							graph_time_dic[data_string].push([null, false]);
+						}
+						graph_time_dic[data_string].push([value_string, true]);
 					}
-				} 
-				graph_time_data_list=[];
-				for (time_item in graph_time_dic) {
-					graph_time_data_list.push([time_item,graph_time_dic[time_item]]);
 				}
-				current_slope_list=[];
-				graph_time_data_list=graph_time_data_list.sort();
-				for ( counter = 0 ; counter < graph_time_data_list.length ; counter++ ) {
-					for (i in graph_time_data_list[counter][1]) {
-						if (graph_time_data_list[counter][1][i][0]===null) {
-							if (counter===0) {
-								from_time=to_time=from_value=to_value=null;
-								for ( search_from_counter = 0; search_from_counter < graph_time_data_list.length ; search_from_counter++) {
-									if (!(graph_time_data_list[search_from_counter][1][i][0]===null)) {
-										from_time=graph_time_data_list[search_from_counter][0];
-										from_value=graph_time_data_list[search_from_counter][1][i][0];
-										for ( search_to_counter = search_from_counter+1; search_to_counter < graph_time_data_list.length ; search_to_counter++) {
-											if (!(graph_time_data_list[search_to_counter][1][i][0]===null)) {
-												to_time=graph_time_data_list[search_to_counter][0];
-												to_value=graph_time_data_list[search_to_counter][1][i];
-												break;
-											}
-										}
-										break;
-									}
-								}
-								slope=current_slope_list[i]=(to_value-from_value)/(to_time-from_time);
-								time_delta=from_time-(graph_time_data_list[0][0]);
-								graph_time_data_list[0][1][i][0]=from_value-(time_delta*slope);
-							} else {
-								if ((!(current_slope_list[i])) || (current_slope_list[i]===null)) {
-									from_time=graph_time_data_list[counter-1][0];
-									from_value=graph_time_data_list[counter-1][1][i][0];
-									to_time=null;
-									to_value=null;
-									for (var finder = counter; finder < graph_time_data_list.length; finder++) {
-										if (!(graph_time_data_list[finder][1][i][0]===null)) {
-											to_time=graph_time_data_list[finder][0];
-											to_value=graph_time_data_list[finder][1][i][0];
+				graph_counter += 1;
+			}
+			graph_counter -= 1;
+			for (time_item in graph_time_dic) { // filling in zeroes (null) at end
+				empty_values = (graph_counter + 1) - graph_time_dic[time_item].length;
+				for (i = 0; i < empty_values; i++) {
+					graph_time_dic[time_item].push([null,false]);
+				}
+			}
+			graph_time_data_list = [];
+			for (time_item in graph_time_dic) {
+				graph_time_data_list.push([time_item, graph_time_dic[time_item]]);
+			}
+			current_slope_list = [];
+			graph_time_data_list = graph_time_data_list.sort();
+			for (counter = 0; counter < graph_time_data_list.length; counter++) {
+				for (i in graph_time_data_list[counter][1]) {
+					JOHANNES=graph_time_data_list[counter][1];
+					if (graph_time_data_list[counter][1][i][0] === null) {
+						if (counter === 0) {
+							from_time = to_time = from_value = to_value = null;
+							for (search_from_counter = 0; search_from_counter < graph_time_data_list.length; search_from_counter++) {
+								if (! (graph_time_data_list[search_from_counter][1][i][0] === null)) {
+									from_time = graph_time_data_list[search_from_counter][0];
+									from_value = graph_time_data_list[search_from_counter][1][i][0];
+									for (search_to_counter = search_from_counter + 1; search_to_counter < graph_time_data_list.length; search_to_counter++) {
+										if (! (graph_time_data_list[search_to_counter][1][i][0] === null)) {
+											to_time = graph_time_data_list[search_to_counter][0];
+											to_value = graph_time_data_list[search_to_counter][1][i][0];
 											break;
 										}
 									}
-									if (to_value===null) {
-										from_time=graph_time_data_list[counter-2][0];
-                                                                        	from_value=graph_time_data_list[counter-2][1][i][0];
-										to_time=graph_time_data_list[counter-1][0];
-                                                                        	to_value=graph_time_data_list[counter-1][1][i][0];
-									}
-									current_slope_list[i]=(to_value-from_value)/(to_time-from_time);
-								} 
-								last_time=graph_time_data_list[counter-1][0];
-								current_time=graph_time_data_list[counter][0];
-								time_delta=current_time-last_time;
-								last_value=graph_time_data_list[counter-1][1][i][0];
-								slope=current_slope_list[i];
-								graph_time_data_list[counter][1][i][0]=last_value+(time_delta*slope);								
+									break;
+								}
 							}
+							slope = current_slope_list[i] = (to_value - from_value) / (to_time - from_time);
+							time_delta = from_time - (graph_time_data_list[0][0]);
+							graph_time_data_list[0][1][i][0] = from_value - (time_delta * slope);
 						} else {
-							current_slope_list[i]=null;
+							if ((! (current_slope_list[i])) || (current_slope_list[i] === null)) {
+								from_time = graph_time_data_list[counter - 1][0];
+								from_value = graph_time_data_list[counter - 1][1][i][0];
+								to_time = null;
+								to_value = null;
+								for (var finder = counter; finder < graph_time_data_list.length; finder++) {
+									if (! (graph_time_data_list[finder][1][i][0] === null)) {
+										to_time = graph_time_data_list[finder][0];
+										to_value = graph_time_data_list[finder][1][i][0];
+										break;
+									}
+								}
+								if (to_value === null) {
+									from_time = graph_time_data_list[counter - 2][0];
+									from_value = graph_time_data_list[counter - 2][1][i][0];
+									to_time = graph_time_data_list[counter - 1][0];
+									to_value = graph_time_data_list[counter - 1][1][i][0];
+								}
+								current_slope_list[i] = (to_value - from_value) / (to_time - from_time);
+							}
+							last_time = graph_time_data_list[counter - 1][0];
+							current_time = graph_time_data_list[counter][0];
+							time_delta = current_time - last_time;
+							last_value = graph_time_data_list[counter - 1][1][i][0];
+							slope = current_slope_list[i];
+							graph_time_data_list[counter][1][i][0] = last_value + (time_delta * slope);
 						}
-					} 
+					} else {
+						current_slope_list[i] = null;
+					}
 				}
-				filled_graph_list.push([median_variable,median_variable_item,header_list,graph_time_data_list]);
+			}
+			filled_graph_list.push([median_variable, median_variable_item, header_list, graph_time_data_list]);
 		}
-		return filled_graph_list;			
+		return filled_graph_list;
 	}
 
 	function calculate_normalizedgraphs(unitgraphs) {
@@ -696,7 +605,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 				'hoverable': this.hoverable
 			};
 			if ('advanced_label' in this) {
-				new_graph.label = this.advanced_label+' (1 = ' + String(start_value) + ' ' + this.unit +'s)';
+				new_graph.label = this.advanced_label + ' (1 = ' + String(start_value) + ' ' + this.unit + 's)';
 			} else if (this.tipo == 'precio') {
 				new_graph.producto = this.producto;
 				new_graph.mercado = this.mercado;
@@ -705,24 +614,26 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 				new_graph.lluvia = this.lluvia;
 				new_graph.label = 'lluvia en ' + this.lluvia + ' (1 = ' + String(start_value) + ' ' + this.unit + 's)';
 			}
-			$.each(this.data,function() {
+			$.each(this.data,
+			function() {
 				var time = this[0];
 				var unit_value = this[1];
 				var pk = this[2];
 				var normalized_value = parseFloat(unit_value) / parseFloat(start_value) * 100;
 				new_data.push([time, normalized_value, pk]);
 			});
-			new_graph.data=new_data;
+			new_graph.data = new_data;
 			if ('minData' in this) {
-				var minData=[];
-				$.each(this.minData,function() {
+				var minData = [];
+				$.each(this.minData,
+				function() {
 					var time = this[0];
 					var unit_value = this[1];
 					var pk = this[2];
 					var normalized_value = parseFloat(unit_value) / parseFloat(start_value) * 100;
 					minData.push([time, normalized_value, pk]);
 				});
-				new_graph.minData=minData;
+				new_graph.minData = minData;
 			}
 			new_graphs.push(new_graph);
 		});
@@ -741,9 +652,10 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		return c;
 	}
 	function drawPoint(ctx, x, y, radius, fillStyle, plotOffset, dataitem, series) {
-		var unique_pk = dataitem[2],comment_pk;
+		var unique_pk = dataitem[2],
+		comment_pk;
 		if ((has_comments) && unique_pk in comments) {
-			if (!(labelCanvas)) {
+			if (! (labelCanvas)) {
 				var canvasHeight = $('#' + query_id + 'stats canvas:first').outerHeight();
 				var canvasWidth = $('#' + query_id + 'stats canvas:first').outerWidth();
 				var canvas = $(makeLabelCanvas(canvasWidth, canvasHeight)).css({
@@ -775,28 +687,29 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 			if (editor_mode) {
 				for (comment_pk in comments[unique_pk]) {
 					comments_text += comments[unique_pk][comment_pk][0];
-					comments_text += '<br /><span class="signature">' + comments[unique_pk][comment_pk][1]+'</span><br />';
+					comments_text += '<br /><span class="signature">' + comments[unique_pk][comment_pk][1] + '</span><br />';
 					if (comments[unique_pk][comment_pk][2] === true) {
-						comments_text += '<span class="editline" id="'+query_id+'_'+unique_pk+'"><span class="link" id="' + unique_pk + '+' + comment_pk + '+' + query_id + '"><span class="ui-icon ui-icon-pencil"></span></span></span>';
+						comments_text += '<span class="editline" id="' + query_id + '_' + unique_pk + '"><span class="link" id="' + unique_pk + '+' + comment_pk + '+' + query_id + '"><span class="ui-icon ui-icon-pencil"></span></span></span>';
 					}
-				$('#' + query_id + 'comments').append('<h3><a href="#">' + label + '</a></h3><div>' + comments_text + '</div>');
+					$('#' + query_id + 'comments').append('<h3><a href="#">' + label + '</a></h3><div>' + comments_text + '</div>');
 				}
 			} else {
-				comments_text+='<tr><td valign="top"><b>'+label+'</b></td>';
-				var first_comment=true;
+				comments_text += '<tr><td valign="top"><b>' + label + '</b></td>';
+				var first_comment = true;
 				for (comment_pk in comments[unique_pk]) {
-					if (!(first_comment)) {
-						comments_text+='<tr><td>&nbsp;</td>';
+					if (! (first_comment)) {
+						comments_text += '<tr><td>&nbsp;</td>';
 					}
-					comments_text += '<td>'+comments[unique_pk][comment_pk][0]+'</td></tr>';
+					comments_text += '<td>' + comments[unique_pk][comment_pk][0] + '</td></tr>';
 					$('#' + query_id + 'comments').append(comments_text);
-					first_comment=false;
-				}						
+					first_comment = false;
+				}
 			}
 
 			$('<div class="pointLabel" id="' + query_id + '_' + unique_pk + 'label">' + label + '</div>').insertAfter('#' + query_id + 'labelcanvas');
 			var editButtons = $('span.editline#' + query_id + '_' + unique_pk + ' span.link');
-			editButtons.bind('click',function() {
+			editButtons.bind('click',
+			function() {
 				var total_pk, this_unique_pk, this_comment_pk;
 				total_pk = $(this).attr('id').split('+');
 				this_unique_pk = total_pk[0];
@@ -845,16 +758,16 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		var raw_date = datapoint_dictionary[unique_pk][0];
 		var date = date_string(raw_date);
 
-		var dialog_options={};
-		var dialog_id=Date.now();
+		var dialog_options = {};
+		var dialog_id = Date.now();
 		var dialog_text = '';
 
-		dialog_options.width=700;		
+		dialog_options.width = 700;
 		dialog_text += '<div id="' + dialog_id + '">';
 		if (comment_pk) {
-			dialog_options.title= 'Editar Comentario: ';
+			dialog_options.title = 'Editar Comentario: ';
 		} else {
-			dialog_options.title= 'Nuevo Comentario: ';
+			dialog_options.title = 'Nuevo Comentario: ';
 		}
 		dialog_options.title += label + ': ' + value + ' (' + date + ')';
 		dialog_text += '<form name="newcomment" id="' + dialog_id + 'newcomment" method="post">';
@@ -869,8 +782,8 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		}
 		dialog_text += '</textarea>';
 		dialog_text += '<div id ="' + dialog_id + 'formDivMessage">&nbsp;</div></form></div>';
-		dialog_options.buttons = { 
-			'Guardar' : function() {
+		dialog_options.buttons = {
+			'Guardar': function() {
 				comment = $('#' + dialog_id + 'comment_field').val();
 				form_info = {
 					object_pk: object_pk,
@@ -903,7 +816,8 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		form_info = {};
 		function returnFormResponse(fI, processMessage, successMessage) {
 			$('#' + dialog_id + 'formDivMessage').html(processMessage);
-			$.post('/ajax/comment/post/', fI, function(data) {
+			$.post('/ajax/comment/post/', fI,
+			function(data) {
 				if (data.status == 'success') {
 					if ('remove' in data) {
 						delete comments[unique_pk][data.pk];
@@ -923,19 +837,21 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 					}
 					redraw_graph();
 					$('#' + dialog_id + 'formDivMessage').html(successMessage);
-					$('#' + dialog_id).fadeOut(300, function() {
-						$('#'+dialog_id).dialog('close');
+					$('#' + dialog_id).fadeOut(300,
+					function() {
+						$('#' + dialog_id).dialog('close');
 					});
 				} else {
 					$('#' + dialog_id + 'formDivMessage').html('Hubo un error!');
 				}
 				// The success or failure check will go here. . .
-			},'json');
+			},
+			'json');
 		}
 	}
 
 	function build_comment_accordion() {
-		$('#'+query_id+'comments').accordion();
+		$('#' + query_id + 'comments').accordion();
 	}
 
 	function reset_comments() {
@@ -965,66 +881,65 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 	}
 
 	function draw_graph_structure() {
-		var show_comments=false;
-		var total_width=$(graphsheader).innerWidth()-5;
+		var total_width = $(graphsheader).innerWidth() - 5;
 		var graph_html = '';
-		graph_html += '<div class="ui-dialog ui-widget ui-widget-content ui-corner-all undefined" style="width:'+total_width+'px;" id="'+query_id+'">';
+		graph_html += '<div class="ui-dialog ui-widget ui-widget-content ui-corner-all undefined" style="width:' + total_width + 'px;" id="' + query_id + '">';
 		graph_html += draw_inner_graph_structure(total_width);
 		graph_html += '</div>';
 		return graph_html;
 	}
 
 	function draw_inner_graph_structure(total_width) {
-		var show_comments=false;
-		var graph_width=total_width-90;
+		var show_comments = false;
+		var graph_width = total_width - 90;
 		if (has_comments || user_can_add) {
-			show_comments=true;
-			graph_width=total_width-200;
+			show_comments = true;
+			graph_width = total_width - 200;
 		}
 		var graph_html = '';
 		graph_html += '<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">';
 		graph_html += '<span id="ui-dialog-title-dialog" class="ui-dialog-title">';
 		graph_html += headline;
 		graph_html += '</span>';
-		var iconpositions=['one','two','three','four','five'];
-		var current_icon=0;
-		if (!(wiki_mode)) {
-			graph_html += '<span class="ui-dialog-titlebar-'+iconpositions[current_icon]+' ui-corner-all link" id="'+query_id+'graph_close"><span class="ui-icon ui-icon-closethick">cerrar</span></span>';
+		var iconpositions = ['one', 'two', 'three', 'four', 'five'];
+		var current_icon = 0;
+		if (! (wiki_mode)) {
+			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_close"><span class="ui-icon ui-icon-closethick">cerrar</span></span>';
 			current_icon++;
-			graph_close=true;
+			graph_close = true;
 		} else {
-			graph_html += '<span class="ui-dialog-titlebar-'+iconpositions[current_icon]+' ui-corner-all link" id="'+query_id+'graph_switchmode"><span class="ui-icon ui-icon-arrowthick-2-ne-sw">ver</span></span>';
+			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_switchmode"><span class="ui-icon ui-icon-arrowthick-2-ne-sw">ver</span></span>';
 			current_icon++;
-			graph_close=true;
+			graph_close = true;
 		}
 		if (jsondata.wiki_code) {
 			if (can_edit_wiki) {
-				graph_html += '<span class="ui-dialog-titlebar-'+iconpositions[current_icon]+' ui-corner-all link" id="'+query_id+'graph_wiki"><span class="ui-icon ui-icon-script">wiki code</span></span>';
+				graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_wiki"><span class="ui-icon ui-icon-script">wiki code</span></span>';
 				current_icon++;
-				graph_wiki=true;
+				graph_wiki = true;
 			}
 		}
 		if (jsondata.query_link) {
-			graph_html += '<span class="ui-dialog-titlebar-'+iconpositions[current_icon]+' ui-corner-all link" id="'+query_id+'graph_link"><span class="ui-icon ui-icon-mail-closed">enlace</span></span>';
+			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_link"><span class="ui-icon ui-icon-mail-closed">enlace</span></span>';
 			current_icon++;
-			graph_link=true;
+			graph_link = true;
 		}
-		graph_html += '<span class="ui-dialog-titlebar-'+iconpositions[current_icon]+' ui-corner-all link" id="'+query_id+'graph_tables"><span class="ui-icon ui-icon-calculator">tablas</span></span>';
+		graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_tables"><span class="ui-icon ui-icon-calculator">tablas</span></span>';
 		current_icon++;
-		graph_table=true;
-		graph_html += '<span class="ui-dialog-titlebar-'+iconpositions[current_icon]+' ui-corner-all link" id="'+query_id+'graph_export"><span class="ui-icon ui-icon-document">exportar</span></span>';
+		graph_table = true;
+		graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_export"><span class="ui-icon ui-icon-document">exportar</span></span>';
 		current_icon++;
-		graph_export=true;
+		graph_export = true;
 		graph_html += '</div>';
-		graph_html += '<div style="height: auto; min-height: 400px; width: auto;" class="ui-dialog-content ui-widget-content" id="'+query_id+'body">';
-		graph_html +='<table cellspacing="0" cellpadding="0" class="layout-grid">';
-		graph_html +='<tr><td valign="top" width="'+graph_width+'px">';
+		graph_html += '<div style="height: auto; min-height: 400px; width: auto;" class="ui-dialog-content ui-widget-content" id="' + query_id + 'body">';
+		graph_html += '<table cellspacing="0" cellpadding="0" class="layout-grid">';
+		graph_html += '<tr><td valign="top" width="' + graph_width + 'px">';
 		graph_html += '<div id="' + query_id + 'stats" style="height:400px;"></div>';
 		graph_html += '<div id="' + query_id + 'statsoverview" style="height:50px;"></div>';
 		graph_html += '<select id="' + query_id + 'xtype" class="' + query_id + 'graphkind">';
 		graph_html += '<option selected="selected" value="real">Real</option>';
 		graph_html += '<option value="normalized">Normalizado</option></select>';
-		if (all_productos.length>0) {
+		if (all_productos.length > 0) {
 			graph_html += '<select id="' + query_id + 'xunits" class="' + query_id + 'graphkind"><option selected="selected" value="cordobas">Cordobas</option>';
 			graph_html += '<option value="dollars">USD</option><option value="euros">Euros</option></select>';
 		}
@@ -1033,7 +948,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		if (show_comments) {
 			graph_html += '<td width="200px" valign="top">';
 			graph_html += '<b>Comentarios</b>';
-			graph_html += '<div id="'+query_id+'comments"></div>';
+			graph_html += '<div id="' + query_id + 'comments"></div>';
 			graph_html += '</td>';
 		}
 		graph_html += '</tr></table>';
@@ -1042,41 +957,40 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 	}
 
 	function draw_small_graph_structure() {
-		var show_comments=false;
-		var total_width=(($(graphsheader).innerWidth()-95)/2);
+		var total_width = (($(graphsheader).innerWidth() - 95) / 2);
 		var graph_html = '';
-		graph_html += '<div class="ui-dialog ui-widget ui-widget-content ui-corner-all undefined" style="width:'+total_width+'px;float: right; margin-right: 0.5em;" id="'+query_id+'">';
+		graph_html += '<div class="ui-dialog ui-widget ui-widget-content ui-corner-all undefined" style="width:' + total_width + 'px;float: right; margin-right: 0.5em;" id="' + query_id + '">';
 		graph_html += draw_small_inner_graph_structure(total_width);
 		graph_html += '</div>';
 		return graph_html;
 	}
 
 	function draw_small_inner_graph_structure(total_width) {
-		var show_comments=false;
+		var show_comments = false;
 		if (has_comments || user_can_add) {
-			show_comments=true;
+			show_comments = true;
 		}
 		var graph_html = '';
 		graph_html += '<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">';
 		graph_html += '<span id="ui-dialog-title-dialog" class="ui-dialog-title">';
 		graph_html += headline;
 		graph_html += '</span>';
-		var iconpositions=['one','two','three','four'];
-		var current_icon=0;
-		if (!(wiki_mode)) {
-			graph_html += '<span class="ui-dialog-titlebar-'+iconpositions[current_icon]+' ui-corner-all link" id="'+query_id+'graph_close"><span class="ui-icon ui-icon-closethick">cerrar</span></span>';
+		var iconpositions = ['one', 'two', 'three', 'four'];
+		var current_icon = 0;
+		if (! (wiki_mode)) {
+			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_close"><span class="ui-icon ui-icon-closethick">cerrar</span></span>';
 			current_icon++;
-			graph_close=true;
+			graph_close = true;
 		}
-		graph_html += '<span class="ui-dialog-titlebar-'+iconpositions[current_icon]+' ui-corner-all link" id="'+query_id+'graph_switchmode"><span class="ui-icon ui-icon-arrowthick-2-ne-sw">editar</span></span>';
+		graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_switchmode"><span class="ui-icon ui-icon-arrowthick-2-ne-sw">editar</span></span>';
 		current_icon++;
 		graph_html += '</div>';
-		graph_html += '<div style="height: auto; min-height: 400px; width: '+(total_width-45)+'px;" class="ui-dialog-content ui-widget-content" id="'+query_id+'body">';
+		graph_html += '<div style="height: auto; min-height: 400px; width: ' + (total_width - 45) + 'px;" class="ui-dialog-content ui-widget-content" id="' + query_id + 'body">';
 		graph_html += '<div id="' + query_id + 'stats" style="height:400px"></div>';
 		graph_html += '<table class="legend">';
 		if (show_comments) {
 			graph_html += '<tr><td width="50%" valign="top">';
-			graph_html += '<table id="'+query_id+'comments" style="font-size: smaller; color: rgb(84, 84, 84);"></table>';
+			graph_html += '<table id="' + query_id + 'comments" style="font-size: smaller; color: rgb(84, 84, 84);"></table>';
 			graph_html += '</td><td width="50%" valign="top">';
 		} else {
 			graph_html += '<td width="100%" valign="top">';
@@ -1103,34 +1017,34 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 	}
 
 	function create_tables() {
-		var html,header_variable,variable,data_variable,data_series_variable;
-		var html='<table style="position:absolute;right:0px;top:40px;font-size: smaller; color: rgb(84, 84, 84);"><tr><td><div style="border: 1px solid rgb(204, 204, 204); padding: 1px;"><div style="border: 5px solid #C1609D; overflow: hidden; width: 4px; height: 0pt;"/></div></td><td>valor estimado</td></tr></table>';
-		for (variable =0; variable < table_data.length; ++variable) {
-			html +='<h3>'+table_data[variable][0]+' '+table_data[variable][1]+'</h3>';
-			html +='<table>';
-			html+='<tr>';
-			html+='<th>&nbsp;</th>';
-			for (header_variable=0; header_variable < table_data[variable][2].length; ++header_variable) {
-				html+='<th>';
-				html+=table_data[variable][2][header_variable]['independent']+' ('+table_data[variable][2][header_variable]['datatype']+')';
-				html+='</th>';
+		var html, header_variable, variable, data_variable, data_series_variable;
+		html = '<table style="position:absolute;right:0px;top:40px;font-size: smaller; color: rgb(84, 84, 84);"><tr><td><div style="border: 1px solid rgb(204, 204, 204); padding: 1px;"><div style="border: 5px solid #C1609D; overflow: hidden; width: 4px; height: 0pt;"/></div></td><td>valor estimado</td></tr></table>';
+		for (variable = 0; variable < table_data.length; ++variable) {
+			html += '<h3>' + table_data[variable][0] + ' ' + table_data[variable][1] + '</h3>';
+			html += '<table>';
+			html += '<tr>';
+			html += '<th>&nbsp;</th>';
+			for (header_variable = 0; header_variable < table_data[variable][2].length; ++header_variable) {
+				html += '<th>';
+				html += table_data[variable][2][header_variable]['independent'] + ' (' + table_data[variable][2][header_variable]['datatype'] + ')';
+				html += '</th>';
 			}
-			html+='</tr>';
-			for (data_variable=0; data_variable < table_data[variable][3].length; ++data_variable) {
-				html+='<tr>';
-				html+='<td><b>'+date_string(parseInt(table_data[variable][3][data_variable][0],10))+'</b></td>';
-				for (data_series_variable=0; data_series_variable < table_data[variable][3][data_variable][1].length; ++data_series_variable) {
+			html += '</tr>';
+			for (data_variable = 0; data_variable < table_data[variable][3].length; ++data_variable) {
+				html += '<tr>';
+				html += '<td><b>' + date_string(parseInt(table_data[variable][3][data_variable][0], 10)) + '</b></td>';
+				for (data_series_variable = 0; data_series_variable < table_data[variable][3][data_variable][1].length; ++data_series_variable) {
 					if (table_data[variable][3][data_variable][1][data_series_variable][1]) {
-						html+='<td align="right">';
+						html += '<td align="right">';
 					} else {
-						html+='<td align="right" style="background-color:#C1609D;">';
+						html += '<td align="right" style="background-color:#C1609D;">';
 					}
-					html+=parseInt(table_data[variable][3][data_variable][1][data_series_variable][0],10);
-					html+='</td>';
+					html += parseInt(table_data[variable][3][data_variable][1][data_series_variable][0], 10);
+					html += '</td>';
 				}
-				html+='</tr>';
-			}			
-			html +='</table>';			
+				html += '</tr>';
+			}
+			html += '</table>';
 		}
 		return html;
 	}
@@ -1209,7 +1123,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		$('#' + query_id + 'stats').unbind('plotselected');
 		$('#' + query_id + 'stats').unbind('plotclick');
 		$('#' + query_id + 'statsoverview').unbind('plotselected');
-		$('div#' + query_id +'legend input.dataseries').die('click');
+		$('div#' + query_id + 'legend input.dataseries').die('click');
 		return true;
 	}
 	function destroy_some_globals() {
@@ -1265,9 +1179,8 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		return ranges;
 	}
 
-
 	function make_graphs() {
-		var axis_dic=false;
+		var axis_dic = false;
 		var options, overview_options, overview;
 		options = {
 			xaxis: {
@@ -1284,7 +1197,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 					return v.toFixed(axis.tickDecimals) + graphs.y2axis;
 				}
 			},
-			legend : {
+			legend: {
 				container: '#' + query_id + 'legend'
 			},
 			points: {
@@ -1296,11 +1209,11 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 			}
 		};
 		if (editor_mode) {
-			options.legend.checkboxes=true;
+			options.legend.checkboxes = true;
 		} else {
-			options.legend.checkboxes=false;
+			options.legend.checkboxes = false;
 		}
-		if ((user_logged_in) && (editor_mode)){
+		if ((user_logged_in) && (editor_mode)) {
 			options.grid = {
 				hoverable: true,
 				clickable: true
@@ -1333,7 +1246,7 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 					mode: 'xy'
 				}
 			};
-			options.legend.show=false; // don't redraw legend on graph redraw
+			options.legend.show = false; // don't redraw legend on graph redraw
 			overview = $.plot($('#' + query_id + 'statsoverview'), graphs, overview_options);
 			build_comment_accordion();
 		}
@@ -1342,15 +1255,16 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 		function draw_resetbutton() {
 			var reset_button_right;
 			//find position of tick labels:
-			$('#'+query_id+' .tickLabels .tickLabel').each(function() {
-        			if($(this).css('text-align') == 'right') {
-					reset_button_right = parseInt($(this).css('right'),10)-25;
-				}//not perfect, because I'm going through all tick labels
+			$('#' + query_id + ' .tickLabels .tickLabel').each(function() {
+				if ($(this).css('text-align') == 'right') {
+					reset_button_right = parseInt($(this).css('right'), 10) - 25;
+				} //not perfect, because I'm going through all tick labels
 			});
-			$('#'+query_id+'stats').append('<span id="' + query_id + 'reset" class="resetbutton link" style="right:'+reset_button_right+'px;" ><span class="ui-icon ui-icon-arrow-4-diag"></span></span>');
+			$('#' + query_id + 'stats').append('<span id="' + query_id + 'reset" class="resetbutton link" style="right:' + reset_button_right + 'px;" ><span class="ui-icon ui-icon-arrow-4-diag"></span></span>');
 		}
 
-		$('#' + query_id + 'stats').bind('plotselected',function(event, ranges) {
+		$('#' + query_id + 'stats').bind('plotselected',
+		function(event, ranges) {
 			reset_comments();
 			// clamp the zooming to prevent eternal zoom
 			if (ranges.xaxis.to - ranges.xaxis.from < 0.00001) {
@@ -1360,8 +1274,9 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 				ranges.yaxis.to = ranges.yaxis.from + 0.00001;
 			}
 			// do the zooming
-			axis_dic=ranges_to_axis_dic(ranges);
-			plot = $.plot($('#' + query_id + 'stats'), graphs, $.extend(true, {},options, axis_dic));
+			axis_dic = ranges_to_axis_dic(ranges);
+			plot = $.plot($('#' + query_id + 'stats'), graphs, $.extend(true, {},
+			options, axis_dic));
 			// don't fire event on the overview to prevent eternal loop
 			draw_resetbutton();
 			if (editor_mode) {
@@ -1381,19 +1296,19 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 				}
 				var xtype = $('select#' + query_id + 'xtype').val();
 				if ((xunits == 'cordobas' || xunits == 'other') && xtype == 'real') {
-					graphs=converted_graphs;
+					graphs = converted_graphs;
 				} else if (xunits == 'dollars' && xtype == 'real') {
-					graphs=dollargraphs;
+					graphs = dollargraphs;
 				} else if (xunits == 'euros' && xtype == 'real') {
-					graphs=eurographs;
+					graphs = eurographs;
 				} else if ((xunits == 'cordobas' || xunits == 'other') && xtype == 'normalized') {
-					graphs=normalized_graphs;
+					graphs = normalized_graphs;
 				} else if (xunits == 'dollars' && xtype == 'normalized') {
-					graphs=normalized_dollargraphs;
+					graphs = normalized_dollargraphs;
 				} else if (xunits == 'euros' && xtype == 'normalized') {
-					graphs=normalized_eurographs;
+					graphs = normalized_eurographs;
 				} else {
-					graphs=converted_graphs;
+					graphs = converted_graphs;
 				}
 				options.legend.show = true; //redraw legend for new type graph
 				reset_comments();
@@ -1402,54 +1317,57 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 					delete axis_dic.yaxis;
 					if ('y2axis' in axis_dic) {
 						delete axis_dic.y2axis;
-					}		
-					plot = $.plot($('#' + query_id + 'stats'), graphs, $.extend(true, {},options, axis_dic));
-					axis_dic=plot.getAxes();
+					}
+					plot = $.plot($('#' + query_id + 'stats'), graphs, $.extend(true, {},
+					options, axis_dic));
+					axis_dic = plot.getAxes();
 					overview.setSelection(axis_dic_to_ranges(axis_dic));
 				} else {
 					plot = $.plot($('#' + query_id + 'stats'), graphs, options);
 				}
 				build_comment_accordion();
-				options.legend.show=false; // don't redraw legend on graph redraw
+				options.legend.show = false; // don't redraw legend on graph redraw
 			});
-	
-			$('#' + query_id + 'statsoverview').bind('plotselected',function(event, ranges) {
+
+			$('#' + query_id + 'statsoverview').bind('plotselected',
+			function(event, ranges) {
 				reset_comments();
 				plot.setSelection(ranges);
 				build_comment_accordion();
 			});
 
-			$('div#'+ query_id +'legend input.dataseries').live('click',function() {
-				var state=$(this).attr('checked');
-				var color_value=parseInt($(this).attr('name'),10);
+			$('div#' + query_id + 'legend input.dataseries').live('click',
+			function() {
+				var state = $(this).attr('checked');
+				var color_value = parseInt($(this).attr('name'), 10);
 				for (i in converted_graphs) {
-					if (converted_graphs[i].color==color_value) {
-						converted_graphs[i].show=state;
+					if (converted_graphs[i].color == color_value) {
+						converted_graphs[i].show = state;
 					}
 				}
 				for (i in eurographs) {
-					if (eurographs[i].color==color_value) {
-						eurographs[i].show=state;
+					if (eurographs[i].color == color_value) {
+						eurographs[i].show = state;
 					}
 				}
 				for (i in dollargraphs) {
-					if (dollargraphs[i].color==color_value) {
-						dollargraphs[i].show=state;
+					if (dollargraphs[i].color == color_value) {
+						dollargraphs[i].show = state;
 					}
 				}
 				for (i in normalized_graphs) {
-					if (normalized_graphs[i].color==color_value) {
-						normalized_graphs[i].show=state;
+					if (normalized_graphs[i].color == color_value) {
+						normalized_graphs[i].show = state;
 					}
 				}
 				for (i in normalized_eurographs) {
-					if (normalized_eurographs[i].color==color_value) {
-						normalized_eurographs[i].show=state;
+					if (normalized_eurographs[i].color == color_value) {
+						normalized_eurographs[i].show = state;
 					}
 				}
 				for (i in normalized_dollargraphs) {
-					if (normalized_dollargraphs[i].color==color_value) {
-						normalized_dollargraphs[i].show=state;
+					if (normalized_dollargraphs[i].color == color_value) {
+						normalized_dollargraphs[i].show = state;
 					}
 				}
 				//current_graphs=graphs;
@@ -1457,8 +1375,9 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 				reset_comments();
 				overview = $.plot($('#' + query_id + 'statsoverview'), graphs, overview_options);
 				if (axis_dic) {
-					plot = $.plot($('#' + query_id + 'stats'), graphs, $.extend(true, {},options, axis_dic));
-					var ranges=axis_dic_to_ranges(axis_dic);
+					plot = $.plot($('#' + query_id + 'stats'), graphs, $.extend(true, {},
+					options, axis_dic));
+					var ranges = axis_dic_to_ranges(axis_dic);
 					overview.setSelection(ranges, true);
 				} else {
 					plot = $.plot($('#' + query_id + 'stats'), graphs, options);
@@ -1468,47 +1387,52 @@ function create_graphs(jsondata,wiki_mode,graphsheader) {
 					draw_resetbutton();
 				}
 			});
-			$('#' + query_id + 'stats').bind('plotclick',function(event, pos, item) {
+			$('#' + query_id + 'stats').bind('plotclick',
+			function(event, pos, item) {
 				if (item) {
 					create_comment_form(item.datapoint[2]);
 				}
 			});
 		}
-		$('#' + query_id + 'reset').live('click',function() {
+		$('#' + query_id + 'reset').live('click',
+		function() {
 			reset_comments();
-			axis_dic=false;
+			axis_dic = false;
 			plot = $.plot($('#' + query_id + 'stats'), graphs, options);
 			if (editor_mode) {
 				overview.clearSelection(true);
 				build_comment_accordion();
 			}
 		});
-		$('#' + query_id + 'graph_switchmode').bind('click',function() {
+		$('#' + query_id + 'graph_switchmode').bind('click',
+		function() {
 			var total_width;
 			if (editor_mode) {
-				total_width=(($(graphsheader).innerWidth()-95)/2);
+				total_width = (($(graphsheader).innerWidth() - 95) / 2);
 			} else {
-				total_width=$(graphsheader).innerWidth()-5;
+				total_width = $(graphsheader).innerWidth() - 5;
 			}
-			$('#'+query_id).animate({width: total_width+'px'},3000); 		
+			$('#' + query_id).animate({
+				width: total_width + 'px'
+			},
+			3000);
 			reset_comments();
-			axis_dic=false;
+			axis_dic = false;
 			var new_text;
 			if (editor_mode) {
-				editor_mode=false;
-				new_text=draw_small_inner_graph_structure(total_width);
+				editor_mode = false;
+				new_text = draw_small_inner_graph_structure(total_width);
 			} else {
-				editor_mode=true;
-				new_text=draw_inner_graph_structure(total_width);
+				editor_mode = true;
+				new_text = draw_inner_graph_structure(total_width);
 			}
 			unbind_all();
 			destroy_some_globals();
 			$('#' + query_id).empty();
-			$('#' + query_id).css('width',total_width+'px');				
-			$('#' + query_id).append(new_text);	
-			make_graphs();	
+			$('#' + query_id).css('width', total_width + 'px');
+			$('#' + query_id).append(new_text);
+			make_graphs();
 		});
-	
 
 	}
 
