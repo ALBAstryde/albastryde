@@ -70,52 +70,19 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 
 	$('span#' + query_id + 'graph_wiki').live('click',
 	function(e) {
-		var dialog_id = Date.now();
-		var dialog_text = '<div id="' + dialog_id + '">Codigo para incluir en pagina de wiki:<br /><b>_estadisticas[' + jsondata.wiki_code + ']</b></div>';
-		var dialog_options = {};
-		dialog_options.title = 'Codigo para la wiki';
-		$('#' + query_id).append(dialog_text);
-		$('#' + dialog_id).dialog(dialog_options);
+		$('#'+query_id+'graph_wiki_dialog').dialog('open');
 	});
 	$('span#' + query_id + 'graph_link').live('click',
 	function(e) {
-		var dialog_id = Date.now();
-		var dialog_text = '<div id="' + dialog_id + '">Para compatir este grÃ¡fico, manda <a href="/estadisticas/' + jsondata.query_link + '">este enlace</a></div>';
-		var dialog_options = {};
-		dialog_options.title = 'Enlace permanente';
-		$('#' + query_id).append(dialog_text);
-		$('#' + dialog_id).dialog(dialog_options);
+		$('#'+query_id+'graph_link_dialog').dialog('open');
 	});
 	$('span#' + query_id + 'graph_export').live('click',
 	function(e) {
-		var export_data = csv_export(raw_graphs);
-		var dialog_id = Date.now();
-		var dialog_text = '<div id="' + dialog_id + '">';
-		dialog_text += 'Para usar estos datos en otros programas, copia el texto abajo a un editor de archivos de texto. Guardalo como un archivo del tipo ".csv". Este archivo se puede abrir en Open Office y otros programas parecidos.<br />';
-		dialog_text += '<textarea rows="10" cols="80">';
-		dialog_text += export_data;
-		dialog_text += '</textarea>';
-		dialog_text += '</div>';
-		var dialog_options = {};
-		dialog_options.title = 'Exportar datos';
-		dialog_options.width = 700;
-		$('#' + query_id).append(dialog_text);
-		$('#' + dialog_id).dialog(dialog_options);
+		$('#'+query_id+'graph_export_dialog').dialog('open');
 	});
 	$('span#' + query_id + 'graph_tables').live('click',
 	function(e) {
-		var dialog_id = Date.now();
-		var table_html = create_tables(dialog_id);
-		var dialog_text = '<div id="' + dialog_id + '">';
-		dialog_text += table_html;
-		dialog_text += '</div>';
-		var dialog_options = {};
-		dialog_options.title = 'Tablas';
-		dialog_options.width = '100%';
-		$('#' + query_id).append(dialog_text);
-		$('#' + dialog_id+'currencytabs').tabs();
-		$('.' + dialog_id+'tabletabs').tabs();
-		$('#' + dialog_id).dialog(dialog_options);
+		$('#'+query_id+'graph_tables_dialog').dialog('open');
 	});
 	$('span#' + query_id + 'graph_close').live('click',
 	function(e) {
@@ -148,9 +115,66 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	$(graphsheader).after(graph_html);
 	graphs = converted_graphs;
 	make_graphs();
-
+	draw_graph_link_dialog();
+	draw_graph_wiki_dialog();
+	draw_graph_export_dialog();
+	draw_graph_tables_dialog();
 	if ($.browser.msie) {
 		$('div.graph').remove();
+	}
+
+	function draw_graph_export_dialog() {
+		var export_data = csv_export(raw_graphs);
+		var dialog_id = query_id+'graph_export_dialog';
+		var dialog_text = '<div id="' + dialog_id + '">';
+		dialog_text += 'Para usar estos datos en otros programas, copia el texto abajo a un editor de archivos de texto. Guardalo como un archivo del tipo ".csv". Este archivo se puede abrir en Open Office y otros programas parecidos.<br />';
+		dialog_text += '<textarea rows="10" cols="80">';
+		dialog_text += export_data;
+		dialog_text += '</textarea>';
+		dialog_text += '</div>';
+		var dialog_options = {};
+		dialog_options.title = 'Exportar datos';
+		dialog_options.autoOpen = false;
+		dialog_options.width = 700;
+		$('#' + query_id).append(dialog_text);
+		$('#' + dialog_id).dialog(dialog_options);
+	}
+
+	function draw_graph_link_dialog() {
+		var dialog_id = query_id+'graph_link_dialog';
+		var dialog_text = '<div id="' + dialog_id + '">Para compatir este gráfico, manda <a href="/estadisticas/' + jsondata.query_link + '">este enlace</a></div>';
+		var dialog_options = {};
+		dialog_options.autoOpen = false;
+		dialog_options.title = 'Enlace permanente';
+		$('#' + query_id).append(dialog_text);
+		$('#' + dialog_id).dialog(dialog_options);
+	}
+
+	function draw_graph_wiki_dialog() {
+		var dialog_id = query_id+'graph_wiki_dialog';
+		var dialog_text = '<div id="' + dialog_id + '">Codigo para incluir en pagina de wiki:<br /><b>_estadisticas[' + jsondata.wiki_code + ']</b></div>';
+		var dialog_options = {};
+		dialog_options.autoOpen = false;
+		dialog_options.title = 'Codigo para la wiki';
+		$('#' + query_id).append(dialog_text);
+		$('#' + dialog_id).dialog(dialog_options);
+	}
+
+	function draw_graph_tables_dialog() {
+		var dialog_id = query_id+'graph_tables_dialog';
+		var table_html = create_tables(dialog_id);
+		var dialog_text = '<div id="' + dialog_id + '">';
+		dialog_text += table_html;
+		dialog_text += '</div>';
+		var dialog_options = {};
+		dialog_options.title = 'Tablas';
+		dialog_options.draggable = false;
+		dialog_options.autoOpen = false;
+		dialog_options.width = '100%';
+		$('#' + query_id).append(dialog_text);
+		$('#' + dialog_id+'currencytabs').tabs();
+		$('.' + dialog_id+'tabletabs').tabs();
+		$('#' + dialog_id).dialog(dialog_options);
 	}
 
 	function convert_graphs_after_transport(graphs) {
@@ -800,6 +824,10 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		var dialog_id = Date.now();
 		var dialog_text = '';
 
+		dialog_options.close = function () {
+			$('#'+dialog_id).dialog('destroy');
+			$('#'+dialog_id).remove();
+		};
 		dialog_options.width = 700;
 		dialog_text += '<div id="' + dialog_id + '">';
 		if (comment_pk) {
@@ -970,6 +998,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_export"><span class="ui-icon ui-icon-document">exportar</span></span>';
 		current_icon++;
 		graph_export = true;
+
 		graph_html += '</div>';
 		graph_html += '<div style="height: auto; min-height: 400px; width: auto;" class="ui-dialog-content ui-widget-content" id="' + query_id + 'body">';
 		graph_html += '<table cellspacing="0" cellpadding="0" class="layout-grid">';
@@ -1057,7 +1086,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	}
 
 	function create_tables(dialog_id) {
-		var html, header_variable, variable, data_variable, data_series_variable;
+		var html, header_variable, variable, data_variable, data_series_variable,single_value,total_value,calculated;
 		html='';
 		html+='<div id="'+dialog_id+'currencytabs">';
 		html+='<ul>';
@@ -1074,29 +1103,64 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			}
 			html += '</ul>';
 			for (variable = 0; variable < table_data[currency].length; ++variable) {
-//				html +='<li><a href="#'+dialog_id+currency+'">'+table_data[currency][variable][0] + ': ' + table_data[currency][variable][1]+'</a></li>';
 				html += '<div id="'+dialog_id+currency+variable+'">';
 				html += '<table style="font-size: smaller; color: rgb(84, 84, 84);"><tr><td><div style="border: 1px solid rgb(204, 204, 204); padding: 1px;"><div style="border: 5px solid #C1609D; overflow: hidden; width: 4px; height: 0pt;"/></div></div></td><td>valor estimado</td></tr></table>';
 				html += '<table>';
 				html += '<tr>';
 				html += '<th>&nbsp;</th>';
+//				header_dic={};
 				for (header_variable = 0; header_variable < table_data[currency][variable][2].length; ++header_variable) {
-					html += '<th>';
-					html += table_data[currency][variable][2][header_variable]['independent'] + ' (' + table_data[currency][variable][2][header_variable]['datatype'] + ')';
+//					if (!(table_data[currency][variable][2][header_variable]['independent'] in header_dic)) {
+//						header_dic[table_data[currency][variable][2][header_variable]['independent']]=[];
+//					} 
+//					header_dic[table_data[currency][variable][2][header_variable]['independent']].push(table_data[currency][variable][2][header_variable]);	
+
+					if (!(table_data[currency][variable][2][header_variable-1]) || !(table_data[currency][variable][2][header_variable-1]['independent']==table_data[currency][variable][2][header_variable]['independent'])) {
+						if (table_data[currency][variable][2][header_variable+1]['independent']==table_data[currency][variable][2][header_variable]['independent']) {
+							html += '<th colspan="2">';
+						} else {
+							html += '<th>';
+						}
+					html += table_data[currency][variable][2][header_variable]['independent'];
 					html += '</th>';
+					}
+				}
+				if (table_data[currency][variable][3][0][1].length > 2) {
+					html += '<th><i>mediano</i></th>';
 				}
 				html += '</tr>';
+				html+='<tr>';
+				html+='<td>&nbsp;</td>';
+				for (header_variable = 0; header_variable < table_data[currency][variable][2].length; ++header_variable) {
+					html += '<td align="right"><b><i>';
+					html += table_data[currency][variable][2][header_variable]['datatype'];
+					html += '</i></b></td>';
+				}
+				html+='<td>&nbsp;</td>';
+				html+='</tr>';
 				for (data_variable = 0; data_variable < table_data[currency][variable][3].length; ++data_variable) {
 					html += '<tr>';
 					html += '<td><b>' + date_string(parseInt(table_data[currency][variable][3][data_variable][0], 10)) + '</b></td>';
+					total_value=0;
+					calculated=false;
 					for (data_series_variable = 0; data_series_variable < table_data[currency][variable][3][data_variable][1].length; ++data_series_variable) {
 						if (table_data[currency][variable][3][data_variable][1][data_series_variable][1]) {
 							html += '<td align="right">';
 						} else {
 							html += '<td align="right" style="background-color:#C1609D;">';
+							calculated=true;
 						}
-						html += String(parseInt(table_data[currency][variable][3][data_variable][1][data_series_variable][0]*100, 10)/100);
+						single_value= table_data[currency][variable][3][data_variable][1][data_series_variable][0];
+						total_value+=single_value;
+						html += String(parseInt(single_value*100, 10)/100);
 						html += '</td>';
+					}
+					if (table_data[currency][variable][3][data_variable][1].length > 2) {
+						html += '<td align="right"';
+						if (calculated) {
+							html+=' style="background-color:#C1609D;"';
+						}
+						html += '><i>'+String(parseInt((total_value/table_data[currency][variable][3][data_variable][1].length*100),10)/100)+'</i></td>';
 					}
 					html += '</tr>';
 				}
@@ -1177,6 +1241,10 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		return html;
 	}
 	function unbind_all() {
+		$('#'+query_id+'graph_export_dialog').dialog('destroy');
+		$('#'+query_id+'graph_wiki_dialog').dialog('destroy');
+		$('#'+query_id+'graph_link_dialog').dialog('destroy');
+		$('#'+query_id+'graph_tables_dialog').dialog('destroy');
 		$('#' + query_id + 'graph_wiki').die('click');
 		$('#' + query_id + 'graph_link').die('click');
 		$('#' + query_id + 'graph_close').die('click');
