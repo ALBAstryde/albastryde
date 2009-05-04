@@ -31,7 +31,7 @@ def translate_query_string(query_string):
 			modelname=u'start date'
 		if modelname==u'hasta':
 			modelname=u'end date'
-		if modelname==u'start date' or modelname==u'end date':
+		if modelname==u'start date' or modelname==u'end date' or modelname==u'frecuencia':
 			new_query_string+="&"+camelcase(modelname)+"="+values[0]
 		else:
 			ctype_list = ContentType.objects.filter(name=modelname)
@@ -76,7 +76,7 @@ def reverse_translate_query(query):
 			modelname='desde'
 		if modelname=='end date':
 			modelname='hasta'
-		if modelname=='desde' or modelname=='hasta':
+		if modelname=='desde' or modelname=='hasta' or modelname=='frecuencia':
 			new_query_string+="&"+modelname+"="+value[0]
 		else:
 			ctype_list = ContentType.objects.filter(name=modelname)
