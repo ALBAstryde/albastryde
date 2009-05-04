@@ -35,7 +35,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	var yaxis = converted_graphs.yaxis,
 	y2axis = converted_graphs.y2axis,
 	frecuencia;
-	JOHANNES=table_data;
 	for (frecuencia in frecuencia_list) {
 		table_data[frecuencia_list[frecuencia]]={};
 		table_data[frecuencia_list[frecuencia]].Cordoba=[];
@@ -404,7 +403,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				new_graph.advanced_label = this.advanced_label;
 			}
 			if (this.unit == 'cordoba') {
-				new_graph.start_value = currency_dic[String(this.start_date / 1000000)] * this.start_value;
+				new_graph.start_value = currency_dic[this.frecuencia][String(this.start_date / 1000000)] * this.start_value;
 				new_data = [];
 				$.each(this.data,
 				function() {
@@ -1270,7 +1269,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			}
 		}
 		html +='</div>';
-		JOHANNES2=html;
 		return html;
 	}
 
