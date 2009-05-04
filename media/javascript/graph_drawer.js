@@ -8,7 +8,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	graph_link = false,
 	graph_export = false,
 	labelCanvas = false,
-	table_data = {};
+	table_data = {},
+	frecuencia_list=['day','month','year'];
 	if (wiki_mode) {
 		editor_mode = false;
 	} else {
@@ -32,31 +33,38 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	datapoint_dictionary = calculate_datapoint_dictionary(converted_graphs);
 	headline = jsondata.headline;
 	var yaxis = converted_graphs.yaxis,
-	y2axis = converted_graphs.y2axis;
-	table_data.Cordoba=[];
-	if (all_productos.length > 1) {
-		var median_producto_data = calculate_estimated_data(converted_graphs, 'producto', 'mercado');
-		table_data.Cordoba = table_data.Cordoba.concat(median_producto_data);
-		var median_producto_graphs = calculate_mediangraphs(median_producto_data);
-		converted_graphs = converted_graphs.concat(median_producto_graphs);
-	}
-	if (all_mercados.length > 1) {
-		var median_mercado_data = calculate_estimated_data(converted_graphs, 'mercado', 'producto');
-		table_data.Cordoba = table_data.Cordoba.concat(median_mercado_data);
-		var median_mercado_graphs = calculate_mediangraphs(median_mercado_data);
-		converted_graphs = converted_graphs.concat(median_mercado_graphs);
+	y2axis = converted_graphs.y2axis,
+	frecuencia;
+	JOHANNES=table_data;
+	for (frecuencia in frecuencia_list) {
+		table_data[frecuencia_list[frecuencia]]={};
+		table_data[frecuencia_list[frecuencia]].Cordoba=[];
 		if (all_productos.length > 1) {
-			median_mercado_graphs_copy=median_mercado_graphs.slice();
-			for (i in median_mercado_graphs_copy) {
-				median_mercado_graphs_copy[i].producto = '1';
-			}
-			var median_mercado_producto_data = calculate_estimated_data(median_mercado_graphs_copy, 'producto', null);
-			var median_mercado_producto_graphs = calculate_mediangraphs(median_mercado_producto_data);
-			if (median_mercado_producto_graphs.length > 0) {
-				median_mercado_producto_graphs[0].advanced_label = 'mediano de todos los mercados y todos los productos';
-				median_mercado_producto_graphs[0].label = 'mediano de todos los mercados y todos los productos (cordoba)';
-				median_mercado_producto_graphs[0].producto = null;
-				converted_graphs = converted_graphs.concat(median_mercado_producto_graphs);
+			var median_producto_data = calculate_estimated_data(converted_graphs, 'producto', 'mercado',frecuencia_list[frecuencia]);
+			table_data[frecuencia_list[frecuencia]].Cordoba = table_data[frecuencia_list[frecuencia]].Cordoba.concat(median_producto_data);
+			var median_producto_graphs = calculate_mediangraphs(median_producto_data);
+			converted_graphs = converted_graphs.concat(median_producto_graphs);
+		}
+		if (all_mercados.length > 1) {
+			var median_mercado_data = calculate_estimated_data(converted_graphs, 'mercado', 'producto',frecuencia_list[frecuencia]);
+			table_data[frecuencia_list[frecuencia]].Cordoba = table_data[frecuencia_list[frecuencia]].Cordoba.concat(median_mercado_data);
+			var median_mercado_graphs = calculate_mediangraphs(median_mercado_data);
+			converted_graphs = converted_graphs.concat(median_mercado_graphs);
+			if (all_productos.length > 1) {
+				median_mercado_graphs_copy=median_mercado_graphs.slice();
+				for (i in median_mercado_graphs_copy) {
+					median_mercado_graphs_copy[i].producto = 'todos';
+				}
+				var median_mercado_producto_data = calculate_estimated_data(median_mercado_graphs_copy, 'producto', 'mercado');
+				table_data[frecuencia_list[frecuencia]].Cordoba = table_data[frecuencia_list[frecuencia]].Cordoba.concat(median_mercado_producto_data);
+				var median_mercado_producto_graphs = calculate_mediangraphs(median_mercado_producto_data);
+				if (median_mercado_producto_graphs.length > 0) {
+					median_mercado_producto_graphs[0].advanced_label = 'mediano de todos los mercados y todos los productos';
+					median_mercado_producto_graphs[0].label = 'mediano de todos los mercados y todos los productos (cordoba)';
+					median_mercado_producto_graphs[0].producto = null;
+					converted_graphs = converted_graphs.concat(median_mercado_producto_graphs);
+				}
+			
 			}
 		}
 	}
@@ -103,8 +111,10 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		eurographs = calculate_currencygraphs(eval(jsondata.euro), converted_graphs);
 		normalized_dollargraphs = calculate_normalizedgraphs(dollargraphs);
 		normalized_eurographs = calculate_normalizedgraphs(eurographs);
-		table_data.USD=calculate_currencytables(eval(jsondata.dollar),table_data.Cordoba);
-		table_data.Euro=calculate_currencytables(eval(jsondata.euro),table_data.Cordoba);
+		for (frecuencia in frecuencia_list) {
+			table_data[frecuencia_list[frecuencia]].USD=calculate_currencytables(eval(jsondata.dollar),table_data[frecuencia_list[frecuencia]].Cordoba);
+			table_data[frecuencia_list[frecuencia]].Euro=calculate_currencytables(eval(jsondata.euro),table_data[frecuencia_list[frecuencia]].Cordoba);
+		}
 	}
 	var graph_html;
 	if (editor_mode) {
@@ -198,7 +208,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			mercado,
 			lluvia,
 			label,
+			frecuencia,
 			start_date;
+			frecuencia = this.frecuencia;
 			unit = this.unit;
 			tipo = this.tipo;
 			if (tipo == 'precio') {
@@ -219,6 +231,11 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				label = 'lluvia en ' + lluvia + ' (' + unit + ')';
 			} else {
 				label = '';
+			}
+			if (frecuencia == 'month') {
+				label +=' promedio mensual';
+			} else if (frecuencia == 'year') {
+				label +=' promedio anual';
 			}
 			if (! (tipo in tipos_graficos)) {
 				tipos_graficos[tipo] = unit;
@@ -276,6 +293,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'label': label,
 				'data': new_data,
 				'unit': unit,
+				'frecuencia': frecuencia,
 				'yaxis': graph_yaxis,
 				'tipo': tipo,
 				'relevance': 'main',
@@ -287,6 +305,12 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'points': {},
 				'start_date': start_date
 			};
+			if (!(frecuencia == 'day')) {
+				new_graph.hoverable=false;
+				new_graph.clickable=false;
+				new_graph.points.show=false;
+				new_graph.points.drawCall=false;
+			}
 			if (tipo == 'precio') {
 				new_graph.start_value = new_data[0][1];
 				new_graph.lines = {
@@ -331,6 +355,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		$.each(cordobatables,
 		function() {
 			var new_data, new_tablerow, i, j;
+			var frecuencia=this[2][0]['frecuencia'];
 			if (this[2][0]['unit']=='cordoba') {
 				new_tablerow=[];
 				new_tablerow[0]=this[0];
@@ -349,7 +374,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					new_tablerow[3][i][1]=[];
 					for (j in this[3][i][1]) {
 						new_tablerow[3][i][1][j]=[];
-						new_tablerow[3][i][1][j][0]=currency_dic[String(parseInt(this[3][i][0],10) / 1000000)] * this[3][i][1][j][0];
+						new_tablerow[3][i][1][j][0]=currency_dic[frecuencia][String(parseInt(this[3][i][0],10) / 1000000)] * this[3][i][1][j][0];
 						new_tablerow[3][i][1][j][1]=this[3][i][1][j][1];
 					}
 				}
@@ -365,12 +390,14 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		$.each(cordobagraphs,
 		function() {
 			var new_data;
+			var frecuencia=this.frecuencia;
 			var new_graph = {
 				'tipo': this.tipo,
 				'yaxis': this.yaxis,
 				'points': this.points,
 				'lines': this.lines,
 				'bars': this.bars,
+				'frecuencia': this.frecuencia,
 				'color': this.color,
 				'relevance': this.relevance,
 				'start_date': this.start_date,
@@ -389,7 +416,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					var time = this[0];
 					var cordoba = this[1];
 					var pk = this[2];
-					var currency = currency_dic[String(time / 1000000)]; //convert to transfer time format to get currency timestamp
+					var currency = currency_dic[frecuencia][String(time / 1000000)]; //convert to transfer time format to get currency timestamp
 					var currency_value = parseFloat(cordoba) * parseFloat(currency);
 					new_data.push([time, currency_value, pk]);
 				});
@@ -401,7 +428,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 						var time = this[0];
 						var cordoba = this[1];
 						var pk = this[2];
-						var currency = currency_dic[String(time / 1000000)]; //convert to transfer time format to get currency timestamp
+						var currency = currency_dic[frecuencia][String(time / 1000000)]; //convert to transfer time format to get currency timestamp
 						var currency_value = parseFloat(cordoba) * parseFloat(currency);
 						minData.push([time, currency_value, pk]);
 					});
@@ -473,6 +500,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					'start_date': new_data[0][0],
 					'start_value': new_data[0][1],
 					'unit': median_data[graph_series][2][0]['unit'],
+					'frecuencia': median_data[graph_series][2][0]['frecuencia'],
 					'tipo': median_data[graph_series][2][0]['tipo'],
 					'yaxis': median_data[graph_series][2][0]['yaxis'],
 					'relevance': 'mediano',
@@ -490,7 +518,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 
 	}
 
-	function calculate_estimated_data(cordobagraphs, median_variable, independent_variable) {
+	function calculate_estimated_data(cordobagraphs, median_variable, independent_variable,frecuencia) {
 		var filled_graph_list = [];
 		var graph_dic = {};
 		var to_time, from_time, from_value, to_value, last_time, last_value, search_from_counter, search_to_counter, slope, current_time, current_slope_list, time_delta, independent_value;
@@ -498,45 +526,59 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		var graph_time_data_list, date_item, graph_item, median_variable_item, header_list;
 		$.each(cordobagraphs,
 		function() {
-			if (median_variable in this) {
-				if (independent_variable) {
-					if (independent_variable in this) {
-						independent_value = this[independent_variable];
+			if (this.frecuencia == frecuencia) {
+				if (median_variable in this) {
+					if (independent_variable) {
+						if (independent_variable in this) {
+							independent_value = this[independent_variable];
+						} else {
+							independent_value = null;
+						}
 					} else {
 						independent_value = null;
 					}
-				} else {
-					independent_value = null;
-				}
-				if (! (this[median_variable] in graph_dic)) {
-					graph_dic[this[median_variable]] = [];
-				}
-				graph_dic[this[median_variable]].push({
-					'tipo': this.tipo,
-					'yaxis': this.yaxis,
-					'unit': this.unit,
-					'data': this.data,
-					'datatype': 'max',
-					'independent': independent_value
-				});
-				if ('minData' in this) {
-					graph_dic[this[median_variable]].push({
-						'tipo': this.tipo,
-						'yaxis': this.yaxis,
-						'unit': this.unit,
-						'data': this.minData,
-						'datatype': 'min',
-						'independent': independent_value
-					});
-				} else {
-					graph_dic[this[median_variable]].push({
-						'tipo': this.tipo,
-						'yaxis': this.yaxis,
-						'unit': this.unit,
-						'data': this.data,
-						'datatype': 'ignore',
-						'independent': independent_value
-					});
+					if (! (this[median_variable] in graph_dic)) {
+						graph_dic[this[median_variable]] = [];
+					}
+					if ('minData' in this) {
+						graph_dic[this[median_variable]].push({
+							'tipo': this.tipo,
+							'yaxis': this.yaxis,
+							'unit': this.unit,
+							'data': this.data,
+							'frecuencia': this.frecuencia,
+							'datatype': 'max',
+							'independent': independent_value
+						});
+						graph_dic[this[median_variable]].push({
+							'tipo': this.tipo,
+							'yaxis': this.yaxis,
+							'frecuencia': this.frecuencia,
+							'unit': this.unit,
+							'data': this.minData,
+							'datatype': 'min',
+							'independent': independent_value
+						});
+					} else {
+						graph_dic[this[median_variable]].push({
+							'tipo': this.tipo,
+							'frecuencia': this.frecuencia,
+							'yaxis': this.yaxis,
+							'unit': this.unit,
+							'data': this.data,
+							'datatype': 'mediano',
+							'independent': independent_value
+						});
+						graph_dic[this[median_variable]].push({
+							'tipo': this.tipo,
+							'frecuencia': this.frecuencia,
+							'yaxis': this.yaxis,
+							'unit': this.unit,
+							'data': this.data,
+							'datatype': 'ignore',
+							'independent': independent_value
+						});
+					}
 				}
 			}
 		});
@@ -549,6 +591,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				header_list.push({
 					'unit': graph_dic[median_variable_item][graph_item]['unit'],
 					'datatype': graph_dic[median_variable_item][graph_item]['datatype'],
+					'frecuencia': graph_dic[median_variable_item][graph_item]['frecuencia'],
 					'independent': graph_dic[median_variable_item][graph_item]['independent']
 				});
 				for (date_item in graph_dic[median_variable_item][graph_item]['data']) {
@@ -658,6 +701,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'tipo': 'normalizado',
 				'yaxis': 1,
 				'bars': this.bars,
+				'frecuencia': this.frecuencia,
 				'points': this.points,
 				'lines': this.lines,
 				'color': this.color,
@@ -666,6 +710,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'clickable': this.clickable,
 				'hoverable': this.hoverable
 			};
+			//JOHANNES.push('calculate_normalizedgrahs:'+this.frecuencia)
 			if ('advanced_label' in this) {
 				new_graph.label = this.advanced_label + ' (1 = ' + String(start_value) + ' ' + this.unit + 's)';
 			} else if (this.tipo == 'precio') {
@@ -990,7 +1035,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			current_icon++;
 			graph_link = true;
 		}
-		if (table_data.Cordoba.length>0) {
+		if ((table_data.day.Cordoba.length>0) || (table_data.month.Cordoba.length>0) || (table_data.year.Cordoba.length>0)) {
 			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_tables"><span class="ui-icon ui-icon-calculator">tablas</span></span>';
 			current_icon++;
 			graph_table = true;
@@ -1085,92 +1130,153 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		return formated_date_string;
 	}
 
+	function frecuencia_spanish(frecuencia) {
+		if (frecuencia == 'day') {
+			return 'diario';
+		} else if (frecuencia == 'month') {
+			return 'mensual';
+		} else {
+			return 'anual';
+		} 
+	}
+
 	function create_tables(dialog_id) {
-		var html, header_variable, variable, data_variable, data_series_variable,single_value,total_value,calculated;
+		var html, header_variable, variable, data_variable, data_series_variable,single_value,total_value,calculated,total_datalines,total_value_per_dataline;
 		html='';
 		html+='<div id="'+dialog_id+'currencytabs">';
 		html+='<ul>';
-		for (currency in table_data) {
-		html+='<li><a href="#'+dialog_id+currency+'">'+currency+'</li>';
+		for (frecuencia in table_data) {
+			for (currency in table_data[frecuencia]) {
+				if (table_data[frecuencia]['Cordoba'].length > 0) {
+					html+='<li><a href="#'+dialog_id+frecuencia+currency+'">'+currency+' '+frecuencia_spanish(frecuencia)+'</li>';
+				}
+			}
 		}
 		html+='</ul>';
-		for (currency in table_data) {			
-			html +='<div id="'+dialog_id+currency+'">';		
-			html += '<div class="'+dialog_id+'tabletabs">';
-			html += '<ul>';
-			for (variable = 0; variable < table_data[currency].length; ++variable) {
-				html+='<li><a href="#'+dialog_id+currency+variable+'">'+table_data[currency][variable][0] + ': ' + table_data[currency][variable][1]+'</a></li>';
-			}
-			html += '</ul>';
-			for (variable = 0; variable < table_data[currency].length; ++variable) {
-				html += '<div id="'+dialog_id+currency+variable+'">';
-				html += '<table style="font-size: smaller; color: rgb(84, 84, 84);"><tr><td><div style="border: 1px solid rgb(204, 204, 204); padding: 1px;"><div style="border: 5px solid #C1609D; overflow: hidden; width: 4px; height: 0pt;"/></div></div></td><td>valor estimado</td></tr></table>';
-				html += '<table>';
-				html += '<tr>';
-				html += '<th>&nbsp;</th>';
-//				header_dic={};
-				for (header_variable = 0; header_variable < table_data[currency][variable][2].length; ++header_variable) {
-//					if (!(table_data[currency][variable][2][header_variable]['independent'] in header_dic)) {
-//						header_dic[table_data[currency][variable][2][header_variable]['independent']]=[];
-//					} 
-//					header_dic[table_data[currency][variable][2][header_variable]['independent']].push(table_data[currency][variable][2][header_variable]);	
-
-					if (!(table_data[currency][variable][2][header_variable-1]) || !(table_data[currency][variable][2][header_variable-1]['independent']==table_data[currency][variable][2][header_variable]['independent'])) {
-						if (table_data[currency][variable][2][header_variable+1]['independent']==table_data[currency][variable][2][header_variable]['independent']) {
-							html += '<th colspan="2">';
+		for (frecuencia in table_data) {
+			if (table_data[frecuencia]['Cordoba'].length > 0) {
+				for (currency in table_data[frecuencia]) {			
+					html +='<div id="'+dialog_id+frecuencia+currency+'">';		
+					html += '<div class="'+dialog_id+'tabletabs">';
+					html += '<ul>';
+					for (variable = 0; variable < table_data[frecuencia][currency].length; ++variable) {
+						html+='<li><a href="#'+dialog_id+frecuencia+currency+variable+'">'+table_data[frecuencia][currency][variable][0] + ': ' + table_data[frecuencia][currency][variable][1]+'</a></li>';
+					}
+					html += '</ul>';
+					for (variable = 0; variable < table_data[frecuencia][currency].length; ++variable) {
+						html += '<div id="'+dialog_id+frecuencia+currency+variable+'">';
+						html += '<table style="font-size: smaller; color: rgb(84, 84, 84);"><tr><td><div style="border: 1px solid rgb(204, 204, 204); padding: 1px;"><div style="border: 5px solid #C1609D; overflow: hidden; width: 4px; height: 0pt;"/></div></div></td><td>valor estimado</td></tr></table>';
+						html += '<table>';
+						html += '<tr>';
+						html += '<th>&nbsp;</th>';
+						datalines_to_ignore={};
+						total_datalines=table_data[frecuencia][currency][variable][3][0][1].length;
+						used_datalines=total_datalines;
+						for (header_variable = 0; header_variable < table_data[frecuencia][currency][variable][2].length; ++header_variable) {
+							if (table_data[frecuencia][currency][variable][2][header_variable]['datatype']=='ignore') {
+								datalines_to_ignore[header_variable]=true;
+								used_datalines--;	
+							} 
+						}
+	
+						for (header_variable = 0; header_variable < table_data[frecuencia][currency][variable][2].length; ++header_variable) {
+							if (!(table_data[frecuencia][currency][variable][2][header_variable-1]) || !(table_data[frecuencia][currency][variable][2][header_variable-1]['independent']==table_data[frecuencia][currency][variable][2][header_variable]['independent'])) {
+								if ((table_data[frecuencia][currency][variable][2][header_variable+1]['independent']==table_data[frecuencia][currency][variable][2][header_variable]['independent']) && (!((header_variable+1) in datalines_to_ignore)) ) {
+									html += '<th colspan="2">';
+								} else {
+									html += '<th>';
+								}
+							html += table_data[frecuencia][currency][variable][2][header_variable]['independent'];
+							html += '</th>';
+							}
+						}
+						html +='<th>&nbsp;</th>';
+						html += '</tr>';
+						html+='<tr>';
+						html+='<td>&nbsp;</td>';
+						for (header_variable = 0; header_variable < table_data[frecuencia][currency][variable][2].length; ++header_variable) {
+							if (!(header_variable in datalines_to_ignore)) {
+								html += '<td align="right"><b><i>';
+								html += table_data[frecuencia][currency][variable][2][header_variable]['datatype'];
+								html += '</i></b></td>';
+							}
+						}
+						if (table_data[frecuencia][currency][variable][3][0][1].length > 1) {
+							html += '<td><i>mediano</i></td>';
 						} else {
-							html += '<th>';
+							html+='<td>&nbsp;</td>';
 						}
-					html += table_data[currency][variable][2][header_variable]['independent'];
-					html += '</th>';
-					}
-				}
-				if (table_data[currency][variable][3][0][1].length > 2) {
-					html += '<th><i>mediano</i></th>';
-				}
-				html += '</tr>';
-				html+='<tr>';
-				html+='<td>&nbsp;</td>';
-				for (header_variable = 0; header_variable < table_data[currency][variable][2].length; ++header_variable) {
-					html += '<td align="right"><b><i>';
-					html += table_data[currency][variable][2][header_variable]['datatype'];
-					html += '</i></b></td>';
-				}
-				html+='<td>&nbsp;</td>';
-				html+='</tr>';
-				for (data_variable = 0; data_variable < table_data[currency][variable][3].length; ++data_variable) {
-					html += '<tr>';
-					html += '<td><b>' + date_string(parseInt(table_data[currency][variable][3][data_variable][0], 10)) + '</b></td>';
-					total_value=0;
-					calculated=false;
-					for (data_series_variable = 0; data_series_variable < table_data[currency][variable][3][data_variable][1].length; ++data_series_variable) {
-						if (table_data[currency][variable][3][data_variable][1][data_series_variable][1]) {
-							html += '<td align="right">';
-						} else {
-							html += '<td align="right" style="background-color:#C1609D;">';
-							calculated=true;
+						html+='</tr>';
+						total_value_per_dataline= new Array(total_datalines+1);
+						for (i=0; i < total_value_per_dataline.length; i++) {
+							total_value_per_dataline[i]=[0,false];
 						}
-						single_value= table_data[currency][variable][3][data_variable][1][data_series_variable][0];
-						total_value+=single_value;
-						html += String(parseInt(single_value*100, 10)/100);
-						html += '</td>';
-					}
-					if (table_data[currency][variable][3][data_variable][1].length > 2) {
-						html += '<td align="right"';
-						if (calculated) {
-							html+=' style="background-color:#C1609D;"';
+						for (data_variable = 0; data_variable < table_data[frecuencia][currency][variable][3].length; ++data_variable) {
+							html += '<tr>';
+							html += '<td><b>'; 
+							date_line = date_string(parseInt(table_data[frecuencia][currency][variable][3][data_variable][0], 10)); 
+							if (frecuencia=='month') {
+								html+=date_line.substring(0,7);
+							} else if (frecuencia=='year') {
+								html+=date_line.substring(0,4);
+							} else {
+								html+=date_line;
+							}
+							html += '</b></td>';
+							total_value=0;
+							calculated=false;
+							for (data_series_variable = 0; data_series_variable < table_data[frecuencia][currency][variable][3][data_variable][1].length; ++data_series_variable) {
+								if (!(data_series_variable in datalines_to_ignore)) {
+									if (table_data[frecuencia][currency][variable][3][data_variable][1][data_series_variable][1]) {
+										html += '<td align="right">';
+									} else {
+										html += '<td align="right" style="background-color:#C1609D;">';
+										calculated=true;
+										total_value_per_dataline[data_series_variable][1]=true;
+									}
+									single_value= parseFloat(table_data[frecuencia][currency][variable][3][data_variable][1][data_series_variable][0]);
+									total_value+=single_value;
+									total_value_per_dataline[data_series_variable][0]+=single_value;
+									html += String(parseInt(single_value*100, 10)/100);
+									html += '</td>';
+								}
+							}
+							if (table_data[frecuencia][currency][variable][3][data_variable][1].length > 1) {
+								html += '<td align="right"';
+								if (calculated) {
+									html+=' style="background-color:#C1609D;"';
+									total_value_per_dataline[total_datalines][1]=true;
+								}
+								median_value_for_date=parseFloat(total_value/used_datalines);
+								html += '><i>'+String(parseInt(median_value_for_date*100,10)/100)+'</i></td>';
+								total_value_per_dataline[total_datalines][0]+=median_value_for_date;
+							}
+							html += '</tr>';
 						}
-						html += '><i>'+String(parseInt((total_value/table_data[currency][variable][3][data_variable][1].length*100),10)/100)+'</i></td>';
-					}
-					html += '</tr>';
+						html += '<tr>';
+						html += '<td><b><i>mediano</i><b></td>';
+						for (i=0;i<total_value_per_dataline.length;i++) {
+							if (!(i in datalines_to_ignore)) {
+								html += '<td';
+								if (total_value_per_dataline[i][1]) {
+										html+=' style="background-color:#C1609D;"';
+								}
+								html += ' align="right"><b><i>';
+								html += String(parseInt((total_value_per_dataline[i][0]/table_data[frecuencia][currency][variable][3].length*100),10)/100);
+								html += '</i></b></td>';
+							}
+						}
+						html += '</tr>';
+						html += '</table>';
+						html += '</div>';
+					}	
+					html += '</div>';
+					html += '</div>';
 				}
-				html += '</table>';
-				html += '</div>';
 			}
-			html += '</div>';
-			html += '</div>';
 		}
 		html +='</div>';
+		JOHANNES2=html;
 		return html;
 	}
 
