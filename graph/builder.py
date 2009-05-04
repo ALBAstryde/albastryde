@@ -5,7 +5,6 @@ from valuta.models import USD,Euro
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.comments.models import Comment
 from django.db.models.options import get_verbose_name
-from django.db.models import Avg
 
 import operator
 import itertools
