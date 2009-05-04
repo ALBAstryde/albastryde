@@ -1,0 +1,49 @@
+body {
+	background: #738040;
+}
+
+div.edit {
+	background: #738040
+}
+
+div.border {
+	background: #6D458A
+}
+
+div.warning {
+	background: #C1609D;
+}
+
+div.nonpublicComment {
+	border: 1px solid #C1609D;
+}
+
+div.pointLabel {
+            color: 'black';
+}
+
+div.formDiv {
+	background-color: #CFE673;
+	color: #738040;
+	border: 1px solid #738040;
+}
+
+
+div#header {
+	background: #CFE673;
+}
+div#contents {
+	background: #ffffff;
+}
+
+div#page {
+	background: #ffffff;
+}
+div#bottom {
+	color: #A3BF30;
+}
+
+div#bottom a {
+	color: #A3BF30;
+}
+
