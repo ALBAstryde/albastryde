@@ -222,20 +222,15 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				if (! (mercado in all_mercados)) {
 					all_mercados.push(mercado);
 				}
-				label = producto + ' en ' + mercado + ' (' + unit + ')';
+				label = producto + ' en ' + mercado + ' (' + unit + ' '+frecuencia_spanish(frecuencia)+')';
 			} else if (tipo == 'lluvia') {
 				lluvia = this.lluvia;
 				if (! (lluvia in all_lluvias)) {
 					all_lluvias.push(lluvia);
 				}
-				label = 'lluvia en ' + lluvia + ' (' + unit + ')';
+				label = 'lluvia en ' + lluvia + ' (' + unit +' '+frecuencia_spanish(frecuencia)+')';
 			} else {
 				label = '';
-			}
-			if (frecuencia == 'month') {
-				label +=' promedio mensual';
-			} else if (frecuencia == 'year') {
-				label +=' promedio anual';
 			}
 			if (! (tipo in tipos_graficos)) {
 				tipos_graficos[tipo] = unit;
@@ -446,13 +441,13 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			if (this.tipo == 'precio') {
 				new_graph.producto = this.producto;
 				new_graph.mercado = this.mercado;
-				new_graph.label = this.producto + ' en ' + this.mercado + ' (' + new_graph.unit + ')';
+				new_graph.label = this.producto + ' en ' + this.mercado + ' (' + new_graph.unit+' '+frecuencia_spanish(new_graph.frecuencia)+')';
 			} else if (this.tipo == 'lluvia') {
 				new_graph.lluvia = this.lluvia;
-				new_graph.label = 'lluvia en ' + this.lluvia + ' (' + new_graph.unit + ')';
+				new_graph.label = 'lluvia en ' + this.lluvia + ' (' + new_graph.unit + ' '+frecuencia_spanish(new_graph.frecuencia)+')';
 			}
 			if ('advanced_label' in this) {
-				new_graph.label = this.advanced_label + ' (' + new_graph.unit + ')';
+				new_graph.label = this.advanced_label + ' (' + new_graph.unit + ' ' +frecuencia_spanish(new_graph.frecuencia)+')';
 			}
 			if (! (this.tipo in tipos_graficos)) {
 				tipos_graficos[this.tipo] = new_graph.unit;
@@ -509,7 +504,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				};
 				color_counter += 1;
 				new_graph[median_data[graph_series][0]] = median_data[graph_series][1];
-				new_graph.label = median_data[graph_series][1] + ' mediano (' + new_graph.unit + ')';
+				new_graph.label = median_data[graph_series][1] + ' mediano (' + new_graph.unit + ' '+frecuencia_spanish(new_graph.frecuencia)+')';
 				new_graph.advanced_label = median_data[graph_series][1] + ' mediano';
 				new_graphs_list.push(new_graph);
 			}
@@ -710,16 +705,15 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'clickable': this.clickable,
 				'hoverable': this.hoverable
 			};
-			//JOHANNES.push('calculate_normalizedgrahs:'+this.frecuencia)
 			if ('advanced_label' in this) {
-				new_graph.label = this.advanced_label + ' (1 = ' + String(start_value) + ' ' + this.unit + 's)';
+				new_graph.label = this.advanced_label + ' (1 = ' + String(start_value) + ' ' + this.unit + 's '+frecuencia_spanish(new_graph.frecuencia)+')';
 			} else if (this.tipo == 'precio') {
 				new_graph.producto = this.producto;
 				new_graph.mercado = this.mercado;
-				new_graph.label = this.producto + ' en ' + this.mercado + ' (1 = ' + String(start_value) + ' ' + this.unit + 's)';
+				new_graph.label = this.producto + ' en ' + this.mercado + ' (1 = ' + String(start_value) + ' ' + this.unit + 's '+frecuencia_spanish(new_graph.frecuencia)+')';
 			} else if (this.tipo == 'lluvia') {
 				new_graph.lluvia = this.lluvia;
-				new_graph.label = 'lluvia en ' + this.lluvia + ' (1 = ' + String(start_value) + ' ' + this.unit + 's)';
+				new_graph.label = 'lluvia en ' + this.lluvia + ' (1 = ' + String(start_value) + ' ' + this.unit + 's '+frecuencia_spanish(new_graph.frecuencia)+')';
 			}
 			$.each(this.data,
 			function() {
