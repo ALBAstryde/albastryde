@@ -31,9 +31,11 @@ h1 {
 }
 h1#header {
             color: #85c226;
-	    border-bottom: 3px solid #0093dd;
-	    padding: 0;
-	    marging: 0;
+	    background-image: url(images/swush.png);
+            background-repeat: no-repeat;
+            background-position:bottom left;
+	    min-height: 41px;
+	    padding-left: 10px;
 }
 
 div.formDiv {
