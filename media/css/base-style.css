@@ -64,35 +64,13 @@ div.formDiv {
 	text-align: center; 
 }
 
-.menu{margin:0 auto; padding:0; height:30px; width:100%; display:block; background:url('/media/images/topMenuImages.png') repeat-x;}
-.menu li{padding:0; margin:0; list-style:none; display:inline;}
-.menu li a{float:left; padding-left:15px; display:block; color:rgb(0,0,0); text-decoration:none; font:12px Verdana, Arial, Helvetica, sans-serif; cursor:pointer; background:url('/media/images/topMenuImages.png') 0px -30px no-repeat;}
-.menu li a span{line-height:30px; float:left; display:block; padding-right:15px; background:url('/media/images/topMenuImages.png') 100% -30px no-repeat;}
-.menu li a:hover{background-position:0px -60px; color:rgb(255,255,255);}
-.menu li a:hover span{background-position:100% -60px;}
-.menu li a.active, .menu li a.active:hover{line-height:30px; font:12px Verdana, Arial, Helvetica, sans-serif; background:url('/media/images/topMenuImages.png') 0px -90px no-repeat; color:rgb(255,255,255);}
-.menu li a.active span, .menu li a.active:hover span{background:url('/media/images/topMenuImages.png') 100% -90px no-repeat;}
-
-div#header {
-	width:100%;
-	background:url('/media/images/header_background.png') repeat-x;
-}
-div#contents {
-	padding: 10px;
-}
 
 div#header h1 {
 	margin: 0px;
 	padding: 10px;
 
 }
-div#page {
-	border: thin solid #000000;
-	margin: 0px;
-	padding: 0px;
-	width:100%;
-	display: table;
-}
+
 div#bottom {
 	font-size: 10px;
 }
@@ -101,8 +79,6 @@ span.signature {
 	font-size: 9px;
 	text-align: right;
 	font-style:italic; 
-}
-div#bottom a {
 }
 
 p.description {

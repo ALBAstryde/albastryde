@@ -5,43 +5,47 @@
 {% block title %}{% endblock %}
 </title>
 <link rel="stylesheet" type="text/css" href="/media/css/base-style.css" />
-<link rel="stylesheet" type="text/css" href="/media/css/albastryde/style.css" />
+<link rel="stylesheet" type="text/css" href="/media/css/gobnic/style.css" />
+<link type="text/css" href="/media/css/gobnic/jquery-ui-1.7.1.custom.css" rel="stylesheet" />
 {% block extraheader %}
 {% endblock %}
 </head>
 <body>
-<div id="page">
-<div id="header">
+<div id="title-banner">&nbsp;</div>
+<div class="ui-tabs ui-widget ui-widget-content ui-corner-all">
 <table>
 <tr>
 <td>
-<h1>
+<h1 id="header">
 {% block headline %}Header{% endblock %}
 </h1>
 </td>
 <td>
 <form method="get" action="/wiki/searchresults"><input type="text" name="q"><input type="submit" value="buscar"></form>
 </td>
+<td id="header-banner">
+&nbsp;
+</td>
 </tr>
 </table>
 {% block menu %}
-<ul class="menu">
+<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
 {% for list_item in menu_list %}
-<li><a href="{{ list_item.url }}" {% if (request.get_full_path()==list_item.url) %}class="active"{% else %}class="inactive"{% endif %}><span>{{ list_item.name | safe}}</span></a></li>
+<li {% if (request.get_full_path()==list_item.url) %}class="ui-corner-top ui-tabs-selected ui-state-active"{% else %}class="ui-corner-top ui-state-default"{% endif %}><a href="{{ list_item.url }}">{{ list_item.name | safe}}</a></li>
 {% endfor %}
 {% if request.user.is_authenticated() %}
-<li><a href="/profiles/{{ request.user }}/" {% if (request.get_full_path()=='/profiles/'+request.user.__str__()+'/') %}class="active"{% else %}class="inactive"{% endif %}><span>Mi 
-perfil</span></a></li>
+<li {% if (request.get_full_path()=='/profiles/'+request.user.__str__()+'/') %}class="ui-corner-top ui-tabs-selected ui-state-active"{% else %}class="ui-corner-top ui-state-default"{% endif %}><a href="/profiles/{{ request.user }}/">Mi 
+perfil</a></li>
 {% if request.user.is_staff %}
-<li><a href="/admin/"><span>Administrar</span></a></li>
+<li class="ui-corner-top ui-state-default"><a href="/admin/"><span>Administrar</span></a></li>
 {% endif %}
-<li><a href="/accounts/logout"><span>Logout</span></a></li>
+<li class="ui-corner-top ui-state-default"><a href="/accounts/logout"><span>Logout</span></a></li>
 {% else %}
-<li><a href="/accounts/login/" {% if (request.get_full_path()=='/accounts/login/') %}class="active"{% else %}class="inactive"{% endif %}><span>Login</span></a></li>
+<li class="ui-corner-top ui-state-default"><a href="/accounts/login/" {% if (request.get_full_path()=='/accounts/login/') %}class="active"{% else %}class="inactive"{% endif %}><span>Login</span></a></li>
 {% endif %}
 </ul>
 {% endblock %}
-</div><div id="contents">
+<div id="contents">
 {% block warning %}
 {% if warning %}
 <div class="warning">
@@ -51,9 +55,10 @@ perfil</span></a></li>
 {% endblock %}
 {% block contents %}
 {% endblock %}
-</div></div>
+</div>
+</div>
 <div id="bottom">
-Hecho por <a href="http://www.johanneswilm.org">Johannes Wilm, 2008&ndash;2009.</a>
+Construido por <a href="http://www.johanneswilm.org">Johannes Wilm, 2008&ndash;2009</a> de <a href="http://www.simas.org.ni">SIMAS</a>.
 </div>
 </body>
 </html>
