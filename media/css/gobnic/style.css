@@ -66,12 +66,18 @@ height: 20px;
 margin:0;
 padding: 0;
 }
-td#header-banner {
+td#header-banner-td {
+height: 78px;
+}
+div#header-banner {
+position: absolute;
+top: 33px;
+right: 20px;
 background-image: url(images/header-banner.png);
 background-repeat: no-repeat;
 background-position:top right;
 height: 78px;
-width: 700px;
+width: 600px;
 margin:0;
 padding: 0;
 }
