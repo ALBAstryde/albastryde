@@ -21,7 +21,7 @@ def load():
     mqs=Municipio.objects.all()
 
     for i in mqs:
-        i.save(force_update=True)
+        i.geosave(force_update=True)
 
     for i in dqs:
-        i.save(force_update=True)
+        i.geosave(force_update=True)

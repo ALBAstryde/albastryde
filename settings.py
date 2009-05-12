@@ -2,7 +2,6 @@
 
 from local_settings import *
 LOGIN_REDIRECT_URL="/"
-DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 AUTH_PROFILE_MODULE = "profiles.UserProfile"
 DEFAULT_CHARSET = 'utf-8'

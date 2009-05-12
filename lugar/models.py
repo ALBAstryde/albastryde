@@ -18,12 +18,12 @@ class Departamento(models.Model):
 		return polygon
 
 
-	def save(self, force_insert=False, force_update=False):
+	def geosave(self, force_insert=False, force_update=False):
 		if self.geom== None:
 			try:
 				print "Starting geom calculation for "+self.nombre+"!"
 				self.geom=self.generate_map()
-		                super(Departamento, self).save(force_insert,force_update)
+		                self.save(force_insert,force_update)
 				print self.nombre+" saved!"
 			except:
 				print "Geom calculation unsuccesful!"
@@ -57,15 +57,15 @@ class Municipio(models.Model):
 		return polygon
 
 
-	def save(self, force_insert=False, force_update=False):
-		#if self.geom== None:
-		#	try:
-		#		print "Starting geom calculation for "+self.nombre+"!"
-		#		self.geom=self.generate_map()
-		#                super(Municipio, self).save(force_insert,force_update)
-		#		print self.nombre+" saved!"
-		#	except:
-		#		print "Geom calculation unsuccesful!"
+	def geosave(self, force_insert=False, force_update=False):
+		if self.geom== None:
+			try:
+				print "Starting geom calculation for "+self.nombre+"!"
+				self.geom=self.generate_map()
+		                self.save(force_insert,force_update)
+				print self.nombre+" saved!"
+			except:
+				print "Geom calculation unsuccesful!"
                 super(Departamento, self).save(force_insert,force_update)
 
 
