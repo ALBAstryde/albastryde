@@ -36,7 +36,6 @@ def view_page(request, page_name,javascript=False):
 			content=page_name+" Desculpe, pero esta pagina ya no existe!"
 			return render_to_html(request,"/view.html", {"page_name":page_name,"menu_list":menu_list,"content":content})			
 	accented_page_name=page.nombre
-	page.markdown_to_html()
 	body_html = page.body_html
 	json_data = page.json_data
 	pk = page.pk
