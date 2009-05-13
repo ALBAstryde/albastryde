@@ -42,8 +42,7 @@ $(document).ready(function() {
 <li {% if (request.get_full_path()[0:list_item.url|length]==list_item.url) %}class="ui-corner-top ui-tabs-selected ui-state-active"{% else %}class="ui-corner-top ui-state-default"{% endif %}><a href="{{ list_item.url }}">{{ list_item.name | safe}}</a></li>
 {% endfor %}
 {% if request.user.is_authenticated() %}
-<li {% if (request.get_full_path()=='/profiles/'+request.user.__str__()+'/') %}class="ui-corner-top ui-tabs-selected ui-state-active"{% else %}class="ui-corner-top ui-state-default"{% endif %}><a href="/profiles/{{ request.user }}/">Mi 
-perfil</a></li>
+<li {% if (request.get_full_path()[0:10]=='/profiles/') %}class="ui-corner-top ui-tabs-selected ui-state-active"{% else %}class="ui-corner-top ui-state-default"{% endif %}><a href="/profiles/{{ request.user }}/">Perfil</a></li>
 {% if request.user.is_staff %}
 <li class="ui-corner-top ui-state-default"><a href="/admin/"><span>Administrar</span></a></li>
 {% endif %}

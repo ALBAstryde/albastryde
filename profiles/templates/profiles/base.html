@@ -4,13 +4,6 @@
 {% block login %}{% endblock %}
 {% block search %}{% endblock %}
 {% block warning %}
-{% if form %}
-{% if form.errors %}
-<div class="warning">
-Por favor corija los siguentes erores: {{ form.non_field_errors() }}
-</div>
-{% endif %}
-{% endif %}
 {% endblock %}
 {% block contents %}
 <table>

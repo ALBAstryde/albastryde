@@ -1,18 +1,15 @@
 {% extends "profiles/base.html" %}
 
 
-{% block title %}Profiles{% endblock %}
+{% block title %}Perfiles{% endblock %}
+
+{% block headline %}Perfiles de los usuarios{% endblock %}
 
 
-{% block content_title %}
-  <h2 class="page_title">User Profiles</h2>
-{% endblock %}
-
-
-{% block content %}
+{% block maincontents %}
   <ul class="link_list">
     {% for profile in object_list %}
-    <li><a href="{{ profile.get_absolute_url }}">{{ profile.full_name }}</a></li>
+    <li><a href="{{ profile.get_absolute_url() }}">{{ profile.user.__unicode__() }}</a></li>
     {% endfor %}
   </ul>
 {% endblock %}

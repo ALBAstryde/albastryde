@@ -349,5 +349,14 @@ def profile_list(request, public_profile_field=None,
     queryset = profile_model._default_manager.all()
     if public_profile_field is not None:
         queryset = queryset.filter(**{ public_profile_field: True })
-    kwargs['queryset'] = queryset
-    return object_list(request, template_name=template_name, **kwargs)
+#    kwargs['queryset'] = queryset
+#    return object_list(request, template_name=template_name, **kwargs)
+    context = RequestContext(request)
+    return render_to_response(template_name,
+                              { 'object_list': queryset, 
+			        'request': request,
+        			'menu_list': menu_list,
+			      },
+                              context_instance=context)
+
+
