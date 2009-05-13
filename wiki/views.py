@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from wiki.models import Pagina
+from wiki.models import Pagina,Tag
 from coffin.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
@@ -21,11 +21,15 @@ def render_to_html(request,template,variables):
         return render_to_response(template, new_variables,context_instance=RequestContext(request))
 
 
-def list_page(request,javascript=False):
-	all_pages = Pagina.objects.all()
-	return render_to_html(request,"/list.html", {"all_pages":all_pages,"menu_list":menu_list})
+def list_page(request,tag_name=None):
+	all_tags = Tag.objects.all()
+	if tag_name!=None:
+		all_pages=Pagina.objects.filter(tag__nombre__contains=tag_name)
+	else: 
+		all_pages = Pagina.objects.all()
+	return render_to_html(request,"/list.html", {"all_pages":all_pages,"all_tags":all_tags,"menu_list":menu_list})
 
-def view_page(request, page_name,javascript=False):
+def view_page(request, page_name):
 	page_name=unquote_plus(page_name)
 	try:
 		page = Pagina.objects.get(nombre=page_name)
@@ -47,7 +51,7 @@ def view_page(request, page_name,javascript=False):
 
 
 
-def search_page(request,javascript=False):
+def search_page(request):
 	query_string = ''
 	found_entries = None
 	if ('q' in request.GET) and request.GET['q'].strip():

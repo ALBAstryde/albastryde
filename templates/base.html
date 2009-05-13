@@ -7,6 +7,12 @@
 <link rel="stylesheet" type="text/css" href="/media/css/base-style.css" />
 <link rel="stylesheet" type="text/css" href="/media/css/gobnic/style.css" />
 <link type="text/css" href="/media/css/gobnic/jquery-ui-1.7.1.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="/media/javascript/jQuery/jquery.js"></script>
+<script language="javascript" type="text/javascript">
+$(document).ready(function() {
+	$('ul#maintabs li').hover(function(){$(this).addClass("ui-state-hover")},function(){$(this).removeClass("ui-state-hover")});
+});
+</script>
 {% block extraheader %}
 {% endblock %}
 </head>
@@ -31,7 +37,7 @@
 </tr>
 </table>
 {% block menu %}
-<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" id="maintabs">
 {% for list_item in menu_list %}
 <li {% if (request.get_full_path()==list_item.url) %}class="ui-corner-top ui-tabs-selected ui-state-active"{% else %}class="ui-corner-top ui-state-default"{% endif %}><a href="{{ list_item.url }}">{{ list_item.name | safe}}</a></li>
 {% endfor %}

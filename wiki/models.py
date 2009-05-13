@@ -8,10 +8,13 @@ from django.conf import settings
 from wiki.albamarkup import albamarkup
 import unicodedata
 from django import forms  
+from graph.models import StatisticsFormVariable
 
 
-class Imagen( models.Model ):
-	nombre = models.CharField( max_length=100 )
+class Tag(StatisticsFormVariable):
+	pass
+
+class Imagen(StatisticsFormVariable):
 	imagen = models.ImageField( upload_to="upload" )
 
 	def __unicode__( self ):
@@ -21,9 +24,9 @@ class Imagen( models.Model ):
 		verbose_name_plural='imagenes'
 
 
-class Pagina(models.Model):
-	nombre = models.CharField(max_length=100,unique=True)
+class Pagina(StatisticsFormVariable):
 	contenido = models.TextField(blank=True)
+	tag=models.ManyToManyField(Tag,blank=True,null=True)
 	index = djangosearch.ModelIndex(text=['nombre','contenido'])
 	imagenes = models.ManyToManyField( Imagen, blank=True )
 	body_html = models.TextField(blank=True,editable=False)
@@ -52,5 +55,5 @@ class Pagina(models.Model):
 
         def save(self,force_insert=False,force_update=False):
 		self.markdown_to_html()
-		super(Pagina, self).save(force_insert,force_update)
+		super(Pagina, self).save()
 

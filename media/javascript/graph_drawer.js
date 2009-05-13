@@ -1338,6 +1338,13 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		}
 		return html;
 	}
+	function unbind_some() {
+		$('#' + query_id + 'stats').unbind('plotselected');
+		$('#' + query_id + 'stats').unbind('plotclick');
+		$('#' + query_id + 'statsoverview').unbind('plotselected');
+		$('div#' + query_id + 'legend input.dataseries').die('click');
+		return true;
+	}
 	function unbind_all() {
 		$('#'+query_id+'graph_export_dialog').dialog('destroy');
 		$('#'+query_id+'graph_wiki_dialog').dialog('destroy');
@@ -1347,10 +1354,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		$('#' + query_id + 'graph_link').die('click');
 		$('#' + query_id + 'graph_close').die('click');
 		$('#' + query_id + 'graph_export').die('click');
-		$('#' + query_id + 'stats').unbind('plotselected');
-		$('#' + query_id + 'stats').unbind('plotclick');
-		$('#' + query_id + 'statsoverview').unbind('plotselected');
-		$('div#' + query_id + 'legend input.dataseries').die('click');
+		unbind_some();
 		return true;
 	}
 	function destroy_some_globals() {
@@ -1637,7 +1641,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			if (editor_mode) {
 				total_width = (($(graphsheader).innerWidth() - 95) / 2);
 			} else {
-				total_width = $(graphsheader).innerWidth() - 5;
+				total_width = $(graphsheader).innerWidth() - 20;
 			}
 			$('#' + query_id).animate({
 				width: total_width + 'px'
@@ -1653,7 +1657,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				editor_mode = true;
 				new_text = draw_inner_graph_structure(total_width);
 			}
-			unbind_all();
+			unbind_some();
 			destroy_some_globals();
 			$('#' + query_id).empty();
 			$('#' + query_id).css('width', total_width + 'px');

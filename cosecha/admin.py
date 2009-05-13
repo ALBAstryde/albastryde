@@ -1,11 +1,9 @@
-from cosecha.models import Cosecha, ProductoCosecha, Departamentos, Municipio
+from cosecha.models import Cosecha, Producto
 from django.contrib import admin
 #import admin_extensions as admin
 
 class PmostrarAdmin(admin.ModelAdmin):
-	list_display = ('nombres',)
+	list_display = ('nombre',)
 
 admin.site.register(Cosecha)
-admin.site.register(ProductoCosecha, PmostrarAdmin)
-admin.site.register(Departamentos)
-admin.site.register(Municipio)
+admin.site.register(Producto, PmostrarAdmin)
