@@ -9,10 +9,11 @@ import settings
 import re
 
 
-index_menuitem = {'url' : '/wiki/', 'name' : 'Inicio'}
-list_menuitem = {'url' : '/wiki/list/', 'name' : 'Lista de p&aacute;ginas'}
+index_menuitem = {'url' : '/wiki/', 'name' : 'Wiki'}
+list_menuitem = {'url' : '/list/', 'name' : 'Lista de p&aacute;ginas'}
 estadisticas_menuitem = {'url' : '/estadisticas/', 'name' : 'Estad&iacute;sticas'}
-menu_list = (index_menuitem, list_menuitem, estadisticas_menuitem)
+busqueda_menuitem = {'url' : '/busqueda/', 'name' : 'Buscar'}
+menu_list = (index_menuitem, list_menuitem, estadisticas_menuitem, busqueda_menuitem)
 
 
 def render_to_html(request,template,variables):
@@ -51,13 +52,22 @@ def view_page(request, page_name):
 
 
 
-def search_page(request):
-	query_string = ''
-	found_entries = None
+def search_page(request, search_term=None):
+	if search_term!=None:
+#		query_string = ''
+#		found_entries = None
+#		if ('q' in request.GET) and request.GET['q'].strip():
+#			query_string =	unicodedata.normalize('NFKD', unicode(request.GET['q'])).encode('ascii','ignore')
+#			found_entries = Pagina.index.search(query_string)
+		found_entries = Pagina.index.search(search_term)
+		return render_to_html(request,'/search_results.html',{ 'query_string': search_term, 'found_entries': found_entries, 'menu_list':menu_list })
+	else:
+		return render_to_html(request,'/search_form.html',{ 'menu_list':menu_list })
+
+
+def search_page_html(request):
 	if ('q' in request.GET) and request.GET['q'].strip():
-		query_string =	unicodedata.normalize('NFKD', unicode(request.GET['q'])).encode('ascii','ignore')
-		found_entries = Pagina.index.search(query_string)
-	return render_to_html(request,'/search_results.html',{ 'query_string': query_string, 'found_entries': found_entries, 'menu_list':menu_list })
-
-
-
+		search_term = request.GET['q']
+		return HttpResponseRedirect("/busqueda/"+search_term+"/")
+	else:
+		return HttpResponseRedirect("/busqueda/")

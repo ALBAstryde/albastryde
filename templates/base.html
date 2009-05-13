@@ -27,7 +27,7 @@ $(document).ready(function() {
 </h1>
 </td>
 <td style="position:relative;z-index:1;">
-<form method="get" action="/wiki/searchresults"><input type="text" name="q" size="10"><br /><input type="submit" value="buscar"></form>
+<form method="get" action="/busqueda_html"><input type="text" name="q" size="10"><br /><input type="submit" value="buscar"></form>
 </td>
 <td id="header-banner-td">
 <div id="header-banner">
@@ -39,7 +39,7 @@ $(document).ready(function() {
 {% block menu %}
 <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" id="maintabs">
 {% for list_item in menu_list %}
-<li {% if (request.get_full_path()==list_item.url) %}class="ui-corner-top ui-tabs-selected ui-state-active"{% else %}class="ui-corner-top ui-state-default"{% endif %}><a href="{{ list_item.url }}">{{ list_item.name | safe}}</a></li>
+<li {% if (request.get_full_path()[0:list_item.url|length]==list_item.url) %}class="ui-corner-top ui-tabs-selected ui-state-active"{% else %}class="ui-corner-top ui-state-default"{% endif %}><a href="{{ list_item.url }}">{{ list_item.name | safe}}</a></li>
 {% endfor %}
 {% if request.user.is_authenticated() %}
 <li {% if (request.get_full_path()=='/profiles/'+request.user.__str__()+'/') %}class="ui-corner-top ui-tabs-selected ui-state-active"{% else %}class="ui-corner-top ui-state-default"{% endif %}><a href="/profiles/{{ request.user }}/">Mi 
@@ -49,7 +49,7 @@ perfil</a></li>
 {% endif %}
 <li class="ui-corner-top ui-state-default"><a href="/accounts/logout"><span>Logout</span></a></li>
 {% else %}
-<li class="ui-corner-top ui-state-default"><a href="/accounts/login/" {% if (request.get_full_path()=='/accounts/login/') %}class="active"{% else %}class="inactive"{% endif %}><span>Login</span></a></li>
+<li {% if (request.get_full_path()=='/accounts/login/') %}class="ui-corner-top ui-tabs-selected ui-state-active"{% else %}class="ui-corner-top ui-state-default"{% endif %}><a href="/accounts/login/">Login</a></li>
 {% endif %}
 </ul>
 {% endblock %}

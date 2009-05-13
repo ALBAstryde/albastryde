@@ -7,7 +7,7 @@ Lista de p&aacute;ginas
 {% endblock %}
 {% block contents %}
 <b>Categorias:</b>
-<a href="/wiki/list/">todos</a>{% for a in all_tags %}, <a href="/wiki/list/{{ a.nombre }}">{{ a.nombre }}</a>{% endfor %}.
+<a href="/list/">todos</a>{% for a in all_tags %}, <a href="/list/{{ a.nombre }}">{{ a.nombre }}</a>{% endfor %}.
 
 <ul>
 {% for a in all_pages %}
