@@ -55,4 +55,4 @@ class Cosecha(models.Model):
 		return self.producto_estimado-self.producto_obtenido
 
 	def __unicode__(self):
-		return str(self.producto) + " en " + str(self.municipio) + ", " + str(self.municipio.departamento) + " ("+ self.tiempo_str() + " " + self.ano_str() + ")"
+		return self.producto.nombre + " en " + self.municipio.nombre + ", " + self.municipio.departamento.nombre + " ("+ self.tiempo_str() + " " + self.ano_str() + ")"
