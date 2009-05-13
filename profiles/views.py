@@ -3,7 +3,6 @@ Views for creating, editing and viewing site-specific user profiles.
 
 """
 
-from wiki.views import menu_list
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -118,7 +117,6 @@ def create_profile(request, form_class=None, success_url=None,
     return render_to_response(template_name,
                               { 'form': form,
 			        'request': request,
-			        'menu_list': menu_list, 
 			      },
                               context_instance=context)
 create_profile = login_required(create_profile)
@@ -212,7 +210,6 @@ def edit_profile(request, form_class=None, success_url=None,
     return render_to_response(template_name,
                               { 'form': form,
 			        'request': request,
-			        'menu_list': menu_list,
                                 'profile': profile_obj, },
                               context_instance=context)
 edit_profile = login_required(edit_profile)
@@ -296,7 +293,6 @@ def profile_detail(request, username, public_profile_field=None,
     return render_to_response(template_name,
                               { 'profile': profile_obj, 
 			        'request': request,
-        			'menu_list': menu_list,
 			      },
                               context_instance=context)
 
@@ -355,7 +351,6 @@ def profile_list(request, public_profile_field=None,
     return render_to_response(template_name,
                               { 'object_list': queryset, 
 			        'request': request,
-        			'menu_list': menu_list,
 			      },
                               context_instance=context)
 

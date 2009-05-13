@@ -12,6 +12,14 @@ ACCOUNT_ACTIVATION_DAYS = 7
 SITE_ID = 1
 USE_I18N = True
 ADMIN_MEDIA_PREFIX = '/media/admin/'
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.auth', 
+    'django.core.context_processors.debug', 
+    'django.core.context_processors.i18n',
+    'context_processors.site_theme',
+    'context_processors.menu_list',
+)
+
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.load_template_source',
     'django.template.loaders.app_directories.load_template_source',

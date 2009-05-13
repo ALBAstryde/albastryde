@@ -15,7 +15,6 @@ from django.utils.http import urlquote, base36_to_int
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from django.views.decorators.cache import never_cache
-from wiki.views import menu_list
 
 def login(request, template_name='registration/login.html', redirect_field_name=REDIRECT_FIELD_NAME):
     "Displays the login form and handles the login action."
@@ -43,7 +42,6 @@ def login(request, template_name='registration/login.html', redirect_field_name=
         redirect_field_name: redirect_to,
         'site_name': current_site.name,
 	'request': request,
-	'menu_list': menu_list, 
     }, context_instance=RequestContext(request))
 login = never_cache(login)
 
@@ -54,7 +52,6 @@ def logout(request, next_page=None, template_name='registration/logged_out.html'
     if next_page is None:
         return render_to_response(template_name, {'title': _('Logged out'),
 	'request': request,
-	'menu_list': menu_list, 
 	}, context_instance=RequestContext(request))
     else:
         # Redirect to this page until the session has been cleared.
@@ -104,14 +101,11 @@ def password_reset(request, is_admin_site=False, template_name='registration/pas
     return render_to_response(template_name, {
         'form': form,
 	'request': request,
-	'menu_list': menu_list, 
-
     }, context_instance=RequestContext(request))
 
 def password_reset_done(request, template_name='registration/password_reset_done.html'):
     return render_to_response(template_name, {
 	'request': request,
-	'menu_list': menu_list, 
     }, context_instance=RequestContext(request))
 
 def password_reset_confirm(request, uidb36=None, token=None, template_name='registration/password_reset_confirm.html',
@@ -147,13 +141,11 @@ def password_reset_confirm(request, uidb36=None, token=None, template_name='regi
     context_instance['form'] = form    
     return render_to_response(template_name,{
 	'request': request,
-	'menu_list': menu_list, 
     }, context_instance=context_instance)
 
 def password_reset_complete(request, template_name='registration/password_reset_complete.html'):
     return render_to_response(template_name, {
 	'request': request,
-	'menu_list': menu_list, 
     },context_instance=RequestContext(request,
                                                                              {'login_url': settings.LOGIN_URL}))
 
@@ -171,12 +163,10 @@ def password_change(request, template_name='registration/password_change_form.ht
     return render_to_response(template_name, {
         'form': form,
 	'request': request,
-	'menu_list': menu_list, 
     }, context_instance=RequestContext(request))
 password_change = login_required(password_change)
 
 def password_change_done(request, template_name='registration/password_change_done.html'):
     return render_to_response(template_name, {
 	'request': request,
-	'menu_list': menu_list, 
     }, context_instance=RequestContext(request))

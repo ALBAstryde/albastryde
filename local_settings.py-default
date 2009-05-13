@@ -16,3 +16,4 @@ TIME_ZONE = 'America/Managua'
 LANGUAGE_CODE = 'es-ni'
 SECRET_KEY = 'algunas letras'
 DEBUG = False
+SITE_THEME = 'albastryde'

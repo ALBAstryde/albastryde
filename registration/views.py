@@ -8,7 +8,6 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 #from django.shortcuts import render_to_response
-from wiki.views import menu_list
 from django.template import RequestContext
 from coffin.shortcuts import render_to_response
 
@@ -72,14 +71,13 @@ def activate(request, activation_key,
     return render_to_response(template_name,
                               { 'account': account,
 				'request': request,
-				'menu_list': menu_list,
                                 'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS },
                               context_instance=context)
 
 
 def register_complete(request,template_name='registration/registration_complete.html'):
     context = RequestContext(request)
-    return render_to_response(template_name, { 'request': request, 'menu_list': menu_list }, context_instance=context)
+    return render_to_response(template_name, { 'request': request,}, context_instance=context)
 
 def register(request, success_url=None,
              form_class=RegistrationForm,
@@ -157,5 +155,5 @@ def register(request, success_url=None,
     for key, value in extra_context.items():
         context[key] = callable(value) and value() or value
     return render_to_response(template_name,
-                              { 'form': form, 'request':request, 'menu_list':menu_list },
+                              { 'form': form, 'request':request},
                               context_instance=context)
