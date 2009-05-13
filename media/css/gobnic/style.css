@@ -1,11 +1,13 @@
-
-
 body {
 	background: #e0007a;
 }
 
 div.edit {
 	background: #738040
+}
+
+div#contents {
+	min-height: 400px;
 }
 
 div.border {
@@ -24,11 +26,10 @@ div.pointLabel {
             color: 'black';
 }
 
-
-
 h1 {
             color: #0093dd;
 }
+
 h1#header {
             color: #85c226;
 	    background-image: url(images/swush.png);
@@ -61,25 +62,27 @@ div#bottom a {
 }
 
 div#title-banner {
-background-image: url(images/title-banner.png);
-background-repeat: no-repeat;
-background-position:top center;
-height: 20px;
-margin:0;
-padding: 0;
+	background-image: url(images/title-banner.png);
+	background-repeat: no-repeat;
+	background-position:top center;
+	height: 20px;
+	margin:0;
+	padding: 0;
 }
+
 td#header-banner-td {
-height: 78px;
+	height: 78px;
 }
+
 div#header-banner {
-position: absolute;
-top: 33px;
-right: 20px;
-background-image: url(images/header-banner.png);
-background-repeat: no-repeat;
-background-position:top right;
-height: 78px;
-width: 600px;
-margin:0;
-padding: 0;
+	position: absolute;
+	top: 33px;
+	right: 20px;
+	background-image: url(images/header-banner.png);
+	background-repeat: no-repeat;
+	background-position:top right;
+	height: 78px;
+	width: 600px;
+	margin:0;
+	padding: 0;
 }
