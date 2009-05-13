@@ -54,6 +54,8 @@ class Pagina(StatisticsFormVariable):
 
 
         def save(self,force_insert=False,force_update=False):
+		if not self.id:
+			super(Pagina, self).save()
 		self.markdown_to_html()
 		super(Pagina, self).save()
 
