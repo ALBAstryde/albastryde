@@ -1,5 +1,24 @@
 @import "jquery-ui-1.7.1.custom.css";
 
+
+div#header-banner {
+        background-image: url(images/ALBAstryde.png);
+	height: 72px;
+	width:240px;
+	left: 0px;
+	right: auto;
+}
+
+h1#header-title {
+	left: 300px;
+	font-size:50px;
+	padding: 0;
+	margin: 0;
+}
+
+div#header-bar {
+	height: 72px;
+}
 body {
 	background: #738040;
 }
