@@ -87,4 +87,16 @@ div#header-banner {
 	width: 600px;
 	margin:0;
 	padding: 0;
+	z-index: 1;
+}
+
+h1#header {
+	position: absolute;
+	top: 33px;
+	right: 20px;
+	z-index: 2;
+}
+
+table#header-table {
+	position:relative;
 }

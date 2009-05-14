@@ -18,14 +18,14 @@ $(document).ready(function() {
 <body>
 <div id="title-banner">&nbsp;</div>
 <div class="ui-tabs ui-widget ui-widget-content ui-corner-all">
-<table>
+<table id="header-table">
 <tr>
-<td id="header-td" style="position:relative;z-index:2;">
+<td id="header-td">
 <h1 id="header">
-{% block headline %}Header{% endblock %}
+{% block headline %}{% endblock %}
 </h1>
 </td>
-<td id="header-banner-td" style="position:relative;z-index:1;">
+<td id="header-banner-td">
 <div id="header-banner">
 &nbsp;
 </div>
