@@ -237,7 +237,7 @@ def price_graph(mercado,producto,frecuencia,start_date,end_date,mercado_count,pr
 			adjusted_fecha+=15800
 		precio=int(i['maximo'])		
 		if i['maximo'] != i['minimo']:
-			min_data_dic[int(fecha)]=int(i['minimo'])
+			min_data_dic[int(adjusted_fecha)]=int(i['minimo'])
 		if not str(int(adjusted_fecha)) in dollar[frecuencia]:
 			if frecuencia=='day':
 				dollar[frecuencia][str(int(adjusted_fecha))]=float(USD.objects.get(fecha__exact=i['fecha']).cordobas)
