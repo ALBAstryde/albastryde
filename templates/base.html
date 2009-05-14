@@ -20,13 +20,10 @@ $(document).ready(function() {
 <div class="ui-tabs ui-widget ui-widget-content ui-corner-all">
 <table>
 <tr>
-<td>
+<td id="header-td">
 <h1 id="header">
 {% block headline %}Header{% endblock %}
 </h1>
-</td>
-<td style="position:relative;z-index:1;">
-<form method="get" action="/busqueda_html"><input type="text" name="q" size="10"><br /><input type="submit" value="buscar"></form>
 </td>
 <td id="header-banner-td">
 <div id="header-banner">
@@ -36,6 +33,7 @@ $(document).ready(function() {
 </tr>
 </table>
 {% block menu %}
+<div id="menu" style="position:relative;">
 <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" id="maintabs">
 {% for list_item in menu_list %}
 <li {% if (request.get_full_path()[0:list_item.url|length]==list_item.url) %}class="ui-corner-top ui-tabs-selected ui-state-active"{% else %}class="ui-corner-top ui-state-default"{% endif %}><a href="{{ list_item.url }}">{{ list_item.name | safe}}</a></li>
@@ -50,6 +48,8 @@ $(document).ready(function() {
 <li {% if (request.get_full_path()=='/accounts/login/') %}class="ui-corner-top ui-tabs-selected ui-state-active"{% else %}class="ui-corner-top ui-state-default"{% endif %}><a href="/accounts/login/">Login</a></li>
 {% endif %}
 </ul>
+<form method="get" action="/busqueda_html" style="position:absolute;top:5px;right:3px;"><input type="text" name="q" size="10"><input type="submit" value="buscar"></form>
+</div>
 {% endblock %}
 <div id="contents">
 {% block warning %}
