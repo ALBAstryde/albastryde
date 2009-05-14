@@ -32,14 +32,16 @@ h1 {
             color: #0093dd;
 }
 
-h1#header {
+h1#header-title {
             color: #85c226;
 	    background-image: url(images/swush.png);
             background-repeat: no-repeat;
             background-position:bottom left;
 	    min-height: 41px;
-	    padding-left: 10px;
+	    min-width: 211px;
 }
+
+
 
 div.formDiv {
 	background-color: #CFE673;
@@ -48,9 +50,6 @@ div.formDiv {
 }
 
 
-div#header {
-	background: #ee73b6;
-}
 div#contents {
 	background: #ffffff;
 }
@@ -63,40 +62,18 @@ div#bottom a {
 	color: #000000;
 }
 
-div#title-banner {
+span#title-banner {
 	background-image: url(images/title-banner.png);
 	background-repeat: no-repeat;
 	background-position:top center;
 	height: 20px;
 	margin:0;
 	padding: 0;
+	display: block;
 }
 
-td#header-banner-td {
-	height: 78px;
-}
 
 div#header-banner {
-	position: absolute;
-	top: 33px;
-	right: 20px;
 	background-image: url(images/header-banner.png);
-	background-repeat: no-repeat;
-	background-position:top right;
-	height: 78px;
-	width: 600px;
-	margin:0;
-	padding: 0;
-	z-index: 1;
 }
 
-h1#header {
-	position: absolute;
-	top: 33px;
-	right: 20px;
-	z-index: 2;
-}
-
-table#header-table {
-	position:relative;
-}

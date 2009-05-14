@@ -1,3 +1,30 @@
+div#header-banner {
+        position: absolute;
+        top: 0px;
+        right: 2px;
+        background-image: url();
+        background-repeat: no-repeat;
+        background-position:top right;
+        height: 78px;
+        width: 600px;
+        margin:0;
+        padding: 0;
+        z-index: 1;
+}                                                                                      
+
+h1#header-title {
+        position: absolute;
+        top: 0px;
+        left: 10px;
+        z-index: 2;
+}
+
+div#header-bar {
+        position:relative;
+	height:80px;
+}
+
+
 body {
 	font:12px Verdana, Arial, Helvetica, sans-serif;
 }

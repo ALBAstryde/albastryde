@@ -16,22 +16,16 @@ $(document).ready(function() {
 {% endblock %}
 </head>
 <body>
-<div id="title-banner">&nbsp;</div>
+<span id="title-banner"></span>
 <div class="ui-tabs ui-widget ui-widget-content ui-corner-all">
-<table id="header-table">
-<tr>
-<td id="header-td">
-<h1 id="header">
+<div id="header-bar">
+<h1 id="header-title">
 {% block headline %}{% endblock %}
 </h1>
-</td>
-<td id="header-banner-td">
 <div id="header-banner">
 &nbsp;
 </div>
-</td>
-</tr>
-</table>
+</div>
 {% block menu %}
 <div id="menu" style="position:relative;">
 <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" id="maintabs">
