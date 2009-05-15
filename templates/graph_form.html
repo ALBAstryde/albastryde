@@ -41,15 +41,23 @@ Hasta:<br /> {{ form.EndDate|safe }}
 <p>
 Frecuencia:<br /> {{form.Frecuencia|safe}}
 </p>
-
 <p>&nbsp;</p>
 
 <p>
 <input type="submit" value="Enviar" id="AjaxFormSubmit" /> 
 </p>
+</td>
+<td valign="top">
+<p>
+Municipio:<br /> {{form.Municipio|safe}}
+</p>
+<p>
+Departamento:<br /> {{form.Departamento|safe}}
+</p>
+
 
 </td>
-<td>
+<td valign="top">
 <div id="variables">
 <h3><a href="#">Variables mercantiles</a></h3>
 <div>
@@ -68,16 +76,6 @@ Mercado:<br /> {{ form.Mercado|safe }}
 Estacion de lluvia:<br /> {{ form.EstacionDeLluvia|safe }}
 </div>
 </div>
-</td>
-<td valign="top">
-<p>
-Departamento:<br /> {{form.Departamento|safe}}
-</p>
-</td>
-<td valign="top">
-<p>
-Municipio:<br /> {{form.Municipio|safe}}
-</p>
 </td>
 <td>&nbsp;</td>
 <td valign="top">

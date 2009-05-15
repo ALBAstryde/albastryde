@@ -10,11 +10,11 @@ date_inputformats=['%d.%m.%Y','%d/%m/%Y','%Y-%m-%d']
 FRECUENCIA_CHOICES=(('diario','todos los datos'),('mensual','promedio mensual'),('anual','promedio anual'))
 
 class DbForm(forms.Form):
-	Departamento=forms.ModelMultipleChoiceField(queryset=Departamento.objects.all(), required=False)
-	Municipio=forms.ModelMultipleChoiceField(queryset=Municipio.objects.all(), required=False)
-	Producto=forms.ModelMultipleChoiceField(queryset=Producto.objects.all(), required=False)
-	Frecuencia=forms.MultipleChoiceField(choices=FRECUENCIA_CHOICES,required=True)
-	Mercado=forms.ModelMultipleChoiceField(queryset=Mercado.objects.all(), required=False)
-	EstacionDeLluvia=forms.ModelMultipleChoiceField(queryset=EstacionDeLluvia.objects.all(), required=False)
+	Departamento=forms.ModelMultipleChoiceField(queryset=Departamento.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
+	Municipio=forms.ModelMultipleChoiceField(queryset=Municipio.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
+	Producto=forms.ModelMultipleChoiceField(queryset=Producto.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
+	Frecuencia=forms.MultipleChoiceField(choices=FRECUENCIA_CHOICES,required=True,initial=['diario'])
+	Mercado=forms.ModelMultipleChoiceField(queryset=Mercado.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
+	EstacionDeLluvia=forms.ModelMultipleChoiceField(queryset=EstacionDeLluvia.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
 	StartDate=forms.DateField(input_formats=date_inputformats)
 	EndDate=forms.DateField(input_formats=date_inputformats)
