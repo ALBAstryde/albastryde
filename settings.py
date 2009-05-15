@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     'albastryde.graph',
     'albastryde.valuta',
     'django.contrib.gis',
+    'albastryde.admin_bulk_add',
     'albastryde.mapa',
     'albastryde.lugar',
     'albastryde.climate',

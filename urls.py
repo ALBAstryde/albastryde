@@ -15,6 +15,10 @@ def gotowiki(request):
 
 urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    (r'^admin/bulkadd/precios/$', 'albastryde.admin_bulk_add.views.precios'),
+    (r'^admin/bulkadd/precios/(?P<mercado_id>[^/]+)/(?P<ano>[^/]+)/(?P<mes>[^/]+)/(?P<dia>[^/]+)/$', 'albastryde.admin_bulk_add.views.precios'),
+    (r'^admin/bulkadd/lluvia/$', 'albastryde.admin_bulk_add.views.lluvia'),
+    (r'^admin/bulkadd/lluvia/(?P<estacion_de_lluvia_id>[^/]+)/(?P<ano>[^/]+)/(?P<mes>[^/]+)/$', 'albastryde.admin_bulk_add.views.lluvia'),
     (r'^admin/(.*)', admin.site.root),
     (r'^busqueda/(?P<search_term>[^/]+)/$', 'albastryde.wiki.views.search_page'),
     (r'^busqueda/$', 'albastryde.wiki.views.search_page'),
