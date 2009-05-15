@@ -24,23 +24,27 @@ def render_to_html(request,template,variables):
 #		model=LluviaPrueba
 
 
-def lluvia(request,ano=None,mes=None,estacion_de_lluvia_id=None):
+def lluvia(request,ano=None,mes=None,estacion_de_lluvia=None):
 	if ano == None:
-		if ('EstacionDeLluvia' in request.GET) and request.GET['EstacionDeLluvia'].strip():
-                	estacion_de_lluvia_id = request.GET['EstacionDeLluvia']
-                	ano = request.GET['Ano']
-                	mes = request.GET['Mes']
-			return HttpResponseRedirect("/admin/bulkadd/lluvia/"+estacion_de_lluvia_id+"/"+ano+"/"+mes+"/")
+		if ('estacion_de_lluvia' in request.GET) and request.GET['estacion_de_lluvia'].strip():
+                	estacion_de_lluvia = request.GET['estacion_de_lluvia']
+                	ano = request.GET['ano']
+                	mes = request.GET['mes']
+			return HttpResponseRedirect("/admin/lluvia/bulk_add/"+estacion_de_lluvia+"/"+ano+"/"+mes+"/")
 		else:
 			form=LluviaParameterForm()
 			return render_to_html(request,"bulk_add_form.html", {'form':form})
 	else:
-		LluviaPruebaFormSet = modelformset_factory(LluviaPrueba,extra=0)
-		datelist=[]
-		for day in range(1,calendar.monthrange(int(ano),int(mes))[1]):
-			datelist.append({'estacion':int(estacion_de_lluvia_id),'fecha':str(ano)+'-'+str(mes)+'-'+str(day)})
-		formset=LluviaPruebaFormSet(initial=datelist)
-		form = formset
+		queryset=LluviaPrueba.objects.filter(fecha__year=int(ano)).filter(fecha__month=int(mes)).filter(estacion=int(estacion_de_lluvia))
+		if len(queryset) > 0:
+			LluviaPruebaFormSet = modelformset_factory(LluviaPrueba,extra=(calendar.monthrange(int(ano),int(mes))[1]-len(queryset)))
+			form = LluviaPruebaFormSet(queryset=queryset)
+		else:
+			initial_list=[]
+			for day in range(1,calendar.monthrange(int(ano),int(mes))[1]+1):
+				initial_list.append({'estacion':str(estacion_de_lluvia),'fecha':str(ano)+'-'+str(mes)+'-'+str(day)})
+			LluviaPruebaFormSet = modelformset_factory(LluviaPrueba,extra=len(initial_list))
+			form = LluviaPruebaFormSet(initial=initial_list,queryset=LluviaPrueba.objects.none())
 		return render_to_html(request,"bulk_add_form_lluvia.html", {"form":form})
 
 

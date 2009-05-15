@@ -15,6 +15,6 @@ MES_CHOICES=((1,1),(2,2),(3,3),(4,4),(5,5),(6,6),(7,7),(8,8),(9,9),(10,10),(11,1
 
 
 class LluviaParameterForm(forms.Form):
-	EstacionDeLluvia=forms.ModelChoiceField(queryset=EstacionDeLluvia.objects.all(), required=True)
-	Mes=forms.ChoiceField(required=True,choices=MES_CHOICES)
-	Ano=forms.ChoiceField(required=True,choices=ANO_CHOICES)
+	estacion_de_lluvia=forms.ModelChoiceField(queryset=EstacionDeLluvia.objects.all(), required=True)
+	mes=forms.ChoiceField(required=True,choices=MES_CHOICES)
+	ano=forms.ChoiceField(required=True,choices=ANO_CHOICES)
