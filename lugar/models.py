@@ -24,8 +24,6 @@ class Departamento(StatisticsFormVariable):
 			except:
 				print "Geom calculation unsuccesful!"
 
-	def __unicode__(self):
-		return str(self.numero)+" "+self.nombre
 
 class Municipio(StatisticsFormVariable):
         numero = models.PositiveIntegerField(primary_key=True, help_text="Indroduzca el numero de Municipio")
@@ -33,8 +31,6 @@ class Municipio(StatisticsFormVariable):
 	geom = models.GeometryField(srid=26716,null=True,blank=True)
 	objects = models.GeoManager()
 
-	def __unicode__(self):
-		return str(self.numero)+" "+self.nombre
 
 
 	def generate_map(self):

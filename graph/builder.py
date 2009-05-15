@@ -1,4 +1,5 @@
 from precios.models import Prueba as PrecioPrueba
+from precios.models import Mercado
 from lluvia.models import Prueba as LLuviaPrueba
 from graph.forms import DbForm
 from valuta.models import USD,Euro
@@ -108,14 +109,28 @@ def build_graph(query,user):
 		first_date=datetime.date.today().timetuple()
 		pk_list=[]
 		graphs=[]
+		municipios = form.cleaned_data['Municipio']
+		departamentos = form.cleaned_data['Departamento']
 		mercados = form.cleaned_data['Mercado']
 		productos = form.cleaned_data['Producto']
 		frecuencias = form.cleaned_data['Frecuencia']
 		estaciones_de_lluvia = form.cleaned_data['EstacionDeLluvia']
 		start_date = form.cleaned_data['StartDate']
 		end_date = form.cleaned_data['EndDate']
-		mercado_count=len(mercados)
 		producto_count=len(productos)
+		municipio_count=len(municipios)
+		departamento_count=len(departamentos)
+		if producto_count > 0:		
+			if len(mercados) == 0:
+				mercados = Mercado.objects.none()
+			if municipio_count > 0:
+				for municipio in municipios:
+					mercados = mercados | municipio.mercado_set.all()
+			if departamento_count > 0:
+				for departamento in departamentos:
+					for municipio in departamento.municipios.iterator():
+						mercados = mercados | municipio.mercado_set.all()
+		mercado_count=len(mercados)
 		lluvia_count=len(estaciones_de_lluvia)
 		if mercado_count > 0 and producto_count > 0:
 			dollar={'unit':'USD','month':{},'year':{},'day':{}}

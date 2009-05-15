@@ -2,13 +2,13 @@ from django.db import models
 from graph.models import Approvable,StatisticsFormVariable
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.comments.models import Comment
+from lugar.models import Municipio
 
 class Producto(StatisticsFormVariable):
 	pass
 
 class Mercado(StatisticsFormVariable):
-	pass
-#	municipio = models.ForeignKey(Municipio)
+	municipio = models.ForeignKey(Municipio,null=True)
 
 
 class Prueba(Approvable):
