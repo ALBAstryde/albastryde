@@ -122,17 +122,17 @@ def build_graph(query,user):
 		municipio_count=len(municipios)
 		departamento_count=len(departamentos)
 		if producto_count > 0:		
-			if len(mercados) == 0:
-				mercados = EmptyQuerySet()
 			if municipio_count > 0:
 				for municipio in municipios:
 					if len(municipio.mercado_set.all()) > 0:
-						mercados = mercados | municipio.mercado_set.all()
+						for i in municipio.mercado_set.all().iterator():
+							mercados.append(i)
 			if departamento_count > 0:
 				for departamento in departamentos:
 					for municipio in departamento.municipios.iterator():
 						if len(municipio.mercado_set.all()) > 0:
-							mercados = mercados | municipio.mercado_set.all()
+							for i in municipio.mercado_set.all().iterator():
+								mercados.append(i)
 		mercado_count=len(mercados)
 		lluvia_count=len(estaciones_de_lluvia)
 		if mercado_count > 0 and producto_count > 0:
