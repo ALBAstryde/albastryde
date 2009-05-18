@@ -6,6 +6,7 @@ from valuta.models import USD,Euro
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.comments.models import Comment
 from django.db.models.options import get_verbose_name
+from django.db.models.query import EmptyQuerySet
 
 import operator
 import itertools
@@ -122,14 +123,16 @@ def build_graph(query,user):
 		departamento_count=len(departamentos)
 		if producto_count > 0:		
 			if len(mercados) == 0:
-				mercados = Mercado.objects.none()
+				mercados = EmptyQuerySet()
 			if municipio_count > 0:
 				for municipio in municipios:
-					mercados = mercados | municipio.mercado_set.all()
+					if len(municipio.mercado_set.all()) > 0:
+						mercados = mercados | municipio.mercado_set.all()
 			if departamento_count > 0:
 				for departamento in departamentos:
 					for municipio in departamento.municipios.iterator():
-						mercados = mercados | municipio.mercado_set.all()
+						if len(municipio.mercado_set.all()) > 0:
+							mercados = mercados | municipio.mercado_set.all()
 		mercado_count=len(mercados)
 		lluvia_count=len(estaciones_de_lluvia)
 		if mercado_count > 0 and producto_count > 0:
