@@ -15,9 +15,9 @@
 {% block breadcrumbs %}{% if not is_popup %}
 <div class="breadcrumbs">
      <a href="../../../">{% trans "Home" %}</a> &rsaquo;
-     <a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo; 
-     {% if has_change_permission %}<a href="../">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %} &rsaquo; 
-     {% if add %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}
+     <a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo;
+     <a href="../">{{ model_label_plural|capfirst }}</a> &rsaquo;
+     {% trans "Add" %} {{ add_set_label }}
 </div>
 {% endif %}{% endblock %}
 
@@ -29,8 +29,42 @@
   </ul>
 {% endif %}{% endif %}
 {% endblock %}
-<form action="." method="get">
-{{ form|safe }}
-<input type="submit">
+
+
+<form action="." method="POST">
+
+    {{ form.management_form }}
+<table>
+    {% for single_form in form.forms %}
+{% if forloop.first %}
+<tr>
+        {% for field in single_form %}
+<th>
+{% ifnotequal field.label_tag '<label for="id_form-0-id">Id</label>' %}
+           {{ field.label_tag }}
+{% endifnotequal%}
+</th>
+
+
+        {% endfor %}
+</tr>
+{% endif %}
+<tr>
+        {% for field in single_form %}
+<td>
+            {{ field }} {{field.errors}}
+</td>
+        {% endfor %}
+</tr>
+    {% endfor %}
+<table>
+
+<div class="submit-row" >
+<input type="submit" value="Grabar" class="default" name="_save" />
+
+<input type="submit" value="{{next_set_description}}" name="_next_set"  />
+<input type="submit" value="Grabar y continuar editando" name="_continue_editing" />
+</div>
+
 </form></div>
 {% endblock %}

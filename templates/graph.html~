@@ -1,7 +1,7 @@
 {% extends "/base_graph.html" %}
 {% block extrastatisticsheader %}
 <script language="javascript" type="text/javascript">
-var jsondata={{json|safe}};
+var jsondata={{rdict}};
 
 $(document).ready(function() {
 	//Do we have any data at all?
@@ -14,7 +14,7 @@ $(document).ready(function() {
 				$('#Warning').after(fieldname+": "+errmsg); 
 			});
 		} else {
-			create_graphs(jsondata,false,'#GraphsHeader');
+			create_graphs(jsondata);
 		}
 	} else {
 		//DON'T PANIC :D
@@ -27,5 +27,7 @@ $(document).ready(function() {
 {% endblock %}
 {% block contents %}
 <div id="Warning"></div>
+
 <div id="GraphsHeader"></div>
+
 {% endblock %}
