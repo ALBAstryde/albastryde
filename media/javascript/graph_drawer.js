@@ -320,8 +320,14 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				new_graph.start_value = top_value;
 				new_graph.bars = {
 					'show': true,
-					'barWidth': 86400000
 				};
+				if (frecuencia == 'day') {
+					new_graph.bars.barWidth=86400000;
+				} else if (frecuencia == 'month') {
+					new_graph.bars.barWidth=2628000000;
+				} else {
+					new_graph.bars.barWidth=31536000000;
+				}
 				new_graph.lluvia = lluvia;
 			}
 			new_graphs.push(new_graph);

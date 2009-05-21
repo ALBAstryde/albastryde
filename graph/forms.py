@@ -16,5 +16,6 @@ class DbForm(forms.Form):
 	Frecuencia=forms.MultipleChoiceField(choices=FRECUENCIA_CHOICES,required=True,initial=['diario'])
 	Mercado=forms.ModelMultipleChoiceField(queryset=Mercado.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
 	EstacionDeLluvia=forms.ModelMultipleChoiceField(queryset=EstacionDeLluvia.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
+	IncludeLluvia=forms.BooleanField(required=False)
 	StartDate=forms.DateField(input_formats=date_inputformats)
 	EndDate=forms.DateField(input_formats=date_inputformats)

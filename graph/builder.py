@@ -116,6 +116,7 @@ def build_graph(query,user):
 		productos = form.cleaned_data['Producto']
 		frecuencias = form.cleaned_data['Frecuencia']
 		estaciones_de_lluvia = form.cleaned_data['EstacionDeLluvia']
+		include_lluvia = form.cleaned_data['IncludeLluvia']
 		start_date = form.cleaned_data['StartDate']
 		end_date = form.cleaned_data['EndDate']
 		producto_count=len(productos)
@@ -134,6 +135,16 @@ def build_graph(query,user):
 							for i in municipio.mercado_set.all().iterator():
 								mercados.append(i)
 		mercado_count=len(mercados)
+		if include_lluvia:
+			if municipio_count > 0:
+				for municipio in municipios:
+					for i in municipio.estaciondelluvia_set.all().iterator():
+						estaciones_de_lluvia.append(i)
+			if departamento_count > 0:
+				for departamento in departamentos:
+					for municipio in departamento.municipios.iterator():
+						for i in municipio.estaciondelluvia_set.all().iterator():
+							estaciones_de_lluvia.append(i)
 		lluvia_count=len(estaciones_de_lluvia)
 		if mercado_count > 0 and producto_count > 0:
 			dollar={'unit':'USD','month':{},'year':{},'day':{}}
@@ -154,10 +165,10 @@ def build_graph(query,user):
 					graph,dollar,euro,pk_list,first_date,last_date=price_graph(mercado=i,producto=b,frecuencia=frecuencia,start_date=start_date,end_date=end_date,mercado_count=mercado_count,producto_count=producto_count,dollar=dollar,euro=euro,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=pricectype)
 					if not graph==None:
 						graphs.append(graph)
-		for d in estaciones_de_lluvia:
-			graph,pk_list,first_date,last_date=lluvia_graph(lluvia=d,start_date=start_date,end_date=end_date,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=lluviactype)
-			if not graph==None:
-				graphs.append(graph)							
+			for d in estaciones_de_lluvia:
+				graph,pk_list,first_date,last_date=lluvia_graph(estacion=d,frecuencia=frecuencia,start_date=start_date,end_date=end_date,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=lluviactype)
+				if not graph==None:
+					graphs.append(graph)							
 		rdict.update({'graphs':graphs})
 		mercado_name=""
 		lluvia_name=""
@@ -233,7 +244,6 @@ def price_graph(mercado,producto,frecuencia,start_date,end_date,mercado_count,pr
 		for row in cursor.fetchall():
 			row_dic={'fecha':row[2],'maximo':row[3],'minimo':row[4],'producto':row[0],'mercado':row[1]}
 			queryset.append(row_dic)
-#		queryset =PrecioPrueba.objects.filter(producto=producto,mercado=mercado,fecha__range=[start_date,end_date]).extra(select={'fecha': "date_trunc('"+frecuencia+"', fecha)"}).values('fecha','producto','mercado','maximo','minimo').annotate(maximo=Avg('maximo'),minimo=Avg('minimo')).order_by('fecha')
 	content_type=ctype.id
 	if len(queryset)==0:
 		return None,dollar,euro,pk_list,first_date,last_date
@@ -266,8 +276,6 @@ def price_graph(mercado,producto,frecuencia,start_date,end_date,mercado_count,pr
 				dollar[frecuencia][str(int(adjusted_fecha))]= float(cursor.fetchone()[0])
 				cursor.execute("select avg(cordobas) from valuta_euro where date_trunc('month',fecha)='"+i['fecha'].strftime('%Y-%m-%d')+"';")
 				euro[frecuencia][str(int(adjusted_fecha))]= float(cursor.fetchone()[0])				
-#				dollar[frecuencia][str(int(adjusted_fecha))]=float(USD.objects.filter(fecha__exact=i['fecha']).extra(select={'fecha': "date_trunc('"+frecuencia+"', fecha)"}).values('fecha').annotate(cordobas=Avg('cordobas'))[0]['cordobas'])
-#				euro[frecuencia][str(int(adjusted_fecha))]=float(Euro.objects.filter(fecha__exact=i['fecha']).extra(select={'fecha': "date_trunc('"+frecuencia+"', fecha)"}).values('fecha').annotate(cordobas=Avg('cordobas'))[0]['cordobas'])
 		adjusted_fecha=int(adjusted_fecha)
 		if frecuencia=='day':
 			unique_pk=str(content_type)+"_"+str(i['pk'])		
@@ -285,25 +293,39 @@ def price_graph(mercado,producto,frecuencia,start_date,end_date,mercado_count,pr
 		result['min_data_dic']=min_data_dic
 	return result,dollar,euro,pk_list,first_date,last_date
 
-def lluvia_graph(lluvia,start_date,end_date,pk_list,first_date,last_date,ctype):
-	queryset =LLuviaPrueba.objects.filter(estacion=lluvia).filter(fecha__range=[start_date,end_date]).order_by('fecha')
+def lluvia_graph(estacion,frecuencia,start_date,end_date,pk_list,first_date,last_date,ctype):
+	queryset = None
+	if frecuencia=='day':
+		queryset =LLuviaPrueba.objects.filter(estacion=estacion).filter(fecha__range=[start_date,end_date]).values('fecha','pk','milimetros_de_lluvia').order_by('fecha')
+	else:
+		cursor = connection.cursor()
+		cursor.execute("select estacion_id as estacion, date_trunc('"+frecuencia+"',fecha) as fecha, avg(milimetros_de_lluvia) as milimetros_de_lluvia from lluvia_prueba where estacion_id = "+str(estacion.pk)+" and fecha > '"+start_date.strftime('%Y-%m-%d')+"' and fecha < '"+end_date.strftime('%Y-%m-%d')+"' group by date_trunc('"+frecuencia+"',fecha), estacion_id order by fecha;")
+		queryset=[]
+		for row in cursor.fetchall():
+			row_dic={'fecha':row[1],'milimetros_de_lluvia':row[2],'estacion':row[0]}
+			queryset.append(row_dic)
 	content_type=ctype.id
 	if len(queryset)==0:
 		return None,pk_list,first_date,last_date
 	data=[]
 	list_of_pk=[]
 	for i in queryset:
-		if i.fecha.timetuple() < first_date:
-			first_date=i.fecha.timetuple()
-		if i.fecha.timetuple() > last_date:
-			last_date=i.fecha.timetuple()
-		value=str(i.milimetros_de_lluvia)
-		fecha=mktime(i.fecha.timetuple())/1000
-		fecha=int(fecha)
-		unique_pk=str(content_type)+"_"+str(i.pk)		
-		list_of_pk.append(str(i.pk))
-		data.append([fecha,value,unique_pk])
-	pk_list.append([content_type,list_of_pk])
-	result={'lluvia':lluvia.nombre,'data':data,'unit':'mm','tipo':'lluvia'}
+		if i['milimetros_de_lluvia'] > 0:
+			if i['fecha'].timetuple() < first_date:
+				first_date=i['fecha'].timetuple()
+			if i['fecha'].timetuple() > last_date:
+				last_date=i['fecha'].timetuple()
+			value=str(i['milimetros_de_lluvia'])
+			fecha=mktime(i['fecha'].timetuple())/1000
+			fecha=int(fecha)
+			if frecuencia=='day':
+				unique_pk=str(content_type)+"_"+str(i['pk'])		
+				list_of_pk.append(str(i['pk']))
+				data.append([fecha,value,unique_pk])
+			else:
+				data.append([fecha,value])
+	if frecuencia=='day':
+		pk_list.append([content_type,list_of_pk])
+	result={'lluvia':estacion.nombre,'data':data,'unit':'mm','tipo':'lluvia','frecuencia':frecuencia}
 	return result,pk_list,first_date,last_date
 
