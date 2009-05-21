@@ -15,7 +15,7 @@ $(function() {
 	var monthNamesShort = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 	var monthNamesMin = ['En','Fe','Mar','Ab','May','Jun','Jul','Ag','Se','Oc','No','Di'];
 
-	$('#id_StartDate').datepicker({
+	$('#id_Desde').datepicker({
 		dayNames: dayNames,
 		dayNamesShort: dayNamesShort,
 		dayNamesMin: dayNamesMin,
@@ -29,10 +29,10 @@ $(function() {
 		maxDate: (new Date()).addDays( - 1),
 		onSelect : function(selectedDate) {
 			d = new Date(selectedDate.substring(3,5)+'/'+selectedDate.substring(0,2)+'/'+selectedDate.substring(6,10)).addDays(1);
-			$('#id_EndDate').datepicker('option','minDate',d);			
+			$('#id_Hasta').datepicker('option','minDate',d);			
 		}
 	});
-	$('#id_EndDate').datepicker({
+	$('#id_Hasta').datepicker({
 		dayNames: dayNames,
 		dayNamesShort: dayNamesShort,
 		dayNamesMin: dayNamesMin,
@@ -46,7 +46,7 @@ $(function() {
 		maxDate: new Date(),
 		onSelect : function(selectedDate) {
 			d = new Date(selectedDate.substring(3,5)+'/'+selectedDate.substring(0,2)+'/'+selectedDate.substring(6,10)).addDays(-1);
-			$('#id_StartDate').datepicker('option','maxDate',d);			
+			$('#id_Desde').datepicker('option','maxDate',d);			
 		}
 	});
 });

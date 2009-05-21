@@ -2,7 +2,8 @@
 import unicodedata
 from django.utils import simplejson
 import re
-from graph.builder import translate_query_string, build_graph
+from graph.translator import translate_query_string
+from graph.builder import build_graph
 from django.contrib.auth.models import AnonymousUser
 from django.http import QueryDict
 

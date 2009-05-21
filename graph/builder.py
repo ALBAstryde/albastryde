@@ -5,92 +5,8 @@ from graph.forms import DbForm
 from valuta.models import USD,Euro
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.comments.models import Comment
-from django.db.models.options import get_verbose_name
-from django.db.models.query import EmptyQuerySet
-
-import operator
-import itertools
-import pprint
-import datetime
+from datetime import date
 from time import mktime
-from django.http import QueryDict
-
-def camelcase(string):
-	decamelcase_list= string.strip().split()
-	camelcase_string=''
-	for j in decamelcase_list:
-		camelcase_string+=j.capitalize()
-	return camelcase_string
-
-
-def translate_query_string(query_string):
-	word_query=QueryDict(query_string)
-	new_query_string=u''
-	for i in word_query.lists():
-		modelname=i[0].strip().lower()
-		values= i[1]
-		if modelname==u'desde':
-			modelname=u'start date'
-		if modelname==u'hasta':
-			modelname=u'end date'
-		if modelname==u'start date' or modelname==u'end date' or modelname==u'frecuencia':
-			new_query_string+="&"+camelcase(modelname)+"="+values[0]
-		else:
-			ctype_list = ContentType.objects.filter(name=modelname)
-			if len(ctype_list) > 0:
-				ctype=ctype_list[0]
-				if len(ctype_list) > 1:
-					name_length=len(ctype.name)
-					for i in ctype_list:
-						if len(i.name) < name_length:
-							ctype=i
-							name_length=len(ctype.name)
-				model_class=ctype.model_class()
-				for b in values:
-					value=b.strip()
-					d=model_class.objects.filter(nombre__startswith=value)
-					if len(d) > 0:
-						variable_value=d[0]
-						if len(d) > 1:
-							name_length=len(variable_value.nombre)
-							for i in d:
-								if len(i.nombre)<name_length:
-									variable_value=i
-									name_length=len(variable_value.nombre)
-						new_query_string+="&"+camelcase(modelname)+"="+str(variable_value.pk)
-					else:
-						try:
-							int(value)
-							e=model_class.objects.filter(pk=int(value))
-							if len(e) > 0:
-								new_query_string+="&"+camelcase(modelname)+"="+str(value)
-						except ValueError:
-							pass
-	new_query_string=new_query_string.lstrip("&")
-	return new_query_string
-
-def reverse_translate_query(query):
-	new_query_string=u''
-	for i in query.lists():
-		modelname=get_verbose_name(i[0])
-		value=i[1]
-		if modelname=='start date':
-			modelname='desde'
-		if modelname=='end date':
-			modelname='hasta'
-		if modelname=='desde' or modelname=='hasta' or modelname=='frecuencia':
-			new_query_string+="&"+modelname+"="+value[0]
-		else:
-			ctype_list = ContentType.objects.filter(name=modelname)
-			if len(ctype_list) > 0:
-				ctype=ctype_list[0]
-				model_class=ctype.model_class()
-				for b in value:
-					d=model_class.objects.filter(pk=b)
-					if len(d) > 0:
-						new_query_string+="&"+modelname+"="+d[0].nombre
-	new_query_string=new_query_string.lstrip("&")
-	return new_query_string
 
 
 def build_graph(query,user):
@@ -106,19 +22,25 @@ def build_graph(query,user):
                         # Bung all that into the dict
                 rdict.update({'errs': d  })
        	else:   
-		last_date=datetime.date(1920,1,1).timetuple()
-		first_date=datetime.date.today().timetuple()
+		last_date=date(1920,1,1).timetuple()
+		first_date=date.today().timetuple()
 		pk_list=[]
 		graphs=[]
 		municipios = form.cleaned_data['Municipio']
 		departamentos = form.cleaned_data['Departamento']
-		mercados = form.cleaned_data['Mercado']
+		mercados_queryset = form.cleaned_data['Mercado']
+		mercados=[]
+		for i in mercados_queryset:
+			mercados.append(i)
 		productos = form.cleaned_data['Producto']
 		frecuencias = form.cleaned_data['Frecuencia']
-		estaciones_de_lluvia = form.cleaned_data['EstacionDeLluvia']
-		include_lluvia = form.cleaned_data['IncludeLluvia']
-		start_date = form.cleaned_data['StartDate']
-		end_date = form.cleaned_data['EndDate']
+		estaciones_de_lluvia_queryset = form.cleaned_data['EstacionDeLluvia']
+		estaciones_de_lluvia=[]
+		for i in estaciones_de_lluvia_queryset:
+			estaciones_de_lluvia.append(i)
+		include_lluvia = form.cleaned_data['IncluirLluvia']
+		start_date = form.cleaned_data['Desde']
+		end_date = form.cleaned_data['Hasta']
 		producto_count=len(productos)
 		municipio_count=len(municipios)
 		departamento_count=len(departamentos)
@@ -205,7 +127,7 @@ def build_graph(query,user):
 			headline +="Precios "
 			headline +=precio_name
 				
-		headline+=": "+str(datetime.date.fromtimestamp(mktime(first_date)))+"&ndash;"+str(datetime.date.fromtimestamp(mktime(last_date)))
+		headline+=": "+str(date.fromtimestamp(mktime(first_date)))+"&ndash;"+str(date.fromtimestamp(mktime(last_date)))
 		rdict.update({'headline':headline})
 		comments={}
 		for content_type in pk_list :

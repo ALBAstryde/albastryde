@@ -4,7 +4,8 @@ from django.utils.encoding import smart_unicode, smart_str
 from django.http import HttpResponseRedirect, HttpResponse
 from graph.forms import DbForm
 from coffin.shortcuts import render_to_response
-from graph.builder import build_graph,translate_query_string,reverse_translate_query
+from graph.builder import build_graph
+from graph.translator import reverse_translate_query
 from base64 import b64encode, b64decode
 from django.utils.http import urlquote_plus
 import operator
