@@ -2131,7 +2131,7 @@
         var r = [];
         var escape = false;
         if (monthNames == null)
-            monthNames = ["Ene", "Fev", "Mar", "Abr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dic"];
+            monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         for (var i = 0; i < fmt.length; ++i) {
             var c = fmt.charAt(i);
             

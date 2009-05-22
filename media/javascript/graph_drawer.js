@@ -1422,7 +1422,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		options = {
 			xaxis: {
 				mode: 'time',
-				minTickSize: [1, 'day']
+				minTickSize: [1, 'day'],
+				monthNames: ["Ene", "Fev", "Mar", "Abr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dic"]
 			},
 			yaxis: {
 				tickFormatter: function(v, axis) {
