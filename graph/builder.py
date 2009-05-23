@@ -177,7 +177,7 @@ def price_graph(mercado,producto,frecuencia,start_date,end_date,mercado_count,pr
 			first_date=i['fecha'].timetuple()
 		if i['fecha'].timetuple() > last_date:
 			last_date=i['fecha'].timetuple()
-		fecha=mktime(i['fecha'].timetuple())/1000
+		fecha=mktime(i['fecha'].timetuple())#*1000
 		adjusted_fecha=fecha
 		if frecuencia=='day':
 			adjusted_fecha+=22
@@ -238,7 +238,7 @@ def lluvia_graph(estacion,frecuencia,start_date,end_date,pk_list,first_date,last
 			if i['fecha'].timetuple() > last_date:
 				last_date=i['fecha'].timetuple()
 			value=str(i['milimetros_de_lluvia'])
-			fecha=mktime(i['fecha'].timetuple())/1000
+			fecha=mktime(i['fecha'].timetuple())
 			fecha=int(fecha)
 			if frecuencia=='day':
 				unique_pk=str(content_type)+"_"+str(i['pk'])		
