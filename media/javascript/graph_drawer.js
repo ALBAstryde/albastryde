@@ -243,7 +243,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				function() {
 					var pk, max_value, min_value, time, new_time;
 					time = this[0];
-					new_time = time * 1000000; //add 7 zeroes to end of time string
 					max_value = parseFloat(this[1]);
 					if (max_value > top_value) {
 						top_value = max_value;
@@ -254,8 +253,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					} else {
 						min_value = max_value;
 					}
-					minData.push([new_time, min_value]);
-					new_max_data.push([new_time, max_value, pk]);
+					minData.push([time, min_value]);
+					new_max_data.push([time, max_value, pk]);
 				});
 				new_data = new_max_data; //.reverse();
 			} else {
@@ -265,13 +264,12 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				function() {
 					var pk, value, time, new_time;
 					time = this[0];
-					new_time = time * 1000000; //add 7 zeroes to end of time string
 					value = parseFloat(this[1]);
 					if (value > top_value) {
 						top_value = value;
 					}
 					pk = this[2];
-					new_data.push([new_time, value, pk]);
+					new_data.push([time, value, pk]);
 				});
 			}
 			start_date = new_data[0][0];
@@ -374,7 +372,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					new_tablerow[3][i][1]=[];
 					for (j in this[3][i][1]) {
 						new_tablerow[3][i][1][j]=[];
-						new_tablerow[3][i][1][j][0]=currency_dic[frecuencia][String(parseInt(this[3][i][0],10) / 1000000)] * this[3][i][1][j][0];
+						new_tablerow[3][i][1][j][0]=currency_dic[frecuencia][String(parseInt(this[3][i][0],10))] * this[3][i][1][j][0];
 						new_tablerow[3][i][1][j][1]=this[3][i][1][j][1];
 					}
 				}
@@ -409,14 +407,14 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				new_graph.advanced_label = this.advanced_label;
 			}
 			if (this.unit == 'cordoba') {
-				new_graph.start_value = currency_dic[this.frecuencia][String(this.start_date / 1000000)] * this.start_value;
+				new_graph.start_value = currency_dic[this.frecuencia][String(this.start_date)] * this.start_value;
 				new_data = [];
 				$.each(this.data,
 				function() {
 					var time = this[0];
 					var cordoba = this[1];
 					var pk = this[2];
-					var currency = currency_dic[frecuencia][String(time / 1000000)]; //convert to transfer time format to get currency timestamp
+					var currency = currency_dic[frecuencia][String(time)]; //convert to transfer time format to get currency timestamp
 					var currency_value = parseFloat(cordoba) * parseFloat(currency);
 					new_data.push([time, currency_value, pk]);
 				});
@@ -428,7 +426,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 						var time = this[0];
 						var cordoba = this[1];
 						var pk = this[2];
-						var currency = currency_dic[frecuencia][String(time / 1000000)]; //convert to transfer time format to get currency timestamp
+						var currency = currency_dic[frecuencia][String(time)]; //convert to transfer time format to get currency timestamp
 						var currency_value = parseFloat(cordoba) * parseFloat(currency);
 						minData.push([time, currency_value, pk]);
 					});
@@ -1114,8 +1112,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		return graph_html;
 	}
 
-	function date_string(timestamp) {
-		var raw_date = new Date(timestamp);
+	function date_string(unixtimestamp) {
+		var raw_date = new Date(unixtimestamp*1000);
 		var day = raw_date.getUTCDate();
 		if (day < 10) {
 			day = '0' + day;
@@ -1300,7 +1298,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 						}
 					}
 					var date = graphs[series]['max_data'][datapoint][0];
-					var date_str = date_string(date * 1000000);
+					var date_str = date_string(date);
 					var max = graphs[series]['max_data'][datapoint][1];
 					var min;
 					if (String(date) in graphs[series].min_data_dic) {
@@ -1331,7 +1329,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 							headerline = new_headerline;
 						}
 					}
-					date = date_string(graphs[series]['data'][datapoint][0] * 1000000);
+					date = date_string(graphs[series]['data'][datapoint][0]);
 					html += date + ', ' + graphs[series]['data'][datapoint][1] + ', "' + graphs[series].unit + '", "' + graphs[series].tipo + '"';
 					if (graphs[series].tipo == 'precio') {
 						html += ', "' + graphs[series].mercado + '", "' + graphs[series].producto + '"';
@@ -1421,7 +1419,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		var options, overview_options, overview;
 		options = {
 			xaxis: {
-				mode: 'time',
+				mode: 'unixtime',
 				minTickSize: [1, 'day'],
 				monthNames: ["Ene", "Fev", "Mar", "Abr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dic"]
 			},
@@ -1472,7 +1470,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				shadowSize: 0,
 				xaxis: {
 					ticks: [],
-					mode: 'time'
+					mode: 'unixtime'
 				},
 				yaxis: {
 					ticks: []

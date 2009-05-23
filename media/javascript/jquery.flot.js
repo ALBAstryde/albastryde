@@ -28,7 +28,7 @@
                     backgroundOpacity: 0.85 // set to 0 to avoid background
                 },
                 xaxis: {
-                    mode: null, // null or "time"
+                    mode: null, // null or "time" or "unixtime"
                     min: null, // min. value to show, null means set automatically
                     max: null, // max. value to show, null means set automatically
                     autoscaleMargin: null, // margin in % to add if auto-setting min/max
@@ -468,20 +468,23 @@
             var delta = (axis.max - axis.min) / noTicks;
             var size, generator, unit, formatter, i, magn, norm;
 
-            if (axisOptions.mode == "time") {
+            if ((axisOptions.mode == "time") || (axisOptions.mode == "unixtime")){
                 // pretty handling of time
-                
+		var timefactor;
+		if (axisOptions.mode == "unixtime") {
+                    timefactor=1000;
+		} else {
+                    timefactor=1;
+		}
                 // map of app. size of time units in milliseconds
                 var timeUnitSize = {
-                    "second": 1000,
-                    "minute": 60 * 1000,
-                    "hour": 60 * 60 * 1000,
-                    "day": 24 * 60 * 60 * 1000,
-                    "month": 30 * 24 * 60 * 60 * 1000,
-                    "year": 365.2425 * 24 * 60 * 60 * 1000
-                };
-
-
+                        "second": 1000/timefactor,
+                        "minute": 60 * 1000/timefactor,
+                        "hour": 60 * 60 * 1000/timefactor,
+                        "day": 24 * 60 * 60 * 1000/timefactor,
+                        "month": 30 * 24 * 60 * 60 * 1000/timefactor,
+                        "year": 365.2425 * 24 * 60 * 60 * 1000/timefactor
+                    };
                 // the allowed tick sizes, after 1 year we use
                 // an integer algorithm
                 var spec = [
@@ -504,12 +507,13 @@
                     else
                         minSize = axisOptions.minTickSize[0] * timeUnitSize[axisOptions.minTickSize[1]];
                 }
-
+		delta=Math.round(delta);
                 for (i = 0; i < spec.length - 1; ++i)
                     if (delta < (spec[i][0] * timeUnitSize[spec[i][1]]
                                  + spec[i + 1][0] * timeUnitSize[spec[i + 1][1]]) / 2
                        && spec[i][0] * timeUnitSize[spec[i][1]] >= minSize)
                         break;
+
                 size = spec[i][0];
                 unit = spec[i][1];
                 
@@ -533,14 +537,12 @@
                     size = axisOptions.tickSize[0];
                     unit = axisOptions.tickSize[1];
                 }
-                
                 generator = function(axis) {
                     var ticks = [],
-                        tickSize = axis.tickSize[0], unit = axis.tickSize[1],
-                        d = new Date(axis.min);
-                    
+		        tickSize=axis.tickSize[0],
+                        unit = axis.tickSize[1],
+                        d = new Date(axis.min*timefactor);
                     var step = tickSize * timeUnitSize[unit];
-
                     if (unit == "second")
                         d.setUTCSeconds(floorInBase(d.getUTCSeconds(), tickSize));
                     if (unit == "minute")
@@ -565,12 +567,11 @@
                     if (step >= timeUnitSize.year)
                         d.setUTCMonth(0);
 
-
                     var carry = 0, v = Number.NaN, prev;
                     do {
                         prev = v;
                         v = d.getTime();
-                        ticks.push({ v: v, label: axis.tickFormatter(v, axis) });
+                        ticks.push({ v: Math.round(v/timefactor), label: axis.tickFormatter(v, axis) });
                         if (unit == "month") {
                             if (tickSize < 1) {
                                 // a bit complicated - we'll divide the month
@@ -590,16 +591,15 @@
                         else if (unit == "year") {
                             d.setUTCFullYear(d.getUTCFullYear() + tickSize);
                         }
-                        else
-                            d.setTime(v + step);
-                    } while (v < axis.max && v != prev);
-
+                        else {
+                            d.setTime(v + (step*timefactor));
+			}
+                    } while (v < axis.max*timefactor && v != prev);
                     return ticks;
                 };
 
                 formatter = function (v, axis) {
                     var d = new Date(v);
-
                     // first check global format
                     if (axisOptions.timeformat != null)
                         return $.plot.formatDate(d, axisOptions.timeformat, axisOptions.monthNames);
@@ -625,7 +625,7 @@
                     }
                     else
                         fmt = "%y";
-                    
+                   
                     return $.plot.formatDate(d, fmt, axisOptions.monthNames);
                 };
             }
