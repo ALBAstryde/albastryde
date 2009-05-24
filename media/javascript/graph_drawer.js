@@ -195,30 +195,34 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	}
 
 	function convert_graphs_after_transport(graphs) {
-		var new_graphs, graph_types;
-		var minData;
-		new_graphs = [];
-		graph_types = {};
+		var new_graphs = [], graph_types = {}, minData=[], new_max_data=[];
 		$.each(graphs,
 		function() {
+			var new_graph = {
+				'unit': this.unit,
+				'frequency': this.frequency,
+				'type': this.type,
+				'included_variables': this.included_variables,
+				'place_js': this.place_js,
+				'main_variable_js': this.main_variable_js,
+				'normalize_factor_js': this.normalize_factor_js,
+				'relevance': 'main',
+				'color': color_counter,
+				'data': [],
+				'clickable': {},
+				'hoverable': {},
+				'bars': {},
+				'lines': {},
+				'points': {},
+				'top_value':0
+			};
 			var data = [],
-			new_data = [],
 			max_data = [],
-			min_data_dic = {},
-			top_value = 0,
-			type,
-			unit,
-			included_variables=this.included_variables,
-			label,
-			frequency,
-			start_date;
-			frequency = this.frequency;
-			unit = this.unit;
-			type = this.type;
+			min_data_dic = {};
 			
 
 			//create dictionary of ists of all variables used by some graph or other (mercado, producto, lluvia estacion, etc.)
-			$.each(included_variables,function(e,v) {
+			$.each(this.included_variables,function(e,v) {
 				if (! (e in all_variables)) {
 					all_variables[e]=[];
 				}
@@ -226,28 +230,21 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					all_variables[e].push(v);
 				}
 			});
-			if (type == 'precio') {
-				label = this.included_variables.producto + ' '+_('in')+' ' + this.included_variables.mercado + ' (' + unit + ' '+_(frequency)+')';
-			} else if (type == 'lluvia') {
-				label = type+' '+_('in')+' ' + this.included_variables.station + ' (' + unit +' '+_(frequency)+')';
-			} else {
-				label = '';
-			}
-			if (! (type in graph_types)) {
-				graph_types[type] = unit;
+			new_graph.label = eval(this.main_variable_js) + ' '+_('in')+' ' + eval(this.place_js) + ' (' + this.unit + ' '+_(this.frequency)+')';
+			if (! (this.type in graph_types)) {
+				graph_types[this.type] = this.unit;
 			}
 			if ('min_data_dic' in this) {
 				max_data = this.max_data;
 				min_data_dic = this.min_data_dic;
-				var new_max_data = [];
-				minData = [];
 				$.each(max_data,
 				function() {
 					var pk, max_value, min_value, time, new_time;
 					time = this[0];
 					max_value = parseFloat(this[1]);
-					if (max_value > top_value) {
-						top_value = max_value;
+					if (max_value > new_graph.top_value) {
+						new_graph.top_value = max_value;
+						new_graph.top_date = time;
 					}
 					pk = this[2];
 					if (String(time) in min_data_dic) {
@@ -256,9 +253,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 						min_value = max_value;
 					}
 					minData.push([time, min_value]);
-					new_max_data.push([time, max_value, pk]);
+					new_graph.data.push([time, max_value, pk]);
 				});
-				new_data = new_max_data; //.reverse();
+				//new_data = new_max_data; //.reverse();
 			} else {
 				data = this.data;
 				minData = false;
@@ -267,47 +264,42 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					var pk, value, time, new_time;
 					time = this[0];
 					value = parseFloat(this[1]);
-					if (value > top_value) {
-						top_value = value;
+					if (value > new_graph.top_value) {
+						new_graph.top_value = value;
 					}
 					pk = this[2];
-					new_data.push([time, value, pk]);
+					new_graph.data.push([time, value, pk]);
 				});
 			}
-			start_date = new_data[0][0];
+			new_graph.start_date = new_graph.data[0][0];
 			var graph_yaxis = 1;
 			var yaxis_finder = 1;
 			for (var item in graph_types) {
-				if (item == type) {
-					graph_yaxis = yaxis_finder;
+				if (item == this.type) {
+					new_graph.yaxis = yaxis_finder;
 				}
 				yaxis_finder += 1;
 			}
-			var new_graph = {
-				'label': label,
-				'data': new_data,
-				'unit': unit,
-				'frequency': frequency,
-				'yaxis': graph_yaxis,
-				'type': type,
-				'relevance': 'main',
-				'color': color_counter,
-				'included_variables': included_variables,
-				'clickable': {},
-				'hoverable': {},
-				'bars': {},
-				'lines': {},
-				'points': {},
-				'start_date': start_date
-			};
-			if (!(frequency == 'daily')) {
+
+			if (!(this.frequency == 'daily')) {
 				new_graph.hoverable=false;
 				new_graph.clickable=false;
 				new_graph.points.show=false;
 				new_graph.points.drawCall=false;
 			}
-			if (type == 'precio') {
-				new_graph.start_value = new_data[0][1];
+			new_graph.start_value = new_graph.data[0][1];
+			if (this.display == 'bars') {
+				new_graph.bars = {
+					'show': true,
+				};
+				if (this.frequency == 'daily') {
+					new_graph.bars.barWidth=86400;
+				} else if (this.frequency == 'monthly') {
+					new_graph.bars.barWidth=2628000;
+				} else {
+					new_graph.bars.barWidth=31536000;
+				}
+			} else {
 				new_graph.lines = {
 					'show': true
 				};
@@ -315,19 +307,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					new_graph.minData = minData;
 					new_graph.lines.fill = true;
 				}
-			} else if (type == 'lluvia') {
-				new_graph.start_value = top_value;
-				new_graph.bars = {
-					'show': true,
-				};
-				if (frequency == 'daily') {
-					new_graph.bars.barWidth=86400;
-				} else if (frequency == 'monthly') {
-					new_graph.bars.barWidth=2628000;
-				} else {
-					new_graph.bars.barWidth=31536000;
-				}
 			}
+
 			new_graphs.push(new_graph);
 			color_counter += 1;
 		});
@@ -396,10 +377,14 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'lines': this.lines,
 				'bars': this.bars,
 				'frequency': this.frequency,
+				'place_js': this.place_js,
+				'main_variable_js': this.main_variable_js,
+				'normalize_factor_js': this.normalize_factor_js,
 				'included_variables': this.included_variables,
 				'color': this.color,
 				'relevance': this.relevance,
 				'start_date': this.start_date,
+				'top_date': this.top_date,
 				'shadowSize': this.shadowSize,
 				'clickable': this.clickable,
 				'hoverable': this.hoverable
@@ -409,6 +394,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			}
 			if (this.unit == 'cordoba') {
 				new_graph.start_value = currency_dic[this.frequency][String(this.start_date)] * this.start_value;
+				new_graph.top_value = currency_dic[this.frequency][String(this.top_date)] * this.top_value;
 				new_data = [];
 				$.each(this.data,
 				function() {
@@ -436,17 +422,14 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				new_graph.unit = currency_dic.unit;
 			} else {
 				new_graph.start_value = this.start_value;
+				new_graph.top_value = this.top_value;
 				new_graph.data = this.data;
 				if ('minData' in this) {
 					new_graph.minData = this.minData;
 				}
 				new_graph.unit = this.unit;
 			}
-			if (this.type == 'precio') {
-				new_graph.label = this.included_variables.producto + ' '+_('in')+' ' + this.included_variables.mercado + ' (' + new_graph.unit+' '+_(new_graph.frequency)+')';
-			} else if (this.type == 'lluvia') {
-				new_graph.label = this.type+' '+_('in')+ this.included_variables.station + ' (' + new_graph.unit + ' '+_(new_graph.frequency)+')';
-			}
+			label = eval(this.main_variable_js) + ' '+_('in')+' ' + eval(this.place_js) + ' (' + new_graph.unit + ' '+_(new_graph.frequency)+')';
 			if ('advanced_label' in this) {
 				new_graph.label = this.advanced_label + ' (' + new_graph.unit + ' ' +_(new_graph.frequency)+')';
 			}
@@ -691,13 +674,15 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		$.each(unitgraphs,
 		function() {
 			var new_data = [];
-			var start_value = this.start_value;
+			var normalize_factor = eval(this.normalize_factor_js);
 			var new_graph = {
 				'unit': '%',
 				'type': 'normalizado',
 				'yaxis': 1,
 				'bars': this.bars,
 				'frequency': this.frequency,
+				'place_js': this.place_js,
+				'main_variable_js': this.main_variable_js,
 				'points': this.points,
 				'lines': this.lines,
 				'color': this.color,
@@ -709,17 +694,15 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			};
 			if ('advanced_label' in this) {
 				new_graph.label = this.advanced_label + ' (1 = ' + String(start_value) + ' ' + this.unit + 's '+_(new_graph.frequency)+')';
-			} else if (this.type == 'precio') {
-				new_graph.label = this.included_variables.producto + ' '+_('in')+' ' + this.included_variables.mercado + ' (1 = ' + String(start_value) + ' ' + this.unit + 's '+_(new_graph.frequency)+')';
-			} else if (this.type == 'lluvia') {
-				new_graph.label = this.type+' '+_('in')+' ' + this.included_variables.station + ' (1 = ' + String(start_value) + ' ' + this.unit + 's '+_(new_graph.frequency)+')';
+			} else {
+				label = eval(this.main_variable_js) + ' '+_('in')+' ' + eval(this.place_js) + ' (1 = ' + String(normalize_factor)+ ' ' + this.unit + 's '+_(new_graph.frequency)+')';
 			}
 			$.each(this.data,
 			function() {
 				var time = this[0];
 				var unit_value = this[1];
 				var pk = this[2];
-				var normalized_value = parseFloat(unit_value) / parseFloat(start_value) * 100;
+				var normalized_value = parseFloat(unit_value) / parseFloat(normalize_factor) * 100;
 				new_data.push([time, normalized_value, pk]);
 			});
 			new_graph.data = new_data;
@@ -730,7 +713,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					var time = this[0];
 					var unit_value = this[1];
 					var pk = this[2];
-					var normalized_value = parseFloat(unit_value) / parseFloat(start_value) * 100;
+					var normalized_value = parseFloat(unit_value) / parseFloat(normalize_factor) * 100;
 					minData.push([time, normalized_value, pk]);
 				});
 				new_graph.minData = minData;

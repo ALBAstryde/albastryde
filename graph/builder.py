@@ -208,7 +208,7 @@ def price_graph(mercado,producto,frequency,start_date,end_date,mercado_count,pro
 			max_data.append([adjusted_fecha,precio])
 	if frequency=='daily':
 		pk_list.append([content_type,list_of_pk])
-	result={'included_variables':{'producto':producto.nombre,'mercado':mercado.nombre},'unit':'cordoba','type':'precio','frequency':frequency}
+	result={'included_variables':{'producto':producto.nombre,'mercado':mercado.nombre},'unit':'cordoba','type':'precio','frequency':frequency,'main_variable_js':'this.included_variables.producto','place_js':'this.included_variables.mercado','normalize_factor_js':'this.start_value','display':'lines'}
 	if len(min_data_dic)==0:
 		result['data']=max_data
 	else:
@@ -252,6 +252,6 @@ def lluvia_graph(estacion,frequency,start_date,end_date,pk_list,first_date,last_
 				data.append([fecha,value])
 	if frequency=='daily':
 		pk_list.append([content_type,list_of_pk])
-	result={'included_variables':{'station':estacion.nombre},'data':data,'unit':'mm','type':'lluvia','frequency':frequency}
+	result={'included_variables':{'station':estacion.nombre},'data':data,'unit':'mm','type':'lluvia','frequency':frequency,'main_variable_js':'"lluvia"','place_js':'this.included_variables.station','normalize_factor_js':'this.top_value','display':'bars'}
 	return result,pk_list,first_date,last_date
 
