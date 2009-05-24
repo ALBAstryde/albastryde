@@ -17,6 +17,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.debug', 
     'django.core.context_processors.i18n',
     'context_processors.site_theme',
+    'context_processors.site_language',
     'context_processors.menu_list',
 )
 

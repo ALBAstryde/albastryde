@@ -52,7 +52,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			if (all_productos.length > 1) {
 				median_mercado_graphs_copy=median_mercado_graphs.slice();
 				for (i in median_mercado_graphs_copy) {
-					median_mercado_graphs_copy[i].producto = 'todos';
+					median_mercado_graphs_copy[i].producto = _('all');
 				}
 				var median_mercado_producto_data = calculate_estimated_data(median_mercado_graphs_copy, 'producto', 'mercado');
 				table_data[frecuencia_list[frecuencia]].Cordoba = table_data[frecuencia_list[frecuencia]].Cordoba.concat(median_mercado_producto_data);
@@ -136,13 +136,14 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		var export_data = csv_export(raw_graphs);
 		var dialog_id = query_id+'graph_export_dialog';
 		var dialog_text = '<div id="' + dialog_id + '">';
-		dialog_text += 'Para usar estos datos en otros programas, copia el texto abajo a un editor de archivos de texto. Guardalo como un archivo del tipo ".csv". Este archivo se puede abrir en Open Office y otros programas parecidos.<br />';
+		dialog_text += _('To open these data in another program, copy the text below into a text editor. Then save it with the ending".csv". This file can now be openes with Open Office and similar programs.');
+		dialog_text += '<br />';
 		dialog_text += '<textarea rows="10" cols="80">';
 		dialog_text += export_data;
 		dialog_text += '</textarea>';
 		dialog_text += '</div>';
 		var dialog_options = {};
-		dialog_options.title = 'Exportar datos';
+		dialog_options.title = _('Export data');
 		dialog_options.autoOpen = false;
 		dialog_options.width = 700;
 		$('#' + query_id).append(dialog_text);
@@ -151,20 +152,26 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 
 	function draw_graph_link_dialog() {
 		var dialog_id = query_id+'graph_link_dialog';
-		var dialog_text = '<div id="' + dialog_id + '">Para compatir este gráfico, manda <a href="/estadisticas/' + jsondata.query_link + '">este enlace</a></div>';
+		var dialog_text = '<div id="' + dialog_id + '">';
+		dialog_text += _('To share this link, email');
+		dialog_text += ' <a href="/estadisticas/' + jsondata.query_link + '">';
+		dialog_text += _('this link');
+		dialog_text += '</a></div>';
 		var dialog_options = {};
 		dialog_options.autoOpen = false;
-		dialog_options.title = 'Enlace permanente';
+		dialog_options.title = _('Permanent link');
 		$('#' + query_id).append(dialog_text);
 		$('#' + dialog_id).dialog(dialog_options);
 	}
 
 	function draw_graph_wiki_dialog() {
 		var dialog_id = query_id+'graph_wiki_dialog';
-		var dialog_text = '<div id="' + dialog_id + '">Codigo para incluir en pagina de wiki:<br /><b>_estadisticas[' + jsondata.wiki_code + ']</b></div>';
+		var dialog_text = '<div id="' + dialog_id + '">';
+		dialog_text += _('Code to include in the wiki');
+		dialog_text += '<br /><b>_estadisticas[' + jsondata.wiki_code + ']</b></div>';
 		var dialog_options = {};
 		dialog_options.autoOpen = false;
-		dialog_options.title = 'Codigo para la wiki';
+		dialog_options.title = _('Code for the wiki');
 		$('#' + query_id).append(dialog_text);
 		$('#' + dialog_id).dialog(dialog_options);
 	}
@@ -221,13 +228,13 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				if (! (mercado in all_mercados)) {
 					all_mercados.push(mercado);
 				}
-				label = producto + ' en ' + mercado + ' (' + unit + ' '+frecuencia_spanish(frecuencia)+')';
+				label = producto + ' '+_('in')+' ' + mercado + ' (' + unit + ' '+_(frecuencia)+')';
 			} else if (tipo == 'lluvia') {
 				lluvia = this.lluvia;
 				if (! (lluvia in all_lluvias)) {
 					all_lluvias.push(lluvia);
 				}
-				label = 'lluvia en ' + lluvia + ' (' + unit +' '+frecuencia_spanish(frecuencia)+')';
+				label = tipo+' '+_('in')+' ' + lluvia + ' (' + unit +' '+_(frecuencia)+')';
 			} else {
 				label = '';
 			}
@@ -444,13 +451,13 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			if (this.tipo == 'precio') {
 				new_graph.producto = this.producto;
 				new_graph.mercado = this.mercado;
-				new_graph.label = this.producto + ' en ' + this.mercado + ' (' + new_graph.unit+' '+frecuencia_spanish(new_graph.frecuencia)+')';
+				new_graph.label = this.producto + ' '+_('in')+' ' + this.mercado + ' (' + new_graph.unit+' '+_(new_graph.frecuencia)+')';
 			} else if (this.tipo == 'lluvia') {
 				new_graph.lluvia = this.lluvia;
-				new_graph.label = 'lluvia en ' + this.lluvia + ' (' + new_graph.unit + ' '+frecuencia_spanish(new_graph.frecuencia)+')';
+				new_graph.label = this.tipo+' '+_('in')+ this.lluvia + ' (' + new_graph.unit + ' '+_(new_graph.frecuencia)+')';
 			}
 			if ('advanced_label' in this) {
-				new_graph.label = this.advanced_label + ' (' + new_graph.unit + ' ' +frecuencia_spanish(new_graph.frecuencia)+')';
+				new_graph.label = this.advanced_label + ' (' + new_graph.unit + ' ' +_(new_graph.frecuencia)+')';
 			}
 			if (! (this.tipo in tipos_graficos)) {
 				tipos_graficos[this.tipo] = new_graph.unit;
@@ -507,7 +514,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				};
 				color_counter += 1;
 				new_graph[median_data[graph_series][0]] = median_data[graph_series][1];
-				new_graph.label = median_data[graph_series][1] + ' mediano (' + new_graph.unit + ' '+frecuencia_spanish(new_graph.frecuencia)+')';
+				new_graph.label = median_data[graph_series][1] + ' '+_('median')+' (' + new_graph.unit + ' '+_(new_graph.frecuencia)+')';
 				new_graph.advanced_label = median_data[graph_series][1] + ' mediano';
 				new_graphs_list.push(new_graph);
 			}
@@ -709,14 +716,14 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'hoverable': this.hoverable
 			};
 			if ('advanced_label' in this) {
-				new_graph.label = this.advanced_label + ' (1 = ' + String(start_value) + ' ' + this.unit + 's '+frecuencia_spanish(new_graph.frecuencia)+')';
+				new_graph.label = this.advanced_label + ' (1 = ' + String(start_value) + ' ' + this.unit + 's '+_(new_graph.frecuencia)+')';
 			} else if (this.tipo == 'precio') {
 				new_graph.producto = this.producto;
 				new_graph.mercado = this.mercado;
-				new_graph.label = this.producto + ' en ' + this.mercado + ' (1 = ' + String(start_value) + ' ' + this.unit + 's '+frecuencia_spanish(new_graph.frecuencia)+')';
+				new_graph.label = this.producto + ' '+_('in')+' ' + this.mercado + ' (1 = ' + String(start_value) + ' ' + this.unit + 's '+_(new_graph.frecuencia)+')';
 			} else if (this.tipo == 'lluvia') {
 				new_graph.lluvia = this.lluvia;
-				new_graph.label = 'lluvia en ' + this.lluvia + ' (1 = ' + String(start_value) + ' ' + this.unit + 's '+frecuencia_spanish(new_graph.frecuencia)+')';
+				new_graph.label = this.tipo+' '+_('in')+' ' + this.lluvia + ' (1 = ' + String(start_value) + ' ' + this.unit + 's '+_(new_graph.frecuencia)+')';
 			}
 			$.each(this.data,
 			function() {
@@ -856,7 +863,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		}
 		var label = datapoint_dictionary[unique_pk][3];
 		if (label.length === 0) {
-			label = 'producto';
+			label = _('product');
 		}
 		var value = datapoint_dictionary[unique_pk][1];
 		var raw_date = datapoint_dictionary[unique_pk][0];
@@ -873,9 +880,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		dialog_options.width = 700;
 		dialog_text += '<div id="' + dialog_id + '">';
 		if (comment_pk) {
-			dialog_options.title = 'Editar Comentario: ';
+			dialog_options.title = _('Edit Comment')+': ';
 		} else {
-			dialog_options.title = 'Nuevo Comentario: ';
+			dialog_options.title = _('New Comment')+': ';
 		}
 		dialog_options.title += label + ': ' + value + ' (' + date + ')';
 		dialog_text += '<form name="newcomment" id="' + dialog_id + 'newcomment" method="post">';
@@ -1012,32 +1019,32 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		var iconpositions = ['one', 'two', 'three', 'four', 'five'];
 		var current_icon = 0;
 		if (! (wiki_mode)) {
-			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_close"><span class="ui-icon ui-icon-closethick">cerrar</span></span>';
+			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_close"><span class="ui-icon ui-icon-closethick">'+_('close')+'</span></span>';
 			current_icon++;
 			graph_close = true;
 		} else {
-			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_switchmode"><span class="ui-icon ui-icon-arrowthick-2-ne-sw">ver</span></span>';
+			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_switchmode"><span class="ui-icon ui-icon-arrowthick-2-ne-sw">'+_('view')+'</span></span>';
 			current_icon++;
 			graph_close = true;
 		}
 		if (jsondata.wiki_code) {
 			if (can_edit_wiki) {
-				graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_wiki"><span class="ui-icon ui-icon-script">wiki code</span></span>';
+				graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_wiki"><span class="ui-icon ui-icon-script">'+_('wiki code')+'</span></span>';
 				current_icon++;
 				graph_wiki = true;
 			}
 		}
 		if (jsondata.query_link) {
-			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_link"><span class="ui-icon ui-icon-mail-closed">enlace</span></span>';
+			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_link"><span class="ui-icon ui-icon-mail-closed">'+_('link')+'</span></span>';
 			current_icon++;
 			graph_link = true;
 		}
 		if ((table_data.day.Cordoba.length>0) || (table_data.month.Cordoba.length>0) || (table_data.year.Cordoba.length>0)) {
-			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_tables"><span class="ui-icon ui-icon-calculator">tablas</span></span>';
+			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_tables"><span class="ui-icon ui-icon-calculator">'+_('tables')+'</span></span>';
 			current_icon++;
 			graph_table = true;
 		}
-		graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_export"><span class="ui-icon ui-icon-document">exportar</span></span>';
+		graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_export"><span class="ui-icon ui-icon-document">'+_('export')+'</span></span>';
 		current_icon++;
 		graph_export = true;
 
@@ -1048,8 +1055,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		graph_html += '<div id="' + query_id + 'stats" style="height:400px;"></div>';
 		graph_html += '<div id="' + query_id + 'statsoverview" style="height:50px;"></div>';
 		graph_html += '<select id="' + query_id + 'xtype" class="' + query_id + 'graphkind">';
-		graph_html += '<option selected="selected" value="real">Real</option>';
-		graph_html += '<option value="normalized">Normalizado</option></select>';
+		graph_html += '<option selected="selected" value="real">'+_('Real')+'</option>';
+		graph_html += '<option value="normalized">'+_('Normalized')+'</option></select>';
 		if (all_productos.length > 0) {
 			graph_html += '<select id="' + query_id + 'xunits" class="' + query_id + 'graphkind"><option selected="selected" value="cordobas">Cordobas</option>';
 			graph_html += '<option value="dollars">USD</option><option value="euros">Euros</option></select>';
@@ -1058,7 +1065,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		graph_html += '</td>';
 		if (show_comments) {
 			graph_html += '<td width="200px" valign="top">';
-			graph_html += '<b>Comentarios</b>';
+			graph_html += '<b>'+_('Comments')+'</b>';
 			graph_html += '<div id="' + query_id + 'comments"></div>';
 			graph_html += '</td>';
 		}
@@ -1089,11 +1096,11 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		var iconpositions = ['one', 'two', 'three', 'four'];
 		var current_icon = 0;
 		if (! (wiki_mode)) {
-			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_close"><span class="ui-icon ui-icon-closethick">cerrar</span></span>';
+			graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_close"><span class="ui-icon ui-icon-closethick">'+_('close')+'</span></span>';
 			current_icon++;
 			graph_close = true;
 		}
-		graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_switchmode"><span class="ui-icon ui-icon-arrowthick-2-ne-sw">editar</span></span>';
+		graph_html += '<span class="ui-dialog-titlebar-' + iconpositions[current_icon] + ' ui-corner-all link" id="' + query_id + 'graph_switchmode"><span class="ui-icon ui-icon-arrowthick-2-ne-sw">'+_('edit')+'</span></span>';
 		current_icon++;
 		graph_html += '</div>';
 		graph_html += '<div style="height: auto; min-height: 400px; width: ' + (total_width - 45) + 'px;" class="ui-dialog-content ui-widget-content" id="' + query_id + 'body">';
@@ -1127,15 +1134,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		return formated_date_string;
 	}
 
-	function frecuencia_spanish(frecuencia) {
-		if (frecuencia == 'day') {
-			return 'diario';
-		} else if (frecuencia == 'month') {
-			return 'mensual';
-		} else {
-			return 'anual';
-		} 
-	}
 
 	function create_tables(dialog_id) {
 		var html, header_variable, variable, data_variable, data_series_variable,single_value,total_value,calculated,total_datalines,total_value_per_dataline;
@@ -1145,7 +1143,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		for (frecuencia in table_data) {
 			for (currency in table_data[frecuencia]) {
 				if (table_data[frecuencia]['Cordoba'].length > 0) {
-					html+='<li><a href="#'+dialog_id+frecuencia+currency+'">'+currency+' '+frecuencia_spanish(frecuencia)+'</li>';
+					html+='<li><a href="#'+dialog_id+frecuencia+currency+'">'+currency+' '+_(frecuencia)+'</li>';
 				}
 			}
 		}
@@ -1162,7 +1160,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					html += '</ul>';
 					for (variable = 0; variable < table_data[frecuencia][currency].length; ++variable) {
 						html += '<div id="'+dialog_id+frecuencia+currency+variable+'">';
-						html += '<table style="font-size: smaller; color: rgb(84, 84, 84);"><tr><td><div style="border: 1px solid rgb(204, 204, 204); padding: 1px;"><div style="border: 5px solid #C1609D; overflow: hidden; width: 4px; height: 0pt;"/></div></div></td><td>valor estimado</td></tr></table>';
+						html += '<table style="font-size: smaller; color: rgb(84, 84, 84);"><tr><td><div style="border: 1px solid rgb(204, 204, 204); padding: 1px;"><div style="border: 5px solid #C1609D; overflow: hidden; width: 4px; height: 0pt;"/></div></div></td><td>'+_('estimated value')+'</td></tr></table>';
 						html += '<table>';
 						html += '<tr>';
 						html += '<th>&nbsp;</th>';
@@ -1199,7 +1197,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 							}
 						}
 						if (table_data[frecuencia][currency][variable][3][0][1].length > 1) {
-							html += '<td><i>mediano</i></td>';
+							html += '<td><i>'+_('median')+'</i></td>';
 						} else {
 							html+='<td>&nbsp;</td>';
 						}
@@ -1287,9 +1285,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					if (datapoint === 0) {
 						new_headerline = 'fecha, min, max, unidad, tipo';
 						if (graphs[series].tipo == 'precio') {
-							new_headerline += ', mercado, producto';
+							new_headerline += ', '+_('market')+', '+_('product');
 						} else if (graphs[series].tipo == 'lluvia') {
-							new_headerline += ', estacion de lluvia';
+							new_headerline += ', '+_('rain water station');
 						}
 						if (! (new_headerline == headerline)) {
 							html += '\n';
@@ -1317,7 +1315,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			} else {
 				for (datapoint = 0; datapoint < graphs[series].data.length; ++datapoint) {
 					if (datapoint === 0) {
-						new_headerline = 'fecha, valor, unidad, tipo';
+						new_headerline = _('date')+', '+_('value')+', '+_('unit')+', '+_('type');
 						if (graphs[series].tipo == 'precio') {
 							new_headerline += ', mercado, producto';
 						} else if (graphs[series].tipo == 'lluvia') {
@@ -1421,7 +1419,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			xaxis: {
 				mode: 'unixtime',
 				minTickSize: [1, 'day'],
-				monthNames: ["Ene", "Fev", "Mar", "Abr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dic"]
+				monthNames: [_('Jan'), _("Feb"), _("Mar"), _("Apr"), _("May"), _("Jun"), _("Jul"), _("Aug"), _("Sep"), _("Oct"), _("Nov"), _("Dec")]
 			},
 			yaxis: {
 				tickFormatter: function(v, axis) {

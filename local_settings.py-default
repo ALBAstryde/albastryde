@@ -17,3 +17,4 @@ LANGUAGE_CODE = 'es-ni'
 SECRET_KEY = 'algunas letras'
 DEBUG = False
 SITE_THEME = 'albastryde'
+SITE_LANGUAGE = 'spanish'

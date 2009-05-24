@@ -3,6 +3,9 @@ from django.conf import settings
 def site_theme(request):
 	return {'site_theme': settings.SITE_THEME}
 
+def site_language(request):
+	return {'site_language': settings.SITE_LANGUAGE}
+
 def menu_list(request):
 	index_menuitem = {'url' : '/wiki/', 'name' : 'Wiki'}
 	list_menuitem = {'url' : '/list/', 'name' : 'Lista de p&aacute;ginas'}
