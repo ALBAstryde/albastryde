@@ -33,7 +33,7 @@ def build_graph(query,user):
 		for i in mercados_queryset:
 			mercados.append(i)
 		productos = form.cleaned_data['Producto']
-		frecuencias = form.cleaned_data['Frecuencia']
+		frequencies = form.cleaned_data['Frequency']
 		estaciones_de_lluvia_queryset = form.cleaned_data['EstacionDeLluvia']
 		estaciones_de_lluvia=[]
 		for i in estaciones_de_lluvia_queryset:
@@ -69,26 +69,18 @@ def build_graph(query,user):
 							estaciones_de_lluvia.append(i)
 		lluvia_count=len(estaciones_de_lluvia)
 		if mercado_count > 0 and producto_count > 0:
-			dollar={'unit':'USD','month':{},'year':{},'day':{}}
-			euro={'unit':'Euro','month':{},'year':{},'day':{}}
+			dollar={'unit':'USD','monthly':{},'annualy':{},'daily':{}}
+			euro={'unit':'Euro','monthly':{},'annualy':{},'daily':{}}
 		pricectype = ContentType.objects.get(app_label__exact='precios', name__exact='prueba')
 		lluviactype = ContentType.objects.get(app_label__exact='lluvia', name__exact='prueba')
-		for c in frecuencias:
-			if c=='diario':
-				frecuencia='day'
-			elif c=='mensual':
-				frecuencia='month'
-			elif c=='anual':
-				frecuencia='year'
-			else:
-				frecuencia=c
+		for frequency in frequencies:
 			for i in mercados:
 				for b in productos:
-					graph,dollar,euro,pk_list,first_date,last_date=price_graph(mercado=i,producto=b,frecuencia=frecuencia,start_date=start_date,end_date=end_date,mercado_count=mercado_count,producto_count=producto_count,dollar=dollar,euro=euro,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=pricectype)
+					graph,dollar,euro,pk_list,first_date,last_date=price_graph(mercado=i,producto=b,frequency=frequency,start_date=start_date,end_date=end_date,mercado_count=mercado_count,producto_count=producto_count,dollar=dollar,euro=euro,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=pricectype)
 					if not graph==None:
 						graphs.append(graph)
 			for d in estaciones_de_lluvia:
-				graph,pk_list,first_date,last_date=lluvia_graph(estacion=d,frecuencia=frecuencia,start_date=start_date,end_date=end_date,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=lluviactype)
+				graph,pk_list,first_date,last_date=lluvia_graph(estacion=d,frequency=frequency,start_date=start_date,end_date=end_date,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=lluviactype)
 				if not graph==None:
 					graphs.append(graph)							
 		rdict.update({'graphs':graphs})
@@ -155,13 +147,16 @@ def build_graph(query,user):
 
 from django.db import connection
 
-def price_graph(mercado,producto,frecuencia,start_date,end_date,mercado_count,producto_count,dollar,euro,pk_list,first_date,last_date,ctype):
+def price_graph(mercado,producto,frequency,start_date,end_date,mercado_count,producto_count,dollar,euro,pk_list,first_date,last_date,ctype):
 	queryset = None
-	if frecuencia=='day':
+	if frequency=='daily':
 		queryset = PrecioPrueba.objects.filter(producto=producto,mercado=mercado,fecha__range=[start_date,end_date]).values('fecha','pk','maximo','minimo').order_by('fecha')
 	else:
 		cursor = connection.cursor()
-		cursor.execute("select producto_id as producto, mercado_id as mercado, date_trunc('"+frecuencia+"',fecha) as fecha, avg(maximo) as maximo, avg(minimo) as minimo from precios_prueba where producto_id = "+str(producto.pk)+" and mercado_id = "+str(mercado.pk)+" and fecha > '"+start_date.strftime('%Y-%m-%d')+"' and fecha < '"+end_date.strftime('%Y-%m-%d')+"' group by date_trunc('"+frecuencia+"',fecha), producto_id, mercado_id order by fecha;")
+		if frequency=='monthly':
+			cursor.execute("select producto_id as producto, mercado_id as mercado, date_trunc('month',fecha) as fecha, avg(maximo) as maximo, avg(minimo) as minimo from precios_prueba where producto_id = "+str(producto.pk)+" and mercado_id = "+str(mercado.pk)+" and fecha > '"+start_date.strftime('%Y-%m-%d')+"' and fecha < '"+end_date.strftime('%Y-%m-%d')+"' group by date_trunc('month',fecha), producto_id, mercado_id order by fecha;")
+		elif frequency=='annualy':
+			cursor.execute("select producto_id as producto, mercado_id as mercado, date_trunc('year',fecha) as fecha, avg(maximo) as maximo, avg(minimo) as minimo from precios_prueba where producto_id = "+str(producto.pk)+" and mercado_id = "+str(mercado.pk)+" and fecha > '"+start_date.strftime('%Y-%m-%d')+"' and fecha < '"+end_date.strftime('%Y-%m-%d')+"' group by date_trunc('year',fecha), producto_id, mercado_id order by fecha;")
 		queryset=[]
 		for row in cursor.fetchall():
 			row_dic={'fecha':row[2],'maximo':row[3],'minimo':row[4],'producto':row[0],'mercado':row[1]}
@@ -177,37 +172,43 @@ def price_graph(mercado,producto,frecuencia,start_date,end_date,mercado_count,pr
 			first_date=i['fecha'].timetuple()
 		if i['fecha'].timetuple() > last_date:
 			last_date=i['fecha'].timetuple()
-		fecha=mktime(i['fecha'].timetuple())#*1000
+		fecha=mktime(i['fecha'].timetuple())
 		adjusted_fecha=fecha
-		if frecuencia=='day':
-			adjusted_fecha+=22
-		elif frecuencia=='month':
-			adjusted_fecha+=1365
-		elif frecuencia=='year':
-			adjusted_fecha+=15800
+		if frequency=='daily':
+			adjusted_fecha+=22000
+		elif frequency=='monthly':
+			adjusted_fecha+=1365000
+		elif frequency=='annualy':
+			adjusted_fecha+=15800000
 		precio=int(i['maximo'])		
 		if i['maximo'] != i['minimo']:
 			min_data_dic[int(adjusted_fecha)]=int(i['minimo'])
-		if not str(int(adjusted_fecha)) in dollar[frecuencia]:
-			if frecuencia=='day':
-				dollar[frecuencia][str(int(adjusted_fecha))]=float(USD.objects.get(fecha__exact=i['fecha']).cordobas)
-				euro[frecuencia][str(int(adjusted_fecha))]=float(Euro.objects.get(fecha__exact=i['fecha']).cordobas)
+		if not str(int(adjusted_fecha)) in dollar[frequency]:
+			if frequency=='daily':
+				dollar[frequency][str(int(adjusted_fecha))]=float(USD.objects.get(fecha__exact=i['fecha']).cordobas)
+				euro[frequency][str(int(adjusted_fecha))]=float(Euro.objects.get(fecha__exact=i['fecha']).cordobas)
 			else:
 				cursor = connection.cursor()
-				cursor.execute("select avg(cordobas) from valuta_usd where date_trunc('month',fecha)='"+i['fecha'].strftime('%Y-%m-%d')+"';")
-				dollar[frecuencia][str(int(adjusted_fecha))]= float(cursor.fetchone()[0])
-				cursor.execute("select avg(cordobas) from valuta_euro where date_trunc('month',fecha)='"+i['fecha'].strftime('%Y-%m-%d')+"';")
-				euro[frecuencia][str(int(adjusted_fecha))]= float(cursor.fetchone()[0])				
+				if frequency=='monthly':
+					cursor.execute("select avg(cordobas) from valuta_usd where date_trunc('month',fecha)='"+i['fecha'].strftime('%Y-%m-%d')+"';")
+				elif frequency=='annualy':
+					cursor.execute("select avg(cordobas) from valuta_usd where date_trunc('year',fecha)='"+i['fecha'].strftime('%Y-%m-%d')+"';")
+				dollar[frequency][str(int(adjusted_fecha))]= float(cursor.fetchone()[0])
+				if frequency=='monthly':
+					cursor.execute("select avg(cordobas) from valuta_euro where date_trunc('month',fecha)='"+i['fecha'].strftime('%Y-%m-%d')+"';")
+				elif frequency=='annualy':
+					cursor.execute("select avg(cordobas) from valuta_euro where date_trunc('year',fecha)='"+i['fecha'].strftime('%Y-%m-%d')+"';")
+				euro[frequency][str(int(adjusted_fecha))]= float(cursor.fetchone()[0])				
 		adjusted_fecha=int(adjusted_fecha)
-		if frecuencia=='day':
+		if frequency=='daily':
 			unique_pk=str(content_type)+"_"+str(i['pk'])		
 			list_of_pk.append(str(i['pk']))
 			max_data.append([adjusted_fecha,precio,unique_pk])
 		else:
 			max_data.append([adjusted_fecha,precio])
-	if frecuencia=='day':
+	if frequency=='daily':
 		pk_list.append([content_type,list_of_pk])
-	result={'producto':producto.nombre,'mercado':mercado.nombre,'unit':'cordoba','tipo':'precio','frecuencia':frecuencia}
+	result={'included_variables':{'producto':producto.nombre,'mercado':mercado.nombre},'unit':'cordoba','type':'precio','frequency':frequency}
 	if len(min_data_dic)==0:
 		result['data']=max_data
 	else:
@@ -215,13 +216,16 @@ def price_graph(mercado,producto,frecuencia,start_date,end_date,mercado_count,pr
 		result['min_data_dic']=min_data_dic
 	return result,dollar,euro,pk_list,first_date,last_date
 
-def lluvia_graph(estacion,frecuencia,start_date,end_date,pk_list,first_date,last_date,ctype):
+def lluvia_graph(estacion,frequency,start_date,end_date,pk_list,first_date,last_date,ctype):
 	queryset = None
-	if frecuencia=='day':
+	if frequency=='daily':
 		queryset =LLuviaPrueba.objects.filter(estacion=estacion).filter(fecha__range=[start_date,end_date]).values('fecha','pk','milimetros_de_lluvia').order_by('fecha')
 	else:
 		cursor = connection.cursor()
-		cursor.execute("select estacion_id as estacion, date_trunc('"+frecuencia+"',fecha) as fecha, avg(milimetros_de_lluvia) as milimetros_de_lluvia from lluvia_prueba where estacion_id = "+str(estacion.pk)+" and fecha > '"+start_date.strftime('%Y-%m-%d')+"' and fecha < '"+end_date.strftime('%Y-%m-%d')+"' group by date_trunc('"+frecuencia+"',fecha), estacion_id order by fecha;")
+		if frequency=='monthly':
+			cursor.execute("select estacion_id as estacion, date_trunc('month',fecha) as fecha, avg(milimetros_de_lluvia) as milimetros_de_lluvia from lluvia_prueba where estacion_id = "+str(estacion.pk)+" and fecha > '"+start_date.strftime('%Y-%m-%d')+"' and fecha < '"+end_date.strftime('%Y-%m-%d')+"' group by date_trunc('month',fecha), estacion_id order by fecha;")
+		elif frequency=='annualy':
+			cursor.execute("select estacion_id as estacion, date_trunc('year',fecha) as fecha, avg(milimetros_de_lluvia) as milimetros_de_lluvia from lluvia_prueba where estacion_id = "+str(estacion.pk)+" and fecha > '"+start_date.strftime('%Y-%m-%d')+"' and fecha < '"+end_date.strftime('%Y-%m-%d')+"' group by date_trunc('year',fecha), estacion_id order by fecha;")
 		queryset=[]
 		for row in cursor.fetchall():
 			row_dic={'fecha':row[1],'milimetros_de_lluvia':row[2],'estacion':row[0]}
@@ -240,14 +244,14 @@ def lluvia_graph(estacion,frecuencia,start_date,end_date,pk_list,first_date,last
 			value=str(i['milimetros_de_lluvia'])
 			fecha=mktime(i['fecha'].timetuple())
 			fecha=int(fecha)
-			if frecuencia=='day':
+			if frequency=='daily':
 				unique_pk=str(content_type)+"_"+str(i['pk'])		
 				list_of_pk.append(str(i['pk']))
 				data.append([fecha,value,unique_pk])
 			else:
 				data.append([fecha,value])
-	if frecuencia=='day':
+	if frequency=='daily':
 		pk_list.append([content_type,list_of_pk])
-	result={'lluvia':estacion.nombre,'data':data,'unit':'mm','tipo':'lluvia','frecuencia':frecuencia}
+	result={'included_variables':{'station':estacion.nombre},'data':data,'unit':'mm','type':'lluvia','frequency':frequency}
 	return result,pk_list,first_date,last_date
 

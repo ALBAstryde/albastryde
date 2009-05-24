@@ -7,13 +7,13 @@ $.preloadImages = function() {
 $.preloadImages('/media/icons/ajax-loader.gif');
 
 $(function() {
-	var dayNames = ['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];
-	var dayNamesShort = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
-	var dayNamesMin = ['Do','Lu','Ma','Mi','Ju','Vi','Sa'];
+	var dayNames = [_('Sunday'),_('Monday'),_('Tuesday'),_('Wednesday'),_('Thursday'),_('Friday'),_('Saturday')];
+	var dayNamesShort = [_('Sun'),_('Mon'),_('Tue'),_('Wed'),_('Thu'),_('Fri'),_('Sat')];
+	var dayNamesMin = [_('Su'),_('Mo'),_('Tu'),_('We'),_('Th'),_('Fr'),_('Sa')];
 
-	var monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-	var monthNamesShort = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-	var monthNamesMin = ['En','Fe','Mar','Ab','May','Jun','Jul','Ag','Se','Oc','No','Di'];
+	var monthNames = [_('January'),_('February'),_('March'),_('April'),_('May'),_('June'),_('July'),_('August'),_('September'),_('October'),_('November'),_('December')];
+	var monthNamesShort = [_('Jan'),_('Feb'),_('Mar'),_('Apr'),_('May'),_('Jun'),_('Jul'),_('Aug'),_('Sep'),_('Oct'),_('Nov'),_('Dec')];
+	var monthNamesMin = [_('Ja'),_('Fe'),_('Mar'),_('Ap'),_('May'),_('Jun'),_('Jul'),_('Ag'),_('Se'),_('Oc'),_('No'),_('De')];
 
 	$('#id_Desde').datepicker({
 		dayNames: dayNames,
@@ -58,7 +58,7 @@ function beforeForm() {
 	//$('#AjaxFormWarning').fadeOut('slow'); //Get rid of the main error message
 	$('#AjaxFormWarning').html('<img src="/media/icons/ajax-loader.gif" />').fadeIn('slow');
 	$('#AjaxFormWarning').ajaxError(function() {
-		$(this).html('Hay problemas con el red!').fadeIn('slow');
+		$(this).html('We are experiencing network errors!').fadeIn('slow');
 		$('#AjaxFormSubmit').attr('disabled', '');
 
 	});
@@ -69,7 +69,6 @@ $(document).ready(function() {
 	// prepare Options Object 
 	var options = {
 		url: '.',
-		// Here we pass the xhr flag
 		dataType: 'json',
 		success: processJson,
 		//What to call after a reply from Django
@@ -82,12 +81,10 @@ $(document).ready(function() {
 function processJson(jsondata) {
 	//Do we have any data at all?
 	if (jsondata) {
-		//		e_msg = 'We received your form, thank you.';
-		//		$('#AjaxFormWarning').text( e_msg ).fadeIn('slow');
 		if (eval(jsondata.bad)) {
-			e_msg = 'Por favor compruebe su formulario.';
+			e_msg = _('Please check the form!');
 			$('#AjaxFormWarning').text( e_msg ).fadeIn('slow');
-			errors = eval(jsondata.errs); //Again with the eval :)
+			errors = eval(jsondata.errs); 
 			$.each(errors,
 			function(fieldname, errmsg) {
 				id = '#id_' + fieldname;
@@ -98,8 +95,8 @@ function processJson(jsondata) {
 
 		}
 	} else {
-		//DON'T PANIC :D
-		$('#AjaxFormWarning').text('Ajax error : no data received. ').fadeIn('slow');
+		$('#AjaxFormWarning').text(_('Ajax error: no data received.')).fadeIn('slow');
+		$('#AjaxFormSubmit').attr('disabled', '');
 	}
 	// re-enable the submit button, coz user has to fix stuff.
 	$('#AjaxFormSubmit').attr('disabled', '');

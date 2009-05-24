@@ -33,7 +33,7 @@ MIDDLEWARE_CLASSES = (
 MEDIA_ROOT = SITE_ROOT+'/media/'
 MEDIA_URL = '/media/'
 TEMPLATE_DIRS = (
-SITE_ROOT+"/templates",
+     SITE_ROOT+"/templates",
 )
 ROOT_URLCONF = 'urls'
 INSTALLED_APPS = (
