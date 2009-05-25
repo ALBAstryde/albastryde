@@ -39,32 +39,35 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	for (frequency in frequency_list) {
 		table_data[frequency_list[frequency]]={};
 		table_data[frequency_list[frequency]].Cordoba=[];
-		if (all_variables['producto'].length > 1) {
-			var median_producto_data = calculate_estimated_data(converted_graphs, 'producto', 'mercado',frequency_list[frequency]);
-			table_data[frequency_list[frequency]].Cordoba = table_data[frequency_list[frequency]].Cordoba.concat(median_producto_data);
-			var median_producto_graphs = calculate_mediangraphs(median_producto_data);
-			converted_graphs = converted_graphs.concat(median_producto_graphs);
-		}
-		if (all_variables['mercado'].length > 1) {
-			var median_mercado_data = calculate_estimated_data(converted_graphs, 'mercado', 'producto',frequency_list[frequency]);
-			table_data[frequency_list[frequency]].Cordoba = table_data[frequency_list[frequency]].Cordoba.concat(median_mercado_data);
-			var median_mercado_graphs = calculate_mediangraphs(median_mercado_data);
-			converted_graphs = converted_graphs.concat(median_mercado_graphs);
-			if (all_variables['producto'].length > 1) {
-				median_mercado_graphs_copy=median_mercado_graphs.slice();
-				for (i in median_mercado_graphs_copy) {
-					median_mercado_graphs_copy[i].producto = _('all');
-				}
-				var median_mercado_producto_data = calculate_estimated_data(median_mercado_graphs_copy, 'producto', 'mercado');
-				table_data[frequency_list[frequency]].Cordoba = table_data[frequency_list[frequency]].Cordoba.concat(median_mercado_producto_data);
-				var median_mercado_producto_graphs = calculate_mediangraphs(median_mercado_producto_data);
-				if (median_mercado_producto_graphs.length > 0) {
-					median_mercado_producto_graphs[0].advanced_label = _('median of all markets and all products');
-					median_mercado_producto_graphs[0].label = _('median of all markets and all products')+' (cordoba)';
-					median_mercado_producto_graphs[0].producto = null;
-					converted_graphs = converted_graphs.concat(median_mercado_producto_graphs);
-				}
+		
+		if ('producto' in all_variables) {
+			if (all_variables['producto'].length > 1 ){
+				var median_producto_data = calculate_estimated_data(converted_graphs, 'producto', 'mercado',frequency_list[frequency]);
+				table_data[frequency_list[frequency]].Cordoba = table_data[frequency_list[frequency]].Cordoba.concat(median_producto_data);
+				var median_producto_graphs = calculate_mediangraphs(median_producto_data);
+				converted_graphs = converted_graphs.concat(median_producto_graphs);
+			}
+			if (all_variables['mercado'].length > 1) {
+				var median_mercado_data = calculate_estimated_data(converted_graphs, 'mercado', 'producto',frequency_list[frequency]);
+				table_data[frequency_list[frequency]].Cordoba = table_data[frequency_list[frequency]].Cordoba.concat(median_mercado_data);
+				var median_mercado_graphs = calculate_mediangraphs(median_mercado_data);
+				converted_graphs = converted_graphs.concat(median_mercado_graphs);
+				if (all_variables['producto'].length > 1) {
+					median_mercado_graphs_copy=median_mercado_graphs.slice();
+					for (i in median_mercado_graphs_copy) {
+						median_mercado_graphs_copy[i].producto = _('all');
+					}
+					var median_mercado_producto_data = calculate_estimated_data(median_mercado_graphs_copy, 'producto', 'mercado');
+					table_data[frequency_list[frequency]].Cordoba = table_data[frequency_list[frequency]].Cordoba.concat(median_mercado_producto_data);
+					var median_mercado_producto_graphs = calculate_mediangraphs(median_mercado_producto_data);
+					if (median_mercado_producto_graphs.length > 0) {
+						median_mercado_producto_graphs[0].advanced_label = _('median of all markets and all products');
+						median_mercado_producto_graphs[0].label = _('median of all markets and all products')+' (cordoba)';
+						median_mercado_producto_graphs[0].producto = null;
+						converted_graphs = converted_graphs.concat(median_mercado_producto_graphs);
+					}
 			
+				}
 			}
 		}
 	}
@@ -106,7 +109,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	//Calculate other graphs	
 	normalized_graphs = calculate_normalizedgraphs(converted_graphs);
 
-	if (all_variables['producto'].length > 0) {
+	if ('producto' in all_variables) {
 		dollargraphs = calculate_currencygraphs(eval(jsondata.dollar), converted_graphs);
 		eurographs = calculate_currencygraphs(eval(jsondata.euro), converted_graphs);
 		normalized_dollargraphs = calculate_normalizedgraphs(dollargraphs);
@@ -195,7 +198,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	}
 
 	function convert_graphs_after_transport(graphs) {
-		var new_graphs = [], graph_types = {}, minData=[], new_max_data=[];
+		var new_graphs = [], graph_types = {};
 		$.each(graphs,
 		function() {
 			var new_graph = {
@@ -215,10 +218,11 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'lines': {},
 				'points': {},
 				'top_value':0
-			};
-			var data = [],
-			max_data = [],
-			min_data_dic = {};
+			},
+			data = [],
+			max_data,
+			minData,
+			min_data_dic;
 			
 
 			//create dictionary of ists of all variables used by some graph or other (mercado, producto, lluvia estacion, etc.)
@@ -235,6 +239,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				graph_types[this.type] = this.unit;
 			}
 			if ('min_data_dic' in this) {
+				minData=[];
 				max_data = this.max_data;
 				min_data_dic = this.min_data_dic;
 				$.each(max_data,
@@ -253,23 +258,27 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 						min_value = max_value;
 					}
 					minData.push([time, min_value]);
-					new_graph.data.push([time, max_value, pk]);
+					//max_data.push([time, max_value, pk]);
 				});
-				//new_data = new_max_data; //.reverse();
+				new_graph.data = max_data;
+				new_graph.minData = minData;
+			} else if ('min_data' in this) {
+				new_graph.data = this.max_data;
+				new_graph.minData = this.minData;
 			} else {
-				data = this.data;
+				new_graph.data = this.data;
 				minData = false;
-				$.each(data,
-				function() {
-					var pk, value, time, new_time;
-					time = this[0];
-					value = parseFloat(this[1]);
-					if (value > new_graph.top_value) {
-						new_graph.top_value = value;
-					}
-					pk = this[2];
-					new_graph.data.push([time, value, pk]);
-				});
+//				$.each(data,
+//				function() {
+//					var pk, value, time, new_time;
+//					time = this[0];
+//					value = parseFloat(this[1]);
+//					if (value > new_graph.top_value) {
+//						new_graph.top_value = value;
+//					}
+//					pk = this[2];
+//					new_graph.data.push([time, value, pk]);
+//				});
 			}
 			new_graph.start_date = new_graph.data[0][0];
 			var graph_yaxis = 1;
@@ -1256,11 +1265,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				for (datapoint = 0; datapoint < graphs[series].max_data.length; ++datapoint) {
 					if (datapoint === 0) {
 						new_headerline = 'fecha, min, max, unidad, type';
-						if (graphs[series].type == 'precio') {
-							new_headerline += ', '+_('market')+', '+_('product');
-						} else if (graphs[series].type == 'lluvia') {
-							new_headerline += ', '+_('rain water station');
-						}
+						$.each(graphs[series].included_variables,function(e,v) {
+							new_headerline += ', '+_(e);
+						});
 						if (! (new_headerline == headerline)) {
 							html += '\n';
 							html += new_headerline + '\n';
@@ -1277,11 +1284,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 						min = max;
 					}
 					html += date_str + ', ' + min + ', ' + max + ', "' + graphs[series].unit + '", "' + graphs[series].type + '"';
-					if (graphs[series].type == 'precio') {
-						html += ', "' + graphs[series].included_variables.mercado + '", "' + graphs[series].included_variables.producto + '"';
-					} else if (graphs[series].type == 'lluvia') {
-						html += ', "' + graphs[series].included_variables.station + '"';
-					}
+					$.each(graphs[series].included_variables,function(e,v) {
+						html += ', '+v;
+					});
 					html += '\n';
 				}
 			} else {

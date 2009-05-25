@@ -9,6 +9,8 @@ from datetime import date
 from time import mktime
 
 
+eng_dic={'diario':'daily','mensual':'monthly','anual':'annualy'}
+
 def build_graph(query,user):
 	form = DbForm(query)
         clean=form.is_valid()# Make some dicts to get passed back to the browser
@@ -33,11 +35,14 @@ def build_graph(query,user):
 		for i in mercados_queryset:
 			mercados.append(i)
 		productos = form.cleaned_data['Producto']
-		frequencies = form.cleaned_data['Frequency']
+		frecuencias = form.cleaned_data['Frecuencia']
 		estaciones_de_lluvia_queryset = form.cleaned_data['EstacionDeLluvia']
 		estaciones_de_lluvia=[]
 		for i in estaciones_de_lluvia_queryset:
 			estaciones_de_lluvia.append(i)
+		frequencies=[]
+		for i in frecuencias:
+			frequencies.append(eng_dic[i])
 		include_lluvia = form.cleaned_data['IncluirLluvia']
 		start_date = form.cleaned_data['Desde']
 		end_date = form.cleaned_data['Hasta']
