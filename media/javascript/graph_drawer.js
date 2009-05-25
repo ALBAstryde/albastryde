@@ -258,7 +258,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 						min_value = max_value;
 					}
 					minData.push([time, min_value]);
-					//max_data.push([time, max_value, pk]);
 				});
 				new_graph.data = max_data;
 				new_graph.minData = minData;
@@ -268,17 +267,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			} else {
 				new_graph.data = this.data;
 				minData = false;
-//				$.each(data,
-//				function() {
-//					var pk, value, time, new_time;
-//					time = this[0];
-//					value = parseFloat(this[1]);
-//					if (value > new_graph.top_value) {
-//						new_graph.top_value = value;
-//					}
-//					pk = this[2];
-//					new_graph.data.push([time, value, pk]);
-//				});
 			}
 			new_graph.start_date = new_graph.data[0][0];
 			var graph_yaxis = 1;
@@ -1264,7 +1252,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			if ('max_data' in graphs[series]) {
 				for (datapoint = 0; datapoint < graphs[series].max_data.length; ++datapoint) {
 					if (datapoint === 0) {
-						new_headerline = 'fecha, min, max, unidad, type';
+						new_headerline = _('date')+', '+_('min')+', '+_('max')+', '+_('unit')+', '+_('type');
 						$.each(graphs[series].included_variables,function(e,v) {
 							new_headerline += ', '+_(e);
 						});
@@ -1283,7 +1271,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					} else {
 						min = max;
 					}
-					html += date_str + ', ' + min + ', ' + max + ', "' + graphs[series].unit + '", "' + graphs[series].type + '"';
+					html += date_str + ', ' + min + ', ' + max + ', ' + graphs[series].unit + ', ' + graphs[series].type;
 					$.each(graphs[series].included_variables,function(e,v) {
 						html += ', '+v;
 					});
@@ -1293,11 +1281,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				for (datapoint = 0; datapoint < graphs[series].data.length; ++datapoint) {
 					if (datapoint === 0) {
 						new_headerline = _('date')+', '+_('value')+', '+_('unit')+', '+_('type');
-						if (graphs[series].type == 'precio') {
-							new_headerline += ', mercado, producto';
-						} else if (graphs[series].type == 'lluvia') {
-							new_headerline += ', estacion de lluvia';
-						}
+						$.each(graphs[series].included_variables,function(e,v) {
+							new_headerline += ', '+_(e);
+						});
 						if (! (new_headerline == headerline)) {
 							html += '\n';
 							html += new_headerline + '\n';
@@ -1305,12 +1291,10 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 						}
 					}
 					date = date_string(graphs[series]['data'][datapoint][0]);
-					html += date + ', ' + graphs[series]['data'][datapoint][1] + ', "' + graphs[series].unit + '", "' + graphs[series].type + '"';
-					if (graphs[series].type == 'precio') {
-						html += ', "' + graphs[series].included_variables.mercado + '", "' + graphs[series].included_variables.producto + '"';
-					} else if (graphs[series].type == 'lluvia') {
-						html += ', "' + graphs[series].included_variables.station + '"';
-					}
+					html += date + ', ' + graphs[series]['data'][datapoint][1] + ', ' + graphs[series].unit + ', ' + graphs[series].type;
+					$.each(graphs[series].included_variables,function(e,v) {
+						new_headerline += ', '+v;
+					});
 					html += '\n';
 				}
 			}
@@ -1581,8 +1565,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 						normalized_dollargraphs[i].show = state;
 					}
 				}
-				//current_graphs=graphs;
-				//redraw_graph();
 				reset_comments();
 				overview = $.plot($('#' + query_id + 'statsoverview'), graphs, overview_options);
 				if (axis_dic) {
