@@ -16,8 +16,8 @@
 <div class="breadcrumbs">
      <a href="../../../">{% trans "Home" %}</a> &rsaquo;
      <a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo; 
-     <a href="../">{{ model_label_plural|capfirst }}</a> &rsaquo; 
-     {% trans "Add" %} {{ add_set_label }}
+     <a href="../">{{ model_label|capfirst }}s</a> &rsaquo; 
+     {{ title }}
 </div>
 {% endif %}{% endblock %}
 
