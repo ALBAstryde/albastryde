@@ -209,7 +209,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'place_js': this.place_js,
 				'main_variable_js': this.main_variable_js,
 				'normalize_factor_js': this.normalize_factor_js,
-				'relevance': 'main',
+				//'relevance': 'main',
 				'color': color_counter,
 				'data': [],
 				'clickable': {},
@@ -379,7 +379,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'normalize_factor_js': this.normalize_factor_js,
 				'included_variables': this.included_variables,
 				'color': this.color,
-				'relevance': this.relevance,
+				//'relevance': this.relevance,
 				'start_date': this.start_date,
 				'top_date': this.top_date,
 				'shadowSize': this.shadowSize,
@@ -479,7 +479,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					'frequency': median_data[graph_series][2][0]['frequency'],
 					'type': median_data[graph_series][2][0]['type'],
 					'yaxis': median_data[graph_series][2][0]['yaxis'],
-					'relevance': 'mediano',
+					//'relevance': 'mediano',
 					'color': color_counter,
 					'data': new_data
 				};
@@ -1026,7 +1026,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		graph_html += '<select id="' + query_id + 'xtype" class="' + query_id + 'graphkind">';
 		graph_html += '<option selected="selected" value="real">'+_('Real')+'</option>';
 		graph_html += '<option value="normalized">'+_('Normalized')+'</option></select>';
-		if (all_variables['producto'].length > 0) {
+		if ('producto' in all_variables) {
 			graph_html += '<select id="' + query_id + 'xunits" class="' + query_id + 'graphkind"><option selected="selected" value="cordobas">Cordobas</option>';
 			graph_html += '<option value="dollars">USD</option><option value="euros">Euros</option></select>';
 		}
