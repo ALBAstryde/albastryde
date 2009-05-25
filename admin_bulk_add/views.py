@@ -23,8 +23,8 @@ def render_to_html(request,template,variables):
 
 def lluvia(request,ano=None,mes=None,estacion_de_lluvia=None):
 	app_label="lluvia"
-	model_label_plural="pruebas"
-	add_set_label="mes de lluvia"
+	model_label="prueba"
+	title="Añadir mes de lluvia"
 	if ano == None:
 		if ('estacion_de_lluvia' in request.GET) and request.GET['estacion_de_lluvia'].strip():
                 	estacion_de_lluvia = request.GET['estacion_de_lluvia']
@@ -33,7 +33,7 @@ def lluvia(request,ano=None,mes=None,estacion_de_lluvia=None):
 			return HttpResponseRedirect("/admin/lluvia/prueba/bulk_add/"+estacion_de_lluvia+"/"+ano+"/"+mes+"/")
 		else:
 			form=LluviaParameterForm()
-			return render_to_html(request,"bulk_add_form_firstpage.html", {'form':form,'app_label':app_label,'model_label_plural':model_label_plural,'add_set_label':add_set_label})
+			return render_to_html(request,"bulk_add_form_firstpage.html", {'form':form,'app_label':app_label,'model_label':model_label,'title':title})
 	else:
 		next_set_description="Grabar y añadir proximo mes"
 		if request.method == "POST":
@@ -43,7 +43,7 @@ def lluvia(request,ano=None,mes=None,estacion_de_lluvia=None):
 			if form.is_valid():
 				form.save()
 			else:
-				return render_to_html(request,"bulk_add_form.html", {"form":form,"next_set_description":next_set_description,"app_label":app_label,"model_label_plural":model_label_plural,"add_set_label":add_set_label})
+				return render_to_html(request,"bulk_add_form.html", {"form":form,"next_set_description":next_set_description,"app_label":app_label,"model_label":model_label,"title":title})
 			if data.has_key('_next_set'):
 				mes=int(mes)
 				ano=int(ano)
@@ -78,12 +78,12 @@ def lluvia(request,ano=None,mes=None,estacion_de_lluvia=None):
 					initial_list.append({'estacion':str(estacion_de_lluvia),'milimetros_de_lluvia':'0.0','fecha':str(ano)+'-'+mes_str+'-'+dia_str})
 				LluviaPruebaFormSet = modelformset_factory(LluviaPrueba,extra=len(initial_list))
 				form = LluviaPruebaFormSet(initial=initial_list,queryset=LluviaPrueba.objects.none())
-			return render_to_html(request,"bulk_add_form.html", {"form":form,"next_set_description":next_set_description,"app_label":app_label,"model_label_plural":model_label_plural,"add_set_label":add_set_label})
+			return render_to_html(request,"bulk_add_form.html", {"form":form,"next_set_description":next_set_description,"app_label":app_label,"model_label":model_label,"title":title})
 
 def precios(request,ano=None,mes=None,dia=None,mercado=None):
 	app_label="precios"
-	model_label_plural="pruebas"
-	add_set_label="precios de una fecha en un mercado"
+	model_label="prueba"
+	title="Añadir precios de una fecha en un mercado"
 	if ano == None:
 		if ('mercado' in request.GET) and request.GET['mercado'].strip():
                 	mercado = request.GET['mercado']
@@ -93,7 +93,7 @@ def precios(request,ano=None,mes=None,dia=None,mercado=None):
 			return HttpResponseRedirect("/admin/precios/prueba/bulk_add/"+mercado+"/"+ano+"/"+mes+"/"+dia+"/")
 		else:
 			form=PreciosParameterForm()
-			return render_to_html(request,"bulk_add_form_firstpage.html", {'form':form,'app_label':app_label,'model_label_plural':model_label_plural,'add_set_label':add_set_label})
+			return render_to_html(request,"bulk_add_form_firstpage.html", {'form':form,'app_label':app_label,'model_label':model_label,'title':title})
 	else:
 		next_set_description="Grabar y añadir datos del proximo mercado"
 		if request.method == "POST":
@@ -103,7 +103,7 @@ def precios(request,ano=None,mes=None,dia=None,mercado=None):
 			if form.is_valid():
 				form.save()
 			else:
-				return render_to_html(request,"bulk_add_form.html", {"form":form,"next_set_description":next_set_description,"app_label":app_label,"model_label_plural":model_label_plural,"add_set_label":add_set_label})
+				return render_to_html(request,"bulk_add_form.html", {"form":form,"next_set_description":next_set_description,"app_label":app_label,"model_label":model_label,"title":title})
 			if data.has_key('_next_set'):
 				mercado=int(mercado)
 				if mercado < len(Mercado.objects.all()):
@@ -134,4 +134,4 @@ def precios(request,ano=None,mes=None,dia=None,mercado=None):
 					initial_list.append({'mercado':str(mercado),'producto':str(producto.id),'fecha':str(ano)+'-'+mes_str+'-'+dia_str})
 				PreciosPruebaFormSet = modelformset_factory(PreciosPrueba,extra=len(initial_list))
 				form = PreciosPruebaFormSet(initial=initial_list,queryset=PreciosPrueba.objects.none())
-			return render_to_html(request,"bulk_add_form.html", {"form":form,"next_set_description":next_set_description,"app_label":app_label,"model_label_plural":model_label_plural,"add_set_label":add_set_label})
+			return render_to_html(request,"bulk_add_form.html", {"form":form,"next_set_description":next_set_description,"app_label":app_label,"model_label":model_label,"title":title})

@@ -6,7 +6,7 @@
 {{ media }}
 {% endblock %}
 
-{% block stylesheet %}{% admin_media_prefix %}css/forms.css{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/forms.css" />{% endblock %}
 
 {% block coltype %}{% if ordered_objects %}colMS{% else %}colM{% endif %}{% endblock %}
 
@@ -14,10 +14,10 @@
 
 {% block breadcrumbs %}{% if not is_popup %}
 <div class="breadcrumbs">
-     <a href="../../../">{% trans "Home" %}</a> &rsaquo;
-     <a href="../../">{{ app_label|capfirst|escape }}</a> &rsaquo;
-     <a href="../">{{ model_label_plural|capfirst }}</a> &rsaquo;
-     {% trans "Add" %} {{ add_set_label }}
+     <a href="/admin/">{% trans "Home" %}</a> &rsaquo;
+     <a href="/admin/{{app_label}}/">{{ app_label|capfirst|escape }}</a> &rsaquo;
+     <a href="/admin/{{app_label}}/{{model_label}}/">{{ model_label|capfirst }}s</a> &rsaquo;
+     {{ title }}
 </div>
 {% endif %}{% endblock %}
 
