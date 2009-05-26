@@ -40,10 +40,16 @@ class Cosecha(models.Model):
 			return None
 
 	def rendimiento_estimado(self):
-		return self.producto_estimado/self.area_estimada
+		if self.area_estimada > 0:
+			return self.producto_estimado/self.area_estimada
+		else:
+			return None
 
 	def rendimiento_obtenido(self):
-		return self.producto_obtenido/self.area_cosechada
+		if self.area_cosecha > 0:
+			return self.producto_obtenido/self.area_cosechada
+		else:
+			return None
 
 	def area_perdida(self):
 		return self.area_sembrada-self.area_cosechada
