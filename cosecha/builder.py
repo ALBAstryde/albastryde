@@ -29,7 +29,7 @@ def traducir_tiempo(ano,tiempo):
 		return date(year=ano,month=9,day=1)
 	return None
 	
-def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,first_date,last_date,ctype):
+def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,ctype):
 	cosecha_start=traducir_fecha(start_date)
 	cosecha_end=traducir_fecha(end_date)
 	a= Cosecha.objects.filter(ano=cosecha_start['ano']).filter(tiempo__gt= cosecha_start['tiempo']-1)
@@ -39,21 +39,17 @@ def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,first_
 	queryset=d.filter(producto=producto).filter(municipio=municipio)
 	content_type=ctype.id
 	if len(queryset)==0:
-		return None,pk_list,first_date,last_date
+		return None,pk_list
 	data=[]
 	list_of_pk=[]
 	for i in queryset:
 		fecha=traducir_tiempo(ano=i.ano,tiempo=i.tiempo)
-		if fecha.timetuple() < first_date:
-			first_date=fecha.timetuple()
-		if fecha.timetuple() > last_date:
-			last_date=fecha.timetuple()
-		value=0
+#		value=0
 		unit=""
 		if variable=='area sembrada':
 			value=i.area_sembrada
 			unit= 'mz'
-		elif variable=='rendimiento_obtenido':
+		elif variable=='rendimiento obtenido':
 			value=i.rendimiento_obtenido
 			unit='lb/mz'
 		fecha_numero=mktime(fecha.timetuple())
@@ -62,6 +58,6 @@ def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,first_
 		list_of_pk.append(str(i.pk))
 		data.append([fecha_numero,value,unique_pk])
 	pk_list.append([content_type,list_of_pk])
-	result = {'included_variables':{'municipio':municipio.nombre, 'cosecha_producto':producto.nombre, 'tipovariable':variable},'data':data,'unit':unit,'type':'cosecha2','frequency':'monthly','main_variable_js':'"'+variable+' de "+this.included_variables.cosecha_producto','place_js':'this.included_variables.municipio','normalize_factor_js':'this.start_value','display':'lines'}
-	return result,pk_list,first_date,last_date
+	result = {'included_variables':{'municipio':municipio.nombre, 'cosecha_producto':producto.nombre, 'tipovariable':variable},'data':data,'unit':unit,'type':'cosecha '+variable,'frequency':'monthly','main_variable_js':'"'+variable+' de "+this.included_variables.cosecha_producto','place_js':'this.included_variables.municipio','normalize_factor_js':'this.start_value','display':'lines'}
+	return result,pk_list
 

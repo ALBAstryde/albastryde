@@ -5,7 +5,7 @@ from valuta.models import USD,Euro
 from time import mktime
 from django.db import connection
 
-def precio_graph(mercado,producto,frequency,start_date,end_date,mercado_count,producto_count,dollar,euro,pk_list,first_date,last_date,ctype):
+def precio_graph(mercado,producto,frequency,start_date,end_date,dollar,euro,pk_list,ctype):
 	queryset = None
 	if frequency=='daily':
 		queryset = PrecioPrueba.objects.filter(producto=producto,mercado=mercado,fecha__range=[start_date,end_date]).values('fecha','pk','maximo','minimo').order_by('fecha')
@@ -21,15 +21,11 @@ def precio_graph(mercado,producto,frequency,start_date,end_date,mercado_count,pr
 			queryset.append(row_dic)
 	content_type=ctype.id
 	if len(queryset)==0:
-		return None,dollar,euro,pk_list,first_date,last_date
+		return None,dollar,euro,pk_list
 	max_data=[]
 	min_data_dic={}
 	list_of_pk=[]
 	for i in queryset:
-		if i['fecha'].timetuple() < first_date:
-			first_date=i['fecha'].timetuple()
-		if i['fecha'].timetuple() > last_date:
-			last_date=i['fecha'].timetuple()
 		fecha=mktime(i['fecha'].timetuple())
 		adjusted_fecha=fecha
 		if frequency=='daily':
@@ -72,5 +68,5 @@ def precio_graph(mercado,producto,frequency,start_date,end_date,mercado_count,pr
 	else:
 		result['max_data']=max_data
 		result['min_data_dic']=min_data_dic
-	return result,dollar,euro,pk_list,first_date,last_date
+	return result,dollar,euro,pk_list
 

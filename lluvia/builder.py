@@ -3,7 +3,7 @@ from lluvia.models import Prueba as LLuviaPrueba
 from time import mktime
 from django.db import connection
 
-def lluvia_graph(estacion,frequency,start_date,end_date,pk_list,first_date,last_date,ctype):
+def lluvia_graph(estacion,frequency,start_date,end_date,pk_list,ctype):
 	queryset = None
 	if frequency=='daily':
 		queryset =LLuviaPrueba.objects.filter(estacion=estacion).filter(fecha__range=[start_date,end_date]).values('fecha','pk','milimetros_de_lluvia').order_by('fecha')
@@ -19,15 +19,11 @@ def lluvia_graph(estacion,frequency,start_date,end_date,pk_list,first_date,last_
 			queryset.append(row_dic)
 	content_type=ctype.id
 	if len(queryset)==0:
-		return None,pk_list,first_date,last_date
+		return None,pk_list
 	data=[]
 	list_of_pk=[]
 	for i in queryset:
 		if i['milimetros_de_lluvia'] > 0:
-			if i['fecha'].timetuple() < first_date:
-				first_date=i['fecha'].timetuple()
-			if i['fecha'].timetuple() > last_date:
-				last_date=i['fecha'].timetuple()
 			value=str(i['milimetros_de_lluvia'])
 			fecha=mktime(i['fecha'].timetuple())
 			fecha=int(fecha)
@@ -40,4 +36,4 @@ def lluvia_graph(estacion,frequency,start_date,end_date,pk_list,first_date,last_
 	if frequency=='daily':
 		pk_list.append([content_type,list_of_pk])
 	result={'included_variables':{'station':estacion.nombre},'data':data,'unit':'mm','type':'lluvia','frequency':frequency,'main_variable_js':'"lluvia"','place_js':'this.included_variables.station','normalize_factor_js':'this.top_value','display':'bars'}
-	return result,pk_list,first_date,last_date
+	return result,pk_list

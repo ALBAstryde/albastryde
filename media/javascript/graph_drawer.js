@@ -10,6 +10,10 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	labelCanvas = false,
 	table_data = {},
 	all_variables={},
+	all_place=[],
+	all_main_variable=[],
+	first_date=parseInt(new Date().getTime()/1000),
+	last_date=-2000000000,
 	frequency_list=['daily','monthly','annualy'];
 	if (wiki_mode) {
 		editor_mode = false;
@@ -32,7 +36,26 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		return true;
 	}
 	datapoint_dictionary = calculate_datapoint_dictionary(converted_graphs);
-	headline = jsondata.headline;
+	first_date_obj=new Date(first_date*1000);
+	last_date_obj=new Date(last_date*1000);
+	first_date_year=first_date_obj.getFullYear();
+	first_date_month=first_date_obj.getMonth();
+	first_date_month++;
+	first_date_day=first_date_obj.getDate();
+	last_date_year=last_date_obj.getFullYear();
+	last_date_month=last_date_obj.getMonth();
+	last_date_month++;
+	last_date_day=last_date_obj.getDate();
+	headline = '';
+	for (i in all_main_variable) {
+		headline +=all_main_variable[i]+', ';
+	}
+
+	headline = headline.substring(0,headline.length-2) + ' ' + _('in') + ' ';
+	for (i in all_place) {
+		headline +=all_place[i]+', ';
+	}
+	headline = headline.substring(0,headline.length-2) + ' ('+String(first_date_year)+'-'+String(first_date_month)+'-'+String(first_date_day)+' &ndash; '+String(last_date_year)+'-'+String(last_date_month)+'-'+String(last_date_day)+')';
 	var yaxis = converted_graphs.yaxis,
 	y2axis = converted_graphs.y2axis,
 	frequency;
@@ -209,7 +232,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'place_js': this.place_js,
 				'main_variable_js': this.main_variable_js,
 				'normalize_factor_js': this.normalize_factor_js,
-				//'relevance': 'main',
 				'color': color_counter,
 				'data': [],
 				'clickable': {},
@@ -285,7 +307,20 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				});
 
 			}
+			if ( !(eval(this.place_js) in all_place)) {
+				all_place.push(eval(this.place_js));
+			}
+			if ( !(eval(this.main_variable_js) in all_main_variable)) {
+				all_main_variable.push(eval(this.main_variable_js));
+			}
 			new_graph.start_date = new_graph.data[0][0];
+			new_graph.end_date = new_graph.data[new_graph.data.length-1][0];
+			if (new_graph.start_date < first_date) {
+				first_date=new_graph.start_date
+			}
+			if (new_graph.end_date > last_date) {
+				last_date=new_graph.end_date
+			}
 			var graph_yaxis = 1;
 			var yaxis_finder = 1;
 			for (var item in graph_types) {

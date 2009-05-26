@@ -2,14 +2,11 @@ from precios.builder import precio_graph
 from lluvia.builder import lluvia_graph
 from cosecha.builder import cosecha_graph
 
-#from precios.models import Mercado
-#from lluvia.models import Prueba as LLuviaPrueba
 from graph.forms import DbForm
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.comments.models import Comment
 from datetime import date
 from time import mktime
-#from cosecha.models import Cosecha
 
 eng_dic={'diario':'daily','mensual':'monthly','anual':'annualy'}
 
@@ -26,8 +23,6 @@ def build_graph(query,user):
                         # Bung all that into the dict
                 rdict.update({'errs': d  })
        	else:   
-		last_date=date(1920,1,1).timetuple()
-		first_date=date.today().timetuple()
 		pk_list=[]
 		graphs=[]
 		municipios = form.cleaned_data['Municipio']
@@ -50,34 +45,30 @@ def build_graph(query,user):
 		cosecha_producto = form.cleaned_data['CosechaProducto']
 		start_date = form.cleaned_data['Desde']
 		end_date = form.cleaned_data['Hasta']
-		producto_count=len(productos)
-		municipio_count=len(municipios)
-		departamento_count=len(departamentos)
-		if producto_count > 0:		
-			if municipio_count > 0:
+		if len(productos) > 0:		
+			if len(municipios) > 0:
 				for municipio in municipios:
 					if len(municipio.mercado_set.all()) > 0:
 						for i in municipio.mercado_set.all().iterator():
 							mercados.append(i)
-			if departamento_count > 0:
+			if len(departamentos) > 0:
 				for departamento in departamentos:
 					for municipio in departamento.municipios.iterator():
 						if len(municipio.mercado_set.all()) > 0:
 							for i in municipio.mercado_set.all().iterator():
 								mercados.append(i)
-		mercado_count=len(mercados)
+		#mercado_count=len(mercados)
 		if include_lluvia:
-			if municipio_count > 0:
+			if len(municipio) > 0:
 				for municipio in municipios:
 					for i in municipio.estaciondelluvia_set.all().iterator():
 						estaciones_de_lluvia.append(i)
-			if departamento_count > 0:
+			if len(departamento) > 0:
 				for departamento in departamentos:
 					for municipio in departamento.municipios.iterator():
 						for i in municipio.estaciondelluvia_set.all().iterator():
 							estaciones_de_lluvia.append(i)
-		lluvia_count=len(estaciones_de_lluvia)
-		if mercado_count > 0 and producto_count > 0:
+		if len(mercados) > 0 and len(productos) > 0:
 			dollar={'unit':'USD','monthly':{},'annualy':{},'daily':{}}
 			euro={'unit':'Euro','monthly':{},'annualy':{},'daily':{}}
 		pricectype = ContentType.objects.get(app_label__exact='precios', name__exact='prueba')
@@ -86,57 +77,24 @@ def build_graph(query,user):
 		for frequency in frequencies:
 			for i in mercados:
 				for b in productos:
-					graph,dollar,euro,pk_list,first_date,last_date=precio_graph(mercado=i,producto=b,frequency=frequency,start_date=start_date,end_date=end_date,mercado_count=mercado_count,producto_count=producto_count,dollar=dollar,euro=euro,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=pricectype)
+					graph,dollar,euro,pk_list=precio_graph(mercado=i,producto=b,frequency=frequency,start_date=start_date,end_date=end_date,dollar=dollar,euro=euro,pk_list=pk_list,ctype=pricectype)
 					if not graph==None:
 						graphs.append(graph)
 			for d in estaciones_de_lluvia:
-				graph,pk_list,first_date,last_date=lluvia_graph(estacion=d,frequency=frequency,start_date=start_date,end_date=end_date,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=lluviactype)
+				graph,pk_list=lluvia_graph(estacion=d,frequency=frequency,start_date=start_date,end_date=end_date,pk_list=pk_list,ctype=lluviactype)
 				if not graph==None:
 					graphs.append(graph)
 			for d in cosecha_variable:
 				for e in municipios:
 					for i in cosecha_producto:
-						graph,pk_list,first_date,last_date=cosecha_graph(variable=d,municipio=e,producto=i,start_date=start_date,end_date=end_date,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=cosechactype)
+						graph,pk_list=cosecha_graph(variable=d,municipio=e,producto=i,start_date=start_date,end_date=end_date,pk_list=pk_list,ctype=cosechactype)
 						if not graph==None:
 							graphs.append(graph)	
 		rdict.update({'graphs':graphs})
-		mercado_name=""
-		lluvia_name=""
-		producto_name=""
-		precio_name=""
-		if mercado_count > 0 and producto_count > 0:
+		if len(mercados) > 0 and len(productos) > 0:
 			rdict.update({'dollar':dollar})
 			rdict.update({'euro':euro})
-			for i in mercados:
-				mercado_name+=i.nombre+", "
-			mercado_name=mercado_name.strip(", ")
-			if len(mercado_name)>60:
-				mercado_name="el mercado"
-			for i in productos:
-				producto_name+=i.nombre.title()+", "
-			producto_name=producto_name.strip(", ")
-			if len(producto_name)>60:
-				producto_name="Unos productos"
-			precio_name=producto_name+" en "+mercado_name 
-		if lluvia_count > 0:
-			for i in estaciones_de_lluvia:
-				lluvia_name+=i.nombre.title()+", "
-			lluvia_name=lluvia_name.strip(", ")
-		headline=""
-		if precio_name != "" and lluvia_name !="":
-			headline += "Precios "
-			headline += precio_name
-			headline += " y lluvia en "				
-			headline +=lluvia_name
-		elif lluvia_name !="":
-			headline +="Lluvia en "
-			headline +=lluvia_name
-		elif precio_name !="":
-			headline +="Precios "
-			headline +=precio_name
-				
-		headline+=": "+str(date.fromtimestamp(mktime(first_date)))+"&ndash;"+str(date.fromtimestamp(mktime(last_date)))
-		rdict.update({'headline':headline})
+		# Lo siguiente es para hacer los comentarios
 		comments={}
 		for content_type in pk_list :
 	               	all_comments_qs=Comment.objects.filter(content_type=content_type[0], object_pk__in=content_type[1],is_removed=False)
