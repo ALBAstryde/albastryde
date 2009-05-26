@@ -337,6 +337,12 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				new_graph.points.drawCall=false;
 			}
 			new_graph.start_value = new_graph.data[0][1];
+			if (new_graph.start_value == 0) {
+				new_graph.start_value+=0.01;
+			}
+			if (new_graph.top_value == 0) {
+				new_graph.top_value+=0.01;
+			}
 			if (this.display == 'bars') {
 				new_graph.bars = {
 					'show': true,
