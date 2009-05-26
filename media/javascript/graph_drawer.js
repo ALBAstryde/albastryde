@@ -108,7 +108,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 
 	//Calculate other graphs	
 	normalized_graphs = calculate_normalizedgraphs(converted_graphs);
-
+	JOHANNES=normalized_graphs;
 	if ('producto' in all_variables) {
 		dollargraphs = calculate_currencygraphs(eval(jsondata.dollar), converted_graphs);
 		eurographs = calculate_currencygraphs(eval(jsondata.euro), converted_graphs);
@@ -264,9 +264,26 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			} else if ('min_data' in this) {
 				new_graph.data = this.max_data;
 				new_graph.minData = this.minData;
+				$.each(this.max_data,function() {
+					time = this[0];
+					max_value = parseFloat(this[1]);
+					if (max_value > new_graph.top_value) {
+						new_graph.top_value = max_value;
+						new_graph.top_date = time;
+					}
+				});
 			} else {
 				new_graph.data = this.data;
 				minData = false;
+				$.each(this.data,function() {
+					time = this[0];
+					max_value = parseFloat(this[1]);
+					if (max_value > new_graph.top_value) {
+						new_graph.top_value = max_value;
+						new_graph.top_date = time;
+					}
+				});
+
 			}
 			new_graph.start_date = new_graph.data[0][0];
 			var graph_yaxis = 1;
@@ -672,6 +689,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		function() {
 			var new_data = [];
 			var normalize_factor = eval(this.normalize_factor_js);
+			JOHANNES2=normalize_factor;
 			var new_graph = {
 				'unit': '%',
 				'type': 'normalizado',
