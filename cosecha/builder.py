@@ -49,7 +49,7 @@ def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,ctype)
                          unit= 'mz'
                  elif variable=='producto estimado':
                          value=i.producto_estimado
-                         unit='lb/mz'
+                         unit='lb'
                  elif variable=='area sembrada':
                          value=i.area_sembrada
                          unit='mz'
@@ -58,7 +58,7 @@ def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,ctype)
                          unit='mz'
                  elif variable=='producto obtenido':
                          value=i.producto_obtenido
-                         unit='lb/mz'
+                         unit='lb'
                  elif variable=='rendimiento estimado':
                          value=i.rendimiento_estimado()
                          unit='lb/mz'
