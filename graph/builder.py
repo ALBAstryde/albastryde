@@ -25,55 +25,51 @@ def build_graph(query,user):
        	else:   
 		pk_list=[]
 		graphs=[]
-		municipios = form.cleaned_data['Municipio']
+		municipio_queryset = form.cleaned_data['Municipio']
+		municipios=[]
+		for municipio in municipio_queryset:
+			municipios.append(municipio)
 		departamentos = form.cleaned_data['Departamento']
 		mercados_queryset = form.cleaned_data['Mercado']
 		mercados=[]
-		for i in mercados_queryset:
-			mercados.append(i)
+		for mercado in mercados_queryset:
+			mercados.append(mercado)
 		productos = form.cleaned_data['Producto']
 		frecuencias = form.cleaned_data['Frecuencia']
 		estaciones_de_lluvia_queryset = form.cleaned_data['EstacionDeLluvia']
 		estaciones_de_lluvia=[]
-		for i in estaciones_de_lluvia_queryset:
-			estaciones_de_lluvia.append(i)
+		for estacion in estaciones_de_lluvia_queryset:
+			estaciones_de_lluvia.append(estacion)
 		frequencies=[]
-		for i in frecuencias:
-			frequencies.append(eng_dic[i])
+		for frecuencia in frecuencias:
+			frequencies.append(eng_dic[frecuencia])
 		include_lluvia = form.cleaned_data['IncluirLluvia']
 		cosecha_variable = form.cleaned_data['CosechaVariable'] #este es para cosecha
 		cosecha_producto = form.cleaned_data['CosechaProducto']
 		start_date = form.cleaned_data['Desde']
 		end_date = form.cleaned_data['Hasta']
+		for departamento in departamentos:
+			for municipio in departamento.municipios.iterator():
+				municipios.append(municipio)
+
 		if len(productos) > 0:		
-			if len(municipios) > 0:
-				for municipio in municipios:
-					if len(municipio.mercado_set.all()) > 0:
-						for i in municipio.mercado_set.all().iterator():
-							mercados.append(i)
-			if len(departamentos) > 0:
-				for departamento in departamentos:
-					for municipio in departamento.municipios.iterator():
-						if len(municipio.mercado_set.all()) > 0:
-							for i in municipio.mercado_set.all().iterator():
-								mercados.append(i)
-		#mercado_count=len(mercados)
+			for municipio in municipios:
+				for mercado in municipio.mercado_set.all().iterator():
+					mercados.append(mercado)
 		if include_lluvia:
-			if len(municipio) > 0:
-				for municipio in municipios:
-					for i in municipio.estaciondelluvia_set.all().iterator():
-						estaciones_de_lluvia.append(i)
-			if len(departamento) > 0:
-				for departamento in departamentos:
-					for municipio in departamento.municipios.iterator():
-						for i in municipio.estaciondelluvia_set.all().iterator():
-							estaciones_de_lluvia.append(i)
+			for municipio in municipios:
+				for estacion in municipio.estaciondelluvia_set.all().iterator():
+					estaciones_de_lluvia.append(estacion)
+
 		if len(mercados) > 0 and len(productos) > 0:
 			dollar={'unit':'USD','monthly':{},'annualy':{},'daily':{}}
 			euro={'unit':'Euro','monthly':{},'annualy':{},'daily':{}}
 		pricectype = ContentType.objects.get(app_label__exact='precios', name__exact='prueba')
 		lluviactype = ContentType.objects.get(app_label__exact='lluvia', name__exact='prueba')
 		cosechactype = ContentType.objects.get(app_label__exact='cosecha', name__exact='cosecha')
+
+		# Aqui se llaman las funciones para hacer cada uno de los graficos
+
 		for frequency in frequencies:
 			for i in mercados:
 				for b in productos:
@@ -90,11 +86,16 @@ def build_graph(query,user):
 						graph,pk_list=cosecha_graph(variable=d,municipio=e,producto=i,start_date=start_date,end_date=end_date,pk_list=pk_list,ctype=cosechactype)
 						if not graph==None:
 							graphs.append(graph)	
+
+
+
 		rdict.update({'graphs':graphs})
 		if len(mercados) > 0 and len(productos) > 0:
 			rdict.update({'dollar':dollar})
 			rdict.update({'euro':euro})
+
 		# Lo siguiente es para hacer los comentarios
+
 		comments={}
 		for content_type in pk_list :
 	               	all_comments_qs=Comment.objects.filter(content_type=content_type[0], object_pk__in=content_type[1],is_removed=False)
