@@ -66,7 +66,6 @@ def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,ctype)
 			value=0
 			unit=""
 		fecha_numero=mktime(fecha.timetuple())
-		#fecha_numero=int(fecha_numero)
 		unique_pk=str(content_type)+"_"+str(i.pk)
 		list_of_pk.append(str(i.pk))
 		data.append([fecha_numero,value,unique_pk])

@@ -29,7 +29,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	}
 	raw_graphs = eval(jsondata.graphs).sort();
 	converted_graphs = convert_graphs_after_transport(raw_graphs);
-	JOHANNES6=converted_graphs;
 	if (converted_graphs.length === 0) {
 		e_msg = _('There is no data available for the selection!');
 		$('#AjaxFormWarning').text(e_msg).fadeIn('slow');
@@ -144,7 +143,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 
 	//Calculate other graphs	
 	normalized_graphs = calculate_normalizedgraphs(converted_graphs);
-	JOHANNES=normalized_graphs;
 	if ('producto' in all_variables) {
 		dollargraphs = calculate_currencygraphs(eval(jsondata.dollar), converted_graphs);
 		eurographs = calculate_currencygraphs(eval(jsondata.euro), converted_graphs);
@@ -751,7 +749,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		function() {
 			var new_data = [];
 			var normalize_factor = eval(this.normalize_factor_js);
-			JOHANNES2=normalize_factor;
 			var new_graph = {
 				'unit': '%',
 				'type': 'normalizado',
