@@ -45,28 +45,28 @@ def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,ctype)
 	for i in queryset:
 		fecha=traducir_tiempo(ano=i.ano,tiempo=i.tiempo)
 		if variable=='area estimada':
-                         value=i.area_estimada
-                         unit= 'mz'
-                 elif variable=='producto estimado':
-                         value=i.producto_estimado
-                         unit='lb'
-                 elif variable=='area sembrada':
-                         value=i.area_sembrada
-                         unit='mz'
-                 elif variable=='area cosechada':
-                         value=i.area_cosechada
-                         unit='mz'
-                 elif variable=='producto obtenido':
-                         value=i.producto_obtenido
-                         unit='lb'
-                 elif variable=='rendimiento estimado':
-                         value=i.rendimiento_estimado()
-                         unit='lb/mz'
+			value=i.area_estimada
+			unit= 'mz'
+		elif variable=='producto estimado':
+			value=i.producto_estimado
+			unit='lb'
+		elif variable=='area sembrada':
+			value=i.area_sembrada
+			unit='mz'
+		elif variable=='area cosechada':
+			value=i.area_cosechada
+			unit='mz'
+		elif variable=='producto obtenido':
+			value=i.producto_obtenido
+			unit='lb'
+		elif variable=='rendimiento estimado':
+			value=i.rendimiento_estimado()
+			unit='lb/mz'
 		else:
 			value=0
 			unit=""
 		fecha_numero=mktime(fecha.timetuple())
-		fecha_numero=int(fecha_numero)
+		#fecha_numero=int(fecha_numero)
 		unique_pk=str(content_type)+"_"+str(i.pk)
 		list_of_pk.append(str(i.pk))
 		data.append([fecha_numero,value,unique_pk])
