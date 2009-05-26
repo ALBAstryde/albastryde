@@ -1,15 +1,15 @@
-from precios.models import Prueba as PrecioPrueba
-from precios.models import Mercado
-from lluvia.models import Prueba as LLuviaPrueba
+from precios.builder import precio_graph
+from lluvia.builder import lluvia_graph
+from cosecha.builder import cosecha_graph
+
+#from precios.models import Mercado
+#from lluvia.models import Prueba as LLuviaPrueba
 from graph.forms import DbForm
-from valuta.models import USD,Euro
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.comments.models import Comment
 from datetime import date
 from time import mktime
-from cosecha.models import Cosecha
-
-
+#from cosecha.models import Cosecha
 
 eng_dic={'diario':'daily','mensual':'monthly','anual':'annualy'}
 
@@ -53,7 +53,6 @@ def build_graph(query,user):
 		producto_count=len(productos)
 		municipio_count=len(municipios)
 		departamento_count=len(departamentos)
-#		cosecha_count=len(cosecha_variable) #esto es para cosecha
 		if producto_count > 0:		
 			if municipio_count > 0:
 				for municipio in municipios:
@@ -86,8 +85,8 @@ def build_graph(query,user):
 		cosechactype = ContentType.objects.get(app_label__exact='cosecha', name__exact='cosecha')
 		for frequency in frequencies:
 			for i in mercados:
-				for b in cosecha_productos:
-					graph,dollar,euro,pk_list,first_date,last_date=price_graph(mercado=i,producto=b,frequency=frequency,start_date=start_date,end_date=end_date,mercado_count=mercado_count,producto_count=producto_count,dollar=dollar,euro=euro,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=pricectype)
+				for b in productos:
+					graph,dollar,euro,pk_list,first_date,last_date=precio_graph(mercado=i,producto=b,frequency=frequency,start_date=start_date,end_date=end_date,mercado_count=mercado_count,producto_count=producto_count,dollar=dollar,euro=euro,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=pricectype)
 					if not graph==None:
 						graphs.append(graph)
 			for d in estaciones_de_lluvia:
@@ -97,7 +96,6 @@ def build_graph(query,user):
 			for d in cosecha_variable:
 				for e in municipios:
 					for i in cosecha_producto:
-#						pass
 						graph,pk_list,first_date,last_date=cosecha_graph(variable=d,municipio=e,producto=i,start_date=start_date,end_date=end_date,pk_list=pk_list,first_date=first_date,last_date=last_date,ctype=cosechactype)
 						if not graph==None:
 							graphs.append(graph)	
@@ -162,175 +160,3 @@ def build_graph(query,user):
 					comments[unique_pk][i.pk]=[i.comment,i.name,puede_editar,i.is_public]
 				rdict.update({'comments':comments})
 	return rdict
-
-from django.db import connection
-
-def price_graph(mercado,producto,frequency,start_date,end_date,mercado_count,producto_count,dollar,euro,pk_list,first_date,last_date,ctype):
-	queryset = None
-	if frequency=='daily':
-		queryset = PrecioPrueba.objects.filter(producto=producto,mercado=mercado,fecha__range=[start_date,end_date]).values('fecha','pk','maximo','minimo').order_by('fecha')
-	else:
-		cursor = connection.cursor()
-		if frequency=='monthly':
-			cursor.execute("select producto_id as producto, mercado_id as mercado, date_trunc('month',fecha) as fecha, avg(maximo) as maximo, avg(minimo) as minimo from precios_prueba where producto_id = "+str(producto.pk)+" and mercado_id = "+str(mercado.pk)+" and fecha > '"+start_date.strftime('%Y-%m-%d')+"' and fecha < '"+end_date.strftime('%Y-%m-%d')+"' group by date_trunc('month',fecha), producto_id, mercado_id order by fecha;")
-		elif frequency=='annualy':
-			cursor.execute("select producto_id as producto, mercado_id as mercado, date_trunc('year',fecha) as fecha, avg(maximo) as maximo, avg(minimo) as minimo from precios_prueba where producto_id = "+str(producto.pk)+" and mercado_id = "+str(mercado.pk)+" and fecha > '"+start_date.strftime('%Y-%m-%d')+"' and fecha < '"+end_date.strftime('%Y-%m-%d')+"' group by date_trunc('year',fecha), producto_id, mercado_id order by fecha;")
-		queryset=[]
-		for row in cursor.fetchall():
-			row_dic={'fecha':row[2],'maximo':row[3],'minimo':row[4],'producto':row[0],'mercado':row[1]}
-			queryset.append(row_dic)
-	content_type=ctype.id
-	if len(queryset)==0:
-		return None,dollar,euro,pk_list,first_date,last_date
-	max_data=[]
-	min_data_dic={}
-	list_of_pk=[]
-	for i in queryset:
-		if i['fecha'].timetuple() < first_date:
-			first_date=i['fecha'].timetuple()
-		if i['fecha'].timetuple() > last_date:
-			last_date=i['fecha'].timetuple()
-		fecha=mktime(i['fecha'].timetuple())
-		adjusted_fecha=fecha
-		if frequency=='daily':
-			adjusted_fecha+=22000
-		elif frequency=='monthly':
-			adjusted_fecha+=1365000
-		elif frequency=='annualy':
-			adjusted_fecha+=15800000
-		precio=int(i['maximo'])		
-		if i['maximo'] != i['minimo']:
-			min_data_dic[int(adjusted_fecha)]=int(i['minimo'])
-		if not str(int(adjusted_fecha)) in dollar[frequency]:
-			if frequency=='daily':
-				dollar[frequency][str(int(adjusted_fecha))]=float(USD.objects.get(fecha__exact=i['fecha']).cordobas)
-				euro[frequency][str(int(adjusted_fecha))]=float(Euro.objects.get(fecha__exact=i['fecha']).cordobas)
-			else:
-				cursor = connection.cursor()
-				if frequency=='monthly':
-					cursor.execute("select avg(cordobas) from valuta_usd where date_trunc('month',fecha)='"+i['fecha'].strftime('%Y-%m-%d')+"';")
-				elif frequency=='annualy':
-					cursor.execute("select avg(cordobas) from valuta_usd where date_trunc('year',fecha)='"+i['fecha'].strftime('%Y-%m-%d')+"';")
-				dollar[frequency][str(int(adjusted_fecha))]= float(cursor.fetchone()[0])
-				if frequency=='monthly':
-					cursor.execute("select avg(cordobas) from valuta_euro where date_trunc('month',fecha)='"+i['fecha'].strftime('%Y-%m-%d')+"';")
-				elif frequency=='annualy':
-					cursor.execute("select avg(cordobas) from valuta_euro where date_trunc('year',fecha)='"+i['fecha'].strftime('%Y-%m-%d')+"';")
-				euro[frequency][str(int(adjusted_fecha))]= float(cursor.fetchone()[0])				
-		adjusted_fecha=int(adjusted_fecha)
-		if frequency=='daily':
-			unique_pk=str(content_type)+"_"+str(i['pk'])		
-			list_of_pk.append(str(i['pk']))
-			max_data.append([adjusted_fecha,precio,unique_pk])
-		else:
-			max_data.append([adjusted_fecha,precio])
-	if frequency=='daily':
-		pk_list.append([content_type,list_of_pk])
-	result={'included_variables':{'producto':producto.nombre,'mercado':mercado.nombre},'unit':'cordoba','type':'precio','frequency':frequency,'main_variable_js':'this.included_variables.producto','place_js':'this.included_variables.mercado','normalize_factor_js':'this.start_value','display':'lines'}
-	if len(min_data_dic)==0:
-		result['data']=max_data
-	else:
-		result['max_data']=max_data
-		result['min_data_dic']=min_data_dic
-	return result,dollar,euro,pk_list,first_date,last_date
-
-def lluvia_graph(estacion,frequency,start_date,end_date,pk_list,first_date,last_date,ctype):
-	queryset = None
-	if frequency=='daily':
-		queryset =LLuviaPrueba.objects.filter(estacion=estacion).filter(fecha__range=[start_date,end_date]).values('fecha','pk','milimetros_de_lluvia').order_by('fecha')
-	else:
-		cursor = connection.cursor()
-		if frequency=='monthly':
-			cursor.execute("select estacion_id as estacion, date_trunc('month',fecha) as fecha, avg(milimetros_de_lluvia) as milimetros_de_lluvia from lluvia_prueba where estacion_id = "+str(estacion.pk)+" and fecha > '"+start_date.strftime('%Y-%m-%d')+"' and fecha < '"+end_date.strftime('%Y-%m-%d')+"' group by date_trunc('month',fecha), estacion_id order by fecha;")
-		elif frequency=='annualy':
-			cursor.execute("select estacion_id as estacion, date_trunc('year',fecha) as fecha, avg(milimetros_de_lluvia) as milimetros_de_lluvia from lluvia_prueba where estacion_id = "+str(estacion.pk)+" and fecha > '"+start_date.strftime('%Y-%m-%d')+"' and fecha < '"+end_date.strftime('%Y-%m-%d')+"' group by date_trunc('year',fecha), estacion_id order by fecha;")
-		queryset=[]
-		for row in cursor.fetchall():
-			row_dic={'fecha':row[1],'milimetros_de_lluvia':row[2],'estacion':row[0]}
-			queryset.append(row_dic)
-	content_type=ctype.id
-	if len(queryset)==0:
-		return None,pk_list,first_date,last_date
-	data=[]
-	list_of_pk=[]
-	for i in queryset:
-		if i['milimetros_de_lluvia'] > 0:
-			if i['fecha'].timetuple() < first_date:
-				first_date=i['fecha'].timetuple()
-			if i['fecha'].timetuple() > last_date:
-				last_date=i['fecha'].timetuple()
-			value=str(i['milimetros_de_lluvia'])
-			fecha=mktime(i['fecha'].timetuple())
-			fecha=int(fecha)
-			if frequency=='daily':
-				unique_pk=str(content_type)+"_"+str(i['pk'])		
-				list_of_pk.append(str(i['pk']))
-				data.append([fecha,value,unique_pk])
-			else:
-				data.append([fecha,value])
-	if frequency=='daily':
-		pk_list.append([content_type,list_of_pk])
-	result={'included_variables':{'station':estacion.nombre},'data':data,'unit':'mm','type':'lluvia','frequency':frequency,'main_variable_js':'"lluvia"','place_js':'this.included_variables.station','normalize_factor_js':'this.top_value','display':'bars'}
-	return result,pk_list,first_date,last_date
-# Esta es para traducir las fechas de los tiempos
-def traducir_fecha(date):
-	cosecha_tiempo={}
-	if date.month < 3:
-		cosecha_tiempo['ano']=date.year-1
-		cosecha_tiempo['tiempo']=3
-	elif date.month > 2 and date.month < 6:
-		cosecha_tiempo['ano']=date.year
-		cosecha_tiempo['tiempo']=1
-	elif date.month > 5 and date.month < 9:
-		cosecha_tiempo['ano']=date.year
-		cosecha_tiempo['tiempo']=2
-	elif date.month > 8:
-		cosecha_tiempo['ano']=date.year
-		cosecha_tiempo['tiempo']=3
-	return cosecha_tiempo
-
-def traducir_tiempo(ano,tiempo):
-	if tiempo==1:
-		return date(year=ano,month=3,day=1)
-	elif tiempo==2:
-		return date(year=ano,month=6,day=1)
-	elif tiempo==3:
-		return date(year=ano,month=9,day=1)
-	return None
-	
-def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,first_date,last_date,ctype):
-	cosecha_start=traducir_fecha(start_date)
-	cosecha_end=traducir_fecha(end_date)
-	a= Cosecha.objects.filter(ano=cosecha_start['ano']).filter(tiempo__gt= cosecha_start['tiempo']-1)
-	b= Cosecha.objects.filter(ano__gt=cosecha_start['ano']).filter(ano__lt=cosecha_end['ano'])
-	c= Cosecha.objects.filter(ano=cosecha_end['ano']).filter(tiempo__lt=cosecha_end['tiempo']+1)
-	d= a | b| c
-	queryset=d.filter(producto=producto).filter(municipio=municipio)
-	content_type=ctype.id
-	if len(queryset)==0:
-		return None,pk_list,first_date,last_date
-	data=[]
-	list_of_pk=[]
-	for i in queryset:
-		fecha=traducir_tiempo(ano=i.ano,tiempo=i.tiempo)
-		if fecha.timetuple() < first_date:
-			first_date=fecha.timetuple()
-		if fecha.timetuple() > last_date:
-			last_date=fecha.timetuple()
-		value=0
-		unit=""
-		if variable=='area sembrada':
-			value=i.area_sembrada
-			unit= 'mz'
-		elif variable=='rendimiento_obtenido':
-			value=i.rendimiento_obtenido
-			unit='lb/mz'
-		fecha_numero=mktime(fecha.timetuple())
-		fecha_numero=int(fecha_numero)
-		unique_pk=str(content_type)+"_"+str(i.pk)
-		list_of_pk.append(str(i.pk))
-		data.append([fecha_numero,value,unique_pk])
-	pk_list.append([content_type,list_of_pk])
-	result = {'included_variables':{'municipio':municipio.nombre, 'cosecha_producto':producto.nombre, 'tipovariable':variable},'data':data,'unit':unit,'type':'cosecha2','frequency':'monthly','main_variable_js':'"'+variable+' de "+this.included_variables.cosecha_producto','place_js':'this.included_variables.municipio','normalize_factor_js':'this.start_value','display':'lines'}
-	return result,pk_list,first_date,last_date
-
