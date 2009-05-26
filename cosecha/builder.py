@@ -71,6 +71,6 @@ def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,ctype)
 		list_of_pk.append(str(i.pk))
 		data.append([fecha_numero,value,unique_pk])
 	pk_list.append([content_type,list_of_pk])
-	result = {'included_variables':{'municipio':municipio.nombre, 'cosecha_producto':producto.nombre, 'tipovariable':variable},'data':data,'unit':unit,'type':'cosecha '+variable,'frequency':'monthly','main_variable_js':'"'+variable+' de "+this.included_variables.cosecha_producto','place_js':'this.included_variables.municipio','normalize_factor_js':'this.start_value','display':'bars'}
+	result = {'included_variables':{'municipio':municipio.nombre, 'cosecha_producto':producto.nombre, 'tipovariable':variable},'data':data,'source':'raw','unit':unit,'type':'cosecha '+variable,'frequency':'monthly','main_variable_js':'"'+variable+' de "+this.included_variables.cosecha_producto','place_js':'this.included_variables.municipio','normalize_factor_js':'this.start_value','display':'bars'}
 	return result,pk_list
 

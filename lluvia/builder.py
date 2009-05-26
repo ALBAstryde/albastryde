@@ -7,6 +7,7 @@ def lluvia_graph(estacion,frequency,start_date,end_date,pk_list,ctype):
 	queryset = None
 	if frequency=='daily':
 		queryset =LLuviaPrueba.objects.filter(estacion=estacion).filter(fecha__range=[start_date,end_date]).values('fecha','pk','milimetros_de_lluvia').order_by('fecha')
+		source='raw'
 	else:
 		cursor = connection.cursor()
 		if frequency=='monthly':
@@ -17,6 +18,7 @@ def lluvia_graph(estacion,frequency,start_date,end_date,pk_list,ctype):
 		for row in cursor.fetchall():
 			row_dic={'fecha':row[1],'milimetros_de_lluvia':row[2],'estacion':row[0]}
 			queryset.append(row_dic)
+		source='computed'
 	content_type=ctype.id
 	if len(queryset)==0:
 		return None,pk_list
@@ -35,5 +37,5 @@ def lluvia_graph(estacion,frequency,start_date,end_date,pk_list,ctype):
 				data.append([fecha,value])
 	if frequency=='daily':
 		pk_list.append([content_type,list_of_pk])
-	result={'included_variables':{'station':estacion.nombre},'data':data,'unit':'mm','type':'lluvia','frequency':frequency,'main_variable_js':'"lluvia"','place_js':'this.included_variables.station','normalize_factor_js':'this.top_value','display':'bars'}
+	result={'included_variables':{'station':estacion.nombre},'data':data,'unit':'mm','type':'lluvia','source':source,'frequency':frequency,'main_variable_js':'"lluvia"','place_js':'this.included_variables.station','normalize_factor_js':'this.top_value','display':'bars'}
 	return result,pk_list

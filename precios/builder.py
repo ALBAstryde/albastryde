@@ -9,6 +9,7 @@ def precio_graph(mercado,producto,frequency,start_date,end_date,dollar,euro,pk_l
 	queryset = None
 	if frequency=='daily':
 		queryset = PrecioPrueba.objects.filter(producto=producto,mercado=mercado,fecha__range=[start_date,end_date]).values('fecha','pk','maximo','minimo').order_by('fecha')
+		source='raw'
 	else:
 		cursor = connection.cursor()
 		if frequency=='monthly':
@@ -19,6 +20,7 @@ def precio_graph(mercado,producto,frequency,start_date,end_date,dollar,euro,pk_l
 		for row in cursor.fetchall():
 			row_dic={'fecha':row[2],'maximo':row[3],'minimo':row[4],'producto':row[0],'mercado':row[1]}
 			queryset.append(row_dic)
+		source='computed'
 	content_type=ctype.id
 	if len(queryset)==0:
 		return None,dollar,euro,pk_list
@@ -62,7 +64,7 @@ def precio_graph(mercado,producto,frequency,start_date,end_date,dollar,euro,pk_l
 			max_data.append([adjusted_fecha,precio])
 	if frequency=='daily':
 		pk_list.append([content_type,list_of_pk])
-	result={'included_variables':{'producto':producto.nombre,'mercado':mercado.nombre},'unit':'cordoba','type':'precio','frequency':frequency,'main_variable_js':'this.included_variables.producto','place_js':'this.included_variables.mercado','normalize_factor_js':'this.start_value','display':'lines'}
+	result={'included_variables':{'producto':producto.nombre,'mercado':mercado.nombre},'unit':'cordoba','type':'precio','source':source,'frequency':frequency,'main_variable_js':'this.included_variables.producto','place_js':'this.included_variables.mercado','normalize_factor_js':'this.start_value','display':'lines'}
 	if len(min_data_dic)==0:
 		result['data']=max_data
 	else:

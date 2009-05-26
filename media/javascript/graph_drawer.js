@@ -29,6 +29,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	}
 	raw_graphs = eval(jsondata.graphs).sort();
 	converted_graphs = convert_graphs_after_transport(raw_graphs);
+	JOHANNES6=converted_graphs;
 	if (converted_graphs.length === 0) {
 		e_msg = _('There is no data available for the selection!');
 		$('#AjaxFormWarning').text(e_msg).fadeIn('slow');
@@ -46,6 +47,18 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	last_date_month=last_date_obj.getMonth();
 	last_date_month++;
 	last_date_day=last_date_obj.getDate();
+	if ((first_date_day==1) && (last_date_day==1)) {
+		if ((first_date_month==1) && (last_date_month==1)) {
+			first_day_string = String(first_date_year);
+			last_day_string = String(last_date_year);
+		} else {
+			first_date_string= String(first_date_year)+'-'+String(first_date_month);
+			last_date_string= String(last_date_year)+'-'+String(last_date_month);
+		}
+	} else {
+		first_date_string= String(first_date_year)+'-'+String(first_date_month)+'-'+String(first_date_day);
+		last_date_string= String(last_date_year)+'-'+String(last_date_month)+'-'+String(last_date_day);
+	}
 	headline = '';
 	$.each(all_main_variable,function(e,v) {
 		headline +=e+', ';
@@ -55,7 +68,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	$.each(all_place,function(e,v) {
 		headline +=e+', ';
 	});
-	headline = headline.substring(0,headline.length-2) + ' ('+String(first_date_year)+'-'+String(first_date_month)+'-'+String(first_date_day)+' &ndash; '+String(last_date_year)+'-'+String(last_date_month)+'-'+String(last_date_day)+')';
+	headline = headline.substring(0,headline.length-2) + ' ('+first_date_string+' &ndash; '+last_date_string+')';
 	var yaxis = converted_graphs.yaxis,
 	y2axis = converted_graphs.y2axis,
 	frequency;
@@ -330,7 +343,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				yaxis_finder += 1;
 			}
 
-			if (!(this.frequency == 'daily')) {
+			if (this.source == 'computed') {
 				new_graph.hoverable=false;
 				new_graph.clickable=false;
 				new_graph.points.show=false;
@@ -355,8 +368,12 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					new_graph.bars.barWidth=86400;
 				} else if (this.frequency == 'monthly') {
 					new_graph.bars.barWidth=2628000;
-				} else {
+				} else if (this.frequency == 'annualy') {
 					new_graph.bars.barWidth=31536000;
+				} else if (parseInt(this.frequency,10) > 0 ) {
+					new_graph.bars.barWidth=parseInt(this.frequency,10);
+				} else {
+					new_graph.bars.barWidth=1;
 				}
 			} else {
 				new_graph.lines = {
