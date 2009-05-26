@@ -10,8 +10,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	labelCanvas = false,
 	table_data = {},
 	all_variables={},
-	all_place=[],
-	all_main_variable=[],
+	all_place={},
+	all_main_variable={},
 	first_date=parseInt(new Date().getTime()/1000),
 	last_date=-2000000000,
 	frequency_list=['daily','monthly','annualy'];
@@ -47,14 +47,14 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	last_date_month++;
 	last_date_day=last_date_obj.getDate();
 	headline = '';
-	for (i in all_main_variable) {
-		headline +=all_main_variable[i]+', ';
-	}
+	$.each(all_main_variable,function(e,v) {
+		headline +=e+', ';
+	});
 
 	headline = headline.substring(0,headline.length-2) + ' ' + _('in') + ' ';
-	for (i in all_place) {
-		headline +=all_place[i]+', ';
-	}
+	$.each(all_place,function(e,v) {
+		headline +=e+', ';
+	});
 	headline = headline.substring(0,headline.length-2) + ' ('+String(first_date_year)+'-'+String(first_date_month)+'-'+String(first_date_day)+' &ndash; '+String(last_date_year)+'-'+String(last_date_month)+'-'+String(last_date_day)+')';
 	var yaxis = converted_graphs.yaxis,
 	y2axis = converted_graphs.y2axis,
@@ -308,10 +308,10 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 
 			}
 			if ( !(eval(this.place_js) in all_place)) {
-				all_place.push(eval(this.place_js));
+				all_place[eval(this.place_js)]=true;
 			}
 			if ( !(eval(this.main_variable_js) in all_main_variable)) {
-				all_main_variable.push(eval(this.main_variable_js));
+				all_main_variable[eval(this.main_variable_js)]=true;
 			}
 			new_graph.start_date = new_graph.data[0][0];
 			new_graph.end_date = new_graph.data[new_graph.data.length-1][0];
