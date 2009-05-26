@@ -44,12 +44,24 @@ def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,ctype)
 	list_of_pk=[]
 	for i in queryset:
 		fecha=traducir_tiempo(ano=i.ano,tiempo=i.tiempo)
-		if variable=='area sembrada':
-			value=i.area_sembrada
-			unit= 'mz'
-		elif variable=='rendimiento obtenido':
-			value=i.rendimiento_obtenido
-			unit='lb/mz'
+		if variable=='area estimada':
+                         value=i.area_estimada
+                         unit= 'mz'
+                 elif variable=='producto estimado':
+                         value=i.producto_estimado
+                         unit='lb/mz'
+                 elif variable=='area sembrada':
+                         value=i.area_sembrada
+                         unit='mz'
+                 elif variable=='area cosechada':
+                         value=i.area_cosechada
+                         unit='mz'
+                 elif variable=='producto obtenido':
+                         value=i.producto_obtenido
+                         unit='lb/mz'
+                 elif variable=='rendimiento estimado':
+                         value=i.rendimiento_estimado()
+                         unit='lb/mz'
 		else:
 			value=0
 			unit=""
@@ -59,6 +71,6 @@ def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,ctype)
 		list_of_pk.append(str(i.pk))
 		data.append([fecha_numero,value,unique_pk])
 	pk_list.append([content_type,list_of_pk])
-	result = {'included_variables':{'municipio':municipio.nombre, 'cosecha_producto':producto.nombre, 'tipovariable':variable},'data':data,'unit':unit,'type':'cosecha '+variable,'frequency':'monthly','main_variable_js':'"'+variable+' de "+this.included_variables.cosecha_producto','place_js':'this.included_variables.municipio','normalize_factor_js':'this.start_value','display':'lines'}
+	result = {'included_variables':{'municipio':municipio.nombre, 'cosecha_producto':producto.nombre, 'tipovariable':variable},'data':data,'unit':unit,'type':'cosecha '+variable,'frequency':'monthly','main_variable_js':'"'+variable+' de "+this.included_variables.cosecha_producto','place_js':'this.included_variables.municipio','normalize_factor_js':'this.start_value','display':'bars'}
 	return result,pk_list
 
