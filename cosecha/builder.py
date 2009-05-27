@@ -43,7 +43,6 @@ def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,ctype)
 	data=[]
 	list_of_pk=[]
 	for i in queryset:
-		fecha=traducir_tiempo(ano=i.ano,tiempo=i.tiempo)
 		if variable=='area estimada':
 			value=i.area_estimada
 			unit= 'mz'
@@ -77,10 +76,11 @@ def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,ctype)
 		else:
 			value=0
 			unit=""
-		fecha_numero=mktime(fecha.timetuple())
+		fecha=int(mktime(traducir_tiempo(ano=i.ano,tiempo=i.tiempo).timetuple()))
+#		fecha_numero=mktime(fecha.timetuple())
 		unique_pk=str(content_type)+"_"+str(i.pk)
 		list_of_pk.append(str(i.pk))
-		data.append([fecha_numero,value,unique_pk])
+		data.append([fecha,value,unique_pk])
 	pk_list.append([content_type,list_of_pk])
 	result = {'included_variables':{'municipio':municipio.nombre, 'cosecha_producto':producto.nombre, 'tipovariable':variable},'data':data,'source':'raw','unit':unit,'type':'cosecha '+variable,'frequency':'monthly','main_variable_js':'"'+variable+' de "+this.included_variables.cosecha_producto','place_js':'this.included_variables.municipio','normalize_factor_js':'this.start_value','display':'bars'}
 	return result,pk_list

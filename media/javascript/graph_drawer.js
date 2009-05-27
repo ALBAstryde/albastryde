@@ -68,8 +68,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		headline +=e+', ';
 	});
 	headline = headline.substring(0,headline.length-2) + ' ('+first_date_string+' &ndash; '+last_date_string+')';
-	var yaxis = converted_graphs.yaxis,
-	y2axis = converted_graphs.y2axis,
+	var yaxis = [converted_graphs.yaxis[0],
+	converted_graphs.yaxis[1]],
 	frequency;
 	for (frequency in frequency_list) {
 		table_data[frequency_list[frequency]]={};
@@ -106,8 +106,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			}
 		}
 	}
-	converted_graphs.yaxis = yaxis;
-	converted_graphs.y2axis = y2axis;
+	converted_graphs.yaxis = [yaxis[0],yaxis[1]];
+//	converted_graphs.y2axis = y2axis;
 	query_id = String(new Date().getTime());
 	e_msg = _('New graph generated!');
 
@@ -386,19 +386,19 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			new_graphs.push(new_graph);
 			color_counter += 1;
 		});
-		var yaxis = '',
-		y2axis = '';
+		var yaxis = ['',''];
+//		y2axis = '';
 		var yaxis_finder = 1;
 		for (var item in graph_types) {
 			if (yaxis_finder == 1) {
-				yaxis = graph_types[item];
+				yaxis[0] = graph_types[item];
 			} else if (yaxis_finder == 2) {
-				y2axis = graph_types[item];
+				yaxis[1] = graph_types[item];
 			}
 			yaxis_finder += 1;
 		}
 		new_graphs.yaxis = yaxis;
-		new_graphs.y2axis = y2axis;
+//		new_graphs.y2axis = y2axis;
 		return new_graphs;
 	}
 
@@ -512,13 +512,15 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			}
 			new_graphs.push(new_graph);
 		});
-		var yaxis_finder = 1;
+		var yaxis_finder = 0;
+		new_graphs.yaxis=[];
 		for (var item in graph_types) {
-			if (yaxis_finder == 1) {
-				new_graphs.yaxis = graph_types[item];
-			} else if (yaxis_finder == 2) {
-				new_graphs.y2axis = graph_types[item];
-			}
+			new_graphs.yaxis[yaxis_finder] = graph_types[item];
+//XXX			if (yaxis_finder == 1) {
+//totalt sluder?				new_graphs.yaxis[0] = graph_types[item];
+//			} else if (yaxis_finder == 2) {
+//				new_graphs.yaxis[1] = graph_types[item];
+//			}
 			yaxis_finder += 1;
 		}
 		return new_graphs.sort();
@@ -794,8 +796,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			}
 			new_graphs.push(new_graph);
 		});
-		new_graphs.yaxis = '%';
-		new_graphs.y2axis = '';
+		new_graphs.yaxis = ['%',''];
+	//	new_graphs.y2axis[1] = '';
 		return new_graphs;
 	}
 	function makeLabelCanvas(width, height) {
@@ -1410,20 +1412,20 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 
 	function ranges_to_axis_dic(ranges) {
 		var axis_dic = {
-			xaxis: {
-				min: ranges.xaxis.from,
-				max: ranges.xaxis.to
-			},
-			yaxis: {
-				min: ranges.yaxis.from,
-				max: ranges.yaxis.to
-			}
+			xaxis: [{
+				min: ranges.xaxis[0].from,
+				max: ranges.xaxis[0].to
+			}],
+			yaxis: [{
+				min: ranges.yaxis[0].from,
+				max: ranges.yaxis[0].to
+			}]
 		};
-		if ('y2axis' in ranges) {
-			axis_dic.y2axis = {
-				min: ranges.y2axis.from,
-				max: ranges.y2axis.to
-			};
+		if (ranges.yaxis.length > 1) {
+			axis_dic.yaxis.push({
+				min: ranges.yaxis[1].from,
+				max: ranges.yaxis[1].to
+			});
 		}
 		return axis_dic;
 	}
@@ -1436,16 +1438,16 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			}
 		};
 		if ('yaxis' in axis_dic) {
-			ranges.yaxis = {
-				from: axis_dic.yaxis.min,
-				to: axis_dic.yaxis.max
-			};
-		}
-		if ('y2axis' in axis_dic) {
-			ranges.y2axis = {
-				from: axis_dic.y2axis.min,
-				to: axis_dic.y2axis.max
-			};
+			ranges.yaxis = [{
+				from: axis_dic.yaxis[0].min,
+				to: axis_dic.yaxis[0].max
+			}];
+			if (axis_dic.yaxis.length > 1) {
+				ranges.yaxis.push({
+					from: axis_dic.yaxis[1].min,
+					to: axis_dic.yaxis[1].max
+				});
+			}
 		}
 		return ranges;
 	}
@@ -1454,21 +1456,21 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		var axis_dic = false;
 		var options, overview_options, overview;
 		options = {
-			xaxis: {
+			xaxis: [{
 				mode: 'unixtime',
 				minTickSize: [1, 'day'],
 				monthNames: [_('Jan'), _("Feb"), _("Mar"), _("Apr"), _("May"), _("Jun"), _("Jul"), _("Aug"), _("Sep"), _("Oct"), _("Nov"), _("Dec")]
-			},
-			yaxis: {
+			}],
+			yaxis: [{
 				tickFormatter: function(v, axis) {
-					return v.toFixed(axis.tickDecimals) + graphs.yaxis;
+					return v.toFixed(axis.tickDecimals) + graphs.yaxis[0];
 				}
 			},
-			y2axis: {
+			{
 				tickFormatter: function(v, axis) {
-					return v.toFixed(axis.tickDecimals) + graphs.y2axis;
+					return v.toFixed(axis.tickDecimals) + graphs.yaxis[1];
 				}
-			},
+			}],
 			legend: {
 				container: '#' + query_id + 'legend'
 			},
@@ -1504,16 +1506,16 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					show: false
 				},
 				shadowSize: 0,
-				xaxis: {
+				xaxis: [{
 					ticks: [],
 					mode: 'unixtime'
-				},
-				yaxis: {
+				}],
+				yaxis: [{
 					ticks: []
 				},
-				y2axis: {
+				{
 					ticks: []
-				},
+				}],
 				selection: {
 					mode: 'xy'
 				}
@@ -1587,9 +1589,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				overview = $.plot($('#' + query_id + 'statsoverview'), graphs, overview_options);
 				if (axis_dic) {
 					delete axis_dic.yaxis;
-					if ('y2axis' in axis_dic) {
-						delete axis_dic.y2axis;
-					}
+					//if ('y2axis' in axis_dic) {
+					//	delete axis_dic.y2axis;
+					//}
 					plot = $.plot($('#' + query_id + 'stats'), graphs, $.extend(true, {},
 					options, axis_dic));
 					axis_dic = plot.getAxes();
