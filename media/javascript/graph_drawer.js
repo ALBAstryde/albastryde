@@ -1,3 +1,4 @@
+JOHANNESOLD=[];
 var e_msg, errors;
 function create_graphs(jsondata, wiki_mode, graphsheader) {
 	var query_id, id, headline, has_comments, plot, comments, datapoint_dictionary, graph_height, raw_graphs, converted_graphs, dollargraphs, eurographs, normalized_graphs, normalized_dollargraphs, normalized_eurographs, graphs;
@@ -12,6 +13,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	all_variables={},
 	all_place={},
 	all_main_variable={},
+	total_yaxis=1;
 	first_date=parseInt(new Date().getTime()/1000),
 	last_date=-2000000000,
 	frequency_list=['daily','monthly','annualy'];
@@ -68,9 +70,11 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		headline +=e+', ';
 	});
 	headline = headline.substring(0,headline.length-2) + ' ('+first_date_string+' &ndash; '+last_date_string+')';
-	var yaxis = [converted_graphs.yaxis[0],
-	converted_graphs.yaxis[1]],
-	frequency;
+	var yaxis=[];
+	for (i=0;i<converted_graphs.yaxis.length;i++) { 
+		yaxis.push(converted_graphs.yaxis[i]);
+	}
+	var frequency;
 	for (frequency in frequency_list) {
 		table_data[frequency_list[frequency]]={};
 		table_data[frequency_list[frequency]].Cordoba=[];
@@ -106,7 +110,11 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			}
 		}
 	}
-	converted_graphs.yaxis = [yaxis[0],yaxis[1]];
+	converted_graphs.yaxis=[];
+	for (i=0;i<yaxis.length;i++) { 
+		converted_graphs.yaxis.push(yaxis[i]);
+	}
+//	converted_graphs.yaxis = [yaxis[0],yaxis[1]];
 //	converted_graphs.y2axis = y2axis;
 	query_id = String(new Date().getTime());
 	e_msg = _('New graph generated!');
@@ -337,6 +345,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			for (var item in graph_types) {
 				if (item == this.type) {
 					new_graph.yaxis = yaxis_finder;
+					if (yaxis_finder > total_yaxis) {
+						total_yaxis=yaxis_finder;
+					}
 				}
 				yaxis_finder += 1;
 			}
@@ -388,14 +399,15 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		});
 		var yaxis = ['',''];
 //		y2axis = '';
-		var yaxis_finder = 1;
+		var yaxis_finder = 0;
 		for (var item in graph_types) {
-			if (yaxis_finder == 1) {
-				yaxis[0] = graph_types[item];
-			} else if (yaxis_finder == 2) {
-				yaxis[1] = graph_types[item];
-			}
-			yaxis_finder += 1;
+//			if (yaxis_finder == 1) {
+//				yaxis[0] = graph_types[item];
+//			} else if (yaxis_finder == 2) {
+//				yaxis[1] = graph_types[item];
+//			}
+			yaxis[yaxis_finder] = graph_types[item];
+			yaxis_finder++;
 		}
 		new_graphs.yaxis = yaxis;
 //		new_graphs.y2axis = y2axis;
@@ -1461,16 +1473,17 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				minTickSize: [1, 'day'],
 				monthNames: [_('Jan'), _("Feb"), _("Mar"), _("Apr"), _("May"), _("Jun"), _("Jul"), _("Aug"), _("Sep"), _("Oct"), _("Nov"), _("Dec")]
 			}],
-			yaxis: [{
-				tickFormatter: function(v, axis) {
-					return v.toFixed(axis.tickDecimals) + graphs.yaxis[0];
-				}
-			},
-			{
-				tickFormatter: function(v, axis) {
-					return v.toFixed(axis.tickDecimals) + graphs.yaxis[1];
-				}
-			}],
+			yaxis: [],
+//				{
+//				tickFormatter: function(v, axis) {
+//					return v.toFixed(axis.tickDecimals) + graphs.yaxis[0];
+//				}
+//			},
+//			{
+//				tickFormatter: function(v, axis) {
+//					return v.toFixed(axis.tickDecimals) + graphs.yaxis[1];
+//				}
+//			}],
 			legend: {
 				container: '#' + query_id + 'legend'
 			},
@@ -1482,6 +1495,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				mode: 'xy'
 			}
 		};
+		for (i=0;i<total_yaxis;i++) {
+			eval('options.yaxis.push({tickFormatter: function(v, axis) {JOHANNESOLD.push([v,axis]);return v.toFixed(axis.tickDecimals) + graphs.yaxis['+String(i)+'];}});');
+		}
 		if (editor_mode) {
 			options.legend.checkboxes = true;
 		} else {
@@ -1494,6 +1510,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			};
 		}
 		plot = $.plot($('#' + query_id + 'stats'), graphs, options);
+JOHANNESOUT=[graphs,options];
 		if (editor_mode) {
 			overview_options = {
 				lines: {

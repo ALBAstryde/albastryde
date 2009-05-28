@@ -46,7 +46,7 @@ class Cosecha(models.Model):
 			return None
 
 	def rendimiento_obtenido(self):
-		if self.area_cosecha > 0:
+		if self.area_cosechada > 0:
 			return self.producto_obtenido/self.area_cosechada
 		else:
 			return None

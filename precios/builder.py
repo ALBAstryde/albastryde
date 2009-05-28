@@ -64,7 +64,7 @@ def precio_graph(mercado,producto,frequency,start_date,end_date,dollar,euro,pk_l
 			max_data.append([adjusted_fecha,precio])
 	if frequency=='daily':
 		pk_list.append([content_type,list_of_pk])
-	result={'included_variables':{'producto':producto.nombre,'mercado':mercado.nombre},'unit':'cordoba','type':'precio','source':source,'frequency':frequency,'main_variable_js':'this.included_variables.producto','place_js':'this.included_variables.mercado','normalize_factor_js':'this.start_value','display':'lines'}
+	result={'included_variables':{'producto':producto.nombre,'mercado':mercado.nombre},'unit':'C$','type':'precio','source':source,'frequency':frequency,'main_variable_js':'this.included_variables.producto','place_js':'this.included_variables.mercado','normalize_factor_js':'this.start_value','display':'lines'}
 	if len(min_data_dic)==0:
 		result['data']=max_data
 	else:

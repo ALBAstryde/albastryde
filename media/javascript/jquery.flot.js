@@ -1,3 +1,4 @@
+JOHANNESNEW=[];
 /* Javascript plotting library for jQuery, v. 0.5.
  *
  * Released under the MIT license by IOLA, December 2007.
@@ -46,7 +47,11 @@
                 {
                     autoscaleMargin: null
                 }],
-                yaxis: [{
+                yaxis: [
+		{
+                    autoscaleMargin: 0.02
+                },
+		{
                     autoscaleMargin: 0.02
                 },
                 {
@@ -106,7 +111,7 @@
         eventHolder = null, // jQuery object that events should be bound to
         ctx = null, octx = null,
         target = $(target_),
-        axes = { xaxis: [{},{}], yaxis: [{},{}] },
+        axes = { xaxis: [{},{}], yaxis: [{},{},{}] },
         plotOffset = { left: 0, right: 0, top: 0, bottom: 0},
         canvasWidth = 0, canvasHeight = 0,
         plotWidth = 0, plotHeight = 0,
@@ -289,7 +294,9 @@
 		    }
 		    if (s.yaxis > options.yaxis.length) {
 			for (var f=options.yaxis.length;f<s.yaxis;f++) {
-			    options.yaxis[f]={};
+			    lastOptions=options.yaxis[options.yaxis.length-1];
+			//    options.yaxis[f]=lastOptions.clone();
+			    options.yaxis[f] = $.extend(true, {}, lastOptions);
 			}
 		    }
 		    s.yaxis=axes.yaxis[s.yaxis-1];
@@ -503,7 +510,7 @@
             var noTicks;
             if (typeof axisOptions.ticks == "number" && axisOptions.ticks > 0)
                 noTicks = axisOptions.ticks;
-            else if (axis == axes.xaxis[0] || axis == axes.xaxis[1])
+            else if (axis in axes.xaxis)
                 noTicks = canvasWidth / 100;
             else
                 noTicks = canvasHeight / 60;
@@ -728,6 +735,7 @@
             }
 
             axis.tickSize = unit ? [size, unit] : size;
+JOHANNESNEW.push([unit,size])
             axis.tickGenerator = generator;
             if ($.isFunction(axisOptions.tickFormatter))
                 axis.tickFormatter = function (v, axis) { return "" + axisOptions.tickFormatter(v, axis); };
@@ -738,13 +746,11 @@
             if (axisOptions.labelHeight != null)
                 axis.labelHeight = axisOptions.labelHeight;
         }
-        
         function setTicks(axis, axisOptions) {
             axis.ticks = [];
-
             if (!axis.used)
                 return;
-            
+	    JOHANNESNEW.push(axis);            
             if (axisOptions.ticks == null)
                 axis.ticks = axis.tickGenerator(axis);
             else if (typeof axisOptions.ticks == "number") {
@@ -983,15 +989,16 @@
                 if ($.isFunction(markings))
                     // xmin etc. are backwards-compatible, to be removed in future
 //                    markings = markings({ xmin: axes.xaxis[0].min, xmax: axes.xaxis[0].max, ymin: axes.yaxis[0].min, ymax: axes.yaxis[0].max, xaxis: [axes.xaxis[0],axes.xaxis[1]], yaxis: [axes.yaxis[0],axes.yaxis[1]] });
-                    markings = markings({ xmin: axes.xaxis[0].min, xmax: axes.xaxis[0].max, ymin: axes.yaxis[0].min, ymax: axes.yaxis[0].max, xaxis: [], yaxis: [] });
+//                    markings = markings({ xmin: axes.xaxis[0].min, xmax: axes.xaxis[0].max, ymin: axes.yaxis[0].min, ymax: axes.yaxis[0].max, xaxis: [], yaxis: [] });
+                    markings = markings({ xaxis: axes.xaxis, yaxis: axes.yaxis });
 
-		for (i=0; i< axes.xaxis.length; i++) {
-		    markings.xaxis.push(axes.xaxis[i]);
-		}
+//		for (i=0; i< axes.xaxis.length; i++) {
+//		    markings.xaxis.push(axes.xaxis[i]);
+//		}
 
-		for (i=0; i< axes.yaxis.length; i++) {
-		    markings.yaxis.push(axes.yaxis[i]);
-		}
+//		for (i=0; i< axes.yaxis.length; i++) {
+//		    markings.yaxis.push(axes.yaxis[i]);
+//		}
 
                 for (i = 0; i < markings.length; ++i) {
                     var m = markings[i],
@@ -1052,7 +1059,10 @@
             ctx.lineWidth = 1;
             ctx.strokeStyle = options.grid.tickColor;
             ctx.beginPath();
-            var v, axis = axes.xaxis[0];
+            var v, axis;
+
+	    for (f in axes.xaxis) { 
+		axis= axes.xaxis[f];
             for (i = 0; i < axis.ticks.length; ++i) {
                 v = axis.ticks[i].v;
                 if (v <= axis.min || v >= axes.xaxis.max)
@@ -1061,8 +1071,10 @@
                 ctx.moveTo(Math.floor(axis.p2c(v)) + ctx.lineWidth/2, 0);
                 ctx.lineTo(Math.floor(axis.p2c(v)) + ctx.lineWidth/2, plotHeight);
             }
+	    }
 
-            axis = axes.yaxis[0];
+	    for (f in axes.yaxis) {
+            axis = axes.yaxis[f];
             for (i = 0; i < axis.ticks.length; ++i) {
                 v = axis.ticks[i].v;
                 if (v <= axis.min || v >= axis.max)
@@ -1071,7 +1083,8 @@
                 ctx.moveTo(0, Math.floor(axis.p2c(v)) + ctx.lineWidth/2);
                 ctx.lineTo(plotWidth, Math.floor(axis.p2c(v)) + ctx.lineWidth/2);
             }
-
+	    }
+JOHANNES3=axes;
             axis = axes.xaxis[1];
             for (i = 0; i < axis.ticks.length; ++i) {
                 v = axis.ticks[i].v;
@@ -1082,15 +1095,15 @@
                 ctx.lineTo(Math.floor(axis.p2c(v)) + ctx.lineWidth/2, 5);
             }
 
-            axis = axes.yaxis[1];
-            for (i = 0; i < axis.ticks.length; ++i) {
-                v = axis.ticks[i].v;
-                if (v <= axis.min || v >= axis.max)
-                    continue;
+//            axis = axes.yaxis[1];
+//            for (i = 0; i < axis.ticks.length; ++i) {
+//                v = axis.ticks[i].v;
+//                if (v <= axis.min || v >= axis.max)
+//                    continue;
 
-                ctx.moveTo(plotWidth-5, Math.floor(axis.p2c(v)) + ctx.lineWidth/2);
-                ctx.lineTo(plotWidth+5, Math.floor(axis.p2c(v)) + ctx.lineWidth/2);
-            }
+//                ctx.moveTo(plotWidth-5, Math.floor(axis.p2c(v)) + ctx.lineWidth/2);
+//                ctx.lineTo(plotWidth+5, Math.floor(axis.p2c(v)) + ctx.lineWidth/2);
+//            }
             
             ctx.stroke();
             
@@ -1106,7 +1119,7 @@
         }
         
         function insertLabels() {
-            target.find(".tickLabels").remove();
+            //target.find(".tickLabels").remove();
             
             var html = '<div class="tickLabels" style="font-size:smaller;color:' + options.grid.color + '">';
 
@@ -2092,6 +2105,7 @@ JOHANNES1=selection;
             else {
                 crosshair.pos.x = clamp(0, pos.x != null ? axes.xaxis[0].p2c(pos.x) : axes.xaxis[1].p2c(pos.x2), plotWidth);
                 crosshair.pos.y = clamp(0, pos.y != null ? axes.yaxis[0].p2c(pos.y) : axes.yaxis[1].p2c(pos.y2), plotHeight);
+//JOHANNESNEW.push([pos.x,pos,y,pos2.y,pos2.x])
             }
             triggerRedrawOverlay();
         }
@@ -2101,17 +2115,32 @@ JOHANNES1=selection;
                 x2 = Math.max(selection.first.x, selection.second.x),
                 y1 = Math.max(selection.first.y, selection.second.y),
                 y2 = Math.min(selection.first.y, selection.second.y);
+//            var x1 = selection.first.x,
+//                x2 = selection.first.x,
+//                y1 = selection.first.y,
+//                y2 = selection.first.y;
 
             var r = {};
 	    r.xaxis=[],r.yaxis=[];
-            if (axes.xaxis[0].used)
-                r.xaxis[0] = { from: axes.xaxis[0].c2p(x1), to: axes.xaxis[0].c2p(x2) };
-            if (axes.xaxis[1].used)
-                r.xaxis[1] = { from: axes.xaxis[1].c2p(x1), to: axes.xaxis[1].c2p(x2) };
-            if (axes.yaxis[0].used)
-                r.yaxis[0] = { from: axes.yaxis[0].c2p(y1), to: axes.yaxis[0].c2p(y2) };
-            if (axes.yaxis[1].used)
-                r.yaxis[1] = { from: axes.yaxis[1].c2p(y1), to: axes.yaxis[1].c2p(y2) };
+
+	    for (i=0;i<axes.xaxis.length;i++) {	    
+                if (axes.xaxis[i].used)
+                    r.xaxis[i] = { from: axes.xaxis[i].c2p(x1), to: axes.xaxis[i].c2p(x2) };
+	    }
+
+	    for (i=0;i<axes.yaxis.length;i++) {	    
+                if (axes.yaxis[i].used)
+                    r.yaxis[i] = { from: axes.yaxis[i].c2p(y1), to: axes.yaxis[i].c2p(y2) };
+	    }
+
+//            if (axes.xaxis[0].used)
+//                r.xaxis[0] = { from: axes.xaxis[0].c2p(x1), to: axes.xaxis[0].c2p(x2) };
+//            if (axes.xaxis[1].used)
+//                r.xaxis[1] = { from: axes.xaxis[1].c2p(x1), to: axes.xaxis[1].c2p(x2) };
+//            if (axes.yaxis[0].used)
+//                r.yaxis[0] = { from: axes.yaxis[0].c2p(y1), to: axes.yaxis[0].c2p(y2) };
+//            if (axes.yaxis[1].used)
+//                r.yaxis[1] = { from: axes.yaxis[1].c2p(y1), to: axes.yaxis[1].c2p(y2) };
             return r;
         }
         
@@ -2121,8 +2150,8 @@ JOHANNES1=selection;
             target.trigger("plotselected", [ r ]);
 
             // backwards-compat stuff, to be removed in future
-            if (axes.xaxis[0].used && axes.yaxis[0].used)
-                target.trigger("selected", [ { x1: r.xaxis[0].from, y1: r.yaxis[0].from, x2: r.xaxis[0].to, y2: r.yaxis[0].to } ]);
+       //     if (axes.xaxis[0].used && axes.yaxis[0].used)
+       //         target.trigger("selected", [ { x1: r.xaxis[0].from, y1: r.yaxis[0].from, x2: r.xaxis[0].to, y2: r.yaxis[0].to } ]);
         }
         
         function onSelectionMouseUp(e) {

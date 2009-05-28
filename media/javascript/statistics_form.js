@@ -53,7 +53,7 @@ $(function() {
 
 
 function beforeForm() {
-	$('#AjaxFormSubmit').attr('disabled', 'disabled'); //Disable the submit button - can't click twice
+//	$('#AjaxFormSubmit').attr('disabled', 'disabled'); //Disable the submit button - can't click twice
 	$('.errorlist').remove(); //Get rid of any old error uls
 	//$('#AjaxFormWarning').fadeOut('slow'); //Get rid of the main error message
 	$('#AjaxFormWarning').html('<img src="/media/icons/ajax-loader.gif" />').fadeIn('slow');

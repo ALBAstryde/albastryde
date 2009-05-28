@@ -72,7 +72,7 @@ def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,ctype)
 			unit='mz'
 		elif variable=='producto miscalculado':
 			value=i.producto_miscalculado()
-			unit='lb/mz'
+			unit='lb'
 		else:
 			value=0
 			unit=""
