@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from precios.models import Prueba as PrecioPrueba
 #from precios.models import Mercado
 from valuta.models import USD,Euro
@@ -5,6 +6,50 @@ import datetime
 from calendar import monthrange
 from time import mktime
 from django.db import connection
+from django.contrib.contenttypes.models import ContentType
+
+content_type = ContentType.objects.get(app_label__exact='precios', name__exact='prueba').id
+
+def precio_builder(form_data,frequencies):
+		pk_list=[]
+		graphs=[]
+		mercados = form_data['Mercado']	
+		productos = form_data['Producto']
+		start_date = form_data['Desde']
+		end_date = form_data['Hasta']
+		municipios = form_data['Municipio']
+		departamentos = form_data['Departamento']
+
+		if len(productos) > 0:		
+			for departamento in departamentos:
+		  		if len(departamento.municipios.all()) > 0:
+			  		if len(municipios) > 0:
+						municipios = municipios | departamento.municipios.all()
+					else:
+				  		municipios = departamento.municipios.all()
+
+			for municipio in municipios:
+			  	if len(municipio.mercado_set.all()) > 0:
+				  	if len(mercados) > 0:
+						mercados = mercados | municipio.mercado_set.all()
+					else:
+					  	mercados = municipio.mercado_set.all()				  
+
+			if len(mercados) > 0:
+				dollar={'unit':'USD','monthly':{},'annualy':{},'daily':{}}
+				euro={'unit':'Euro','monthly':{},'annualy':{},'daily':{}}
+
+
+		# Aqui se llaman las funciones para hacer cada uno de los graficos
+
+				for frequency in frequencies:
+					for i in mercados:
+						for b in productos:
+							graph,dollar,euro,pk_list=precio_graph(mercado=i,producto=b,frequency=frequency,start_date=start_date,end_date=end_date,dollar=dollar,euro=euro,pk_list=pk_list)
+							if not graph==None:
+								graphs.append(graph)
+
+		return graphs,pk_list,dollar,euro
 
 
 
@@ -25,7 +70,7 @@ def add_year(datum, n=1):
 
 	
 
-def precio_graph(mercado,producto,frequency,start_date,end_date,dollar,euro,pk_list,ctype):
+def precio_graph(mercado,producto,frequency,start_date,end_date,dollar,euro,pk_list):
 	queryset = None
 	if frequency=='daily':
 		queryset = PrecioPrueba.objects.filter(producto=producto,mercado=mercado,fecha__range=[start_date,end_date]).values('fecha','pk','maximo','minimo').order_by('fecha')
@@ -41,7 +86,6 @@ def precio_graph(mercado,producto,frequency,start_date,end_date,dollar,euro,pk_l
 			row_dic={'fecha':row[2],'maximo':row[3],'minimo':row[4],'producto':row[0],'mercado':row[1]}
 			queryset.append(row_dic)
 		source='computed'
-	content_type=ctype.id
 	if len(queryset)==0:
 		return None,dollar,euro,pk_list
 	max_data=[]
@@ -82,8 +126,10 @@ def precio_graph(mercado,producto,frequency,start_date,end_date,dollar,euro,pk_l
 		if frequency=='daily':
 			unique_pk=str(content_type)+"_"+str(i['pk'])		
 			list_of_pk.append(str(i['pk']))
+#			max_data.append([now_fecha,precio,unique_pk])
 			max_data.append([[now_fecha,next_fecha],precio,unique_pk])
 		else:
+#			max_data.append([now_fecha,precio])
 			max_data.append([[now_fecha,next_fecha],precio])
 	if frequency=='daily':
 		pk_list.append([content_type,list_of_pk])

@@ -1,4 +1,3 @@
-JOHANNESNEW=[];
 /* Javascript plotting library for jQuery, v. 0.5.
  *
  * Released under the MIT license by IOLA, December 2007.
@@ -737,7 +736,6 @@ JOHANNESNEW=[];
             }
 
             axis.tickSize = unit ? [size, unit] : size;
-JOHANNESNEW.push([unit,size])
             axis.tickGenerator = generator;
             if ($.isFunction(axisOptions.tickFormatter))
                 axis.tickFormatter = function (v, axis) { return "" + axisOptions.tickFormatter(v, axis); };
@@ -752,7 +750,6 @@ JOHANNESNEW.push([unit,size])
             axis.ticks = [];
             if (!axis.used)
                 return;
-	    JOHANNESNEW.push(axis);            
             if (axisOptions.ticks == null)
                 axis.ticks = axis.tickGenerator(axis);
             else if (typeof axisOptions.ticks == "number") {
@@ -1086,7 +1083,6 @@ JOHANNESNEW.push([unit,size])
                 ctx.lineTo(plotWidth, Math.floor(axis.p2c(v)) + ctx.lineWidth/2);
             }
 	    }
-JOHANNES3=axes;
             axis = axes.xaxis[1];
             for (i = 0; i < axis.ticks.length; ++i) {
                 v = axis.ticks[i].v;
@@ -1779,7 +1775,6 @@ JOHANNES3=axes;
             clickIsMouseUp = false,
             redrawTimeout = null,
             hoverTimeout = null;
-JOHANNES1=selection;
         
         // Returns the data item the mouse is over, or null if none is found
         function findNearbyItem(mouseX, mouseY, seriesFilter) {
@@ -1813,21 +1808,29 @@ JOHANNES1=selection;
                     maxy = maxDistance / axisy.scale,
                     checkbar = series[i].bars.show,
                     checkpoint = !(series[i].bars.show && !(series[i].lines.show || series[i].points.show)),
-                    barLeft = series[i].bars.align == "left" ? 0 : -series[i].bars.barWidth/2,
-                    barRight = barLeft + series[i].bars.barWidth;
+                    barLeft = series[i].bars.align == "left" ? 0 : -series[i].bars.barWidth/2;
+//interval                    var barRight = barLeft + series[i].bars.barWidth;
                 for (var j = 0; j < data.length; ++j) {
                     if (data[j] == null)
                         continue;
 
 //interval                    var x = data[j][0], y = data[j][1];
-                    var x, y = data[j][1];
-		    x = (typeof(data[j][0])=='object') ? data[j][0][0] : data[j][0];  
+                    var barRight,pointX, barX, y = data[j][1];
+		    if (typeof(data[j][0])=='object') {
+			pointX = data[j][0][0]+(data[j][0][1]-data[j][0][0])/2;
+			barX = data[j][0][0];
+			barRight = (data[j][0][1]-data[j][0][0]);
+		    } else {
+			pointX = data[j][0];
+			barX = data[j][0];
+			barRight = barLeft + series[i].bars.barWidth;
+		    }
 //interval end
                     if (checkbar) {
                         // For a bar graph, the cursor must be inside the bar
                         // and no other point can be nearby
-                        if (!foundPoint && mx >= x + barLeft &&
-                            mx <= x + barRight &&
+                        if (!foundPoint && mx >= barX + barLeft &&
+                            mx <= barX + barRight &&
                             my >= Math.min(0, y) && my <= Math.max(0, y))
                             item = result(i, j);
                     }
@@ -1837,13 +1840,13 @@ JOHANNES1=selection;
                         // certain distance to the data point
  
                         // check bounding box first
-                        if ((x - mx > maxx || x - mx < -maxx) ||
+                        if ((pointX - mx > maxx || pointX - mx < -maxx) ||
                             (y - my > maxy || y - my < -maxy))
                             continue;
 
                         // We have to calculate distances in pixels, not in
                         // data units, because the scale of the axes may be different
-                        var dx = Math.abs(axisx.p2c(x) - mouseX),
+                        var dx = Math.abs(axisx.p2c(pointX) - mouseX),
                             dy = Math.abs(axisy.p2c(y) - mouseY),
                             dist = dx * dx + dy * dy;
                         if (dist < lowestDistance) {
@@ -1947,7 +1950,6 @@ JOHANNES1=selection;
 //                   pos.x[i] = axes.xaxis[i].c2p(canvasX);
 //	    }
 
-//JOHANNES2=pos;
 
 //	    for (i=0;i<axes.yaxis.length;i++) {
 //                if (axes.yaxis[i].used)
@@ -1968,7 +1970,7 @@ JOHANNES1=selection;
             if (item) {
                 // fill in mouse pos for any listeners out there
 //interval                item.pageX = parseInt(item.series.xaxis.p2c(item.datapoint[0]) + offset.left + plotOffset.left);
-		var time_value = (typeof(item_datapoint[0])=='object') ? (item_datapoint[0][0]+(item_datapoint[0][1]-item_datapoint[0][0])/2) : item_datapoint[0];
+		var time_value = (typeof(item.datapoint[0])=='object') ? (item.datapoint[0][0]+(item.datapoint[0][1]-item.datapoint[0][0])/2) : item.datapoint[0];
                 item.pageX = parseInt(item.series.xaxis.p2c(time_value) + offset.left + plotOffset.left,10);
 //interval end
                 item.pageY = parseInt(item.series.yaxis.p2c(item.datapoint[1]) + offset.top + plotOffset.top);
@@ -2142,7 +2144,6 @@ JOHANNES1=selection;
             else {
                 crosshair.pos.x = clamp(0, pos.x != null ? axes.xaxis[0].p2c(pos.x) : axes.xaxis[1].p2c(pos.x2), plotWidth);
                 crosshair.pos.y = clamp(0, pos.y != null ? axes.yaxis[0].p2c(pos.y) : axes.yaxis[1].p2c(pos.y2), plotHeight);
-//JOHANNESNEW.push([pos.x,pos,y,pos2.y,pos2.x])
             }
             triggerRedrawOverlay();
         }
@@ -2152,21 +2153,17 @@ JOHANNES1=selection;
                 x2 = Math.max(selection.first.x, selection.second.x),
                 y1 = Math.max(selection.first.y, selection.second.y),
                 y2 = Math.min(selection.first.y, selection.second.y);
-//            var x1 = selection.first.x,
-//                x2 = selection.first.x,
-//                y1 = selection.first.y,
-//                y2 = selection.first.y;
 
             var r = {};
 	    r.xaxis=[],r.yaxis=[];
 
 	    for (i=0;i<axes.xaxis.length;i++) {	    
-                if (axes.xaxis[i].used)
+//                if (axes.xaxis[i].used)
                     r.xaxis[i] = { from: axes.xaxis[i].c2p(x1), to: axes.xaxis[i].c2p(x2) };
 	    }
 
 	    for (i=0;i<axes.yaxis.length;i++) {	    
-                if (axes.yaxis[i].used)
+//                if (axes.yaxis[i].used)
                     r.yaxis[i] = { from: axes.yaxis[i].c2p(y1), to: axes.yaxis[i].c2p(y2) };
 	    }
 

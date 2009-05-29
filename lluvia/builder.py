@@ -1,10 +1,47 @@
+# -*- coding: utf-8 -*-
 from lluvia.models import Prueba as LLuviaPrueba
 #from datetime import date
 from time import mktime
 from django.db import connection
+from django.contrib.contenttypes.models import ContentType
 from precios.builder import add_month, add_year
 
-def lluvia_graph(estacion,frequency,start_date,end_date,pk_list,ctype):
+content_type = ContentType.objects.get(app_label__exact='lluvia', name__exact='prueba').id
+
+def lluvia_builder(form_data,frequencies):
+  		pk_list=[]
+		graphs=[]
+		municipios = form_data['Municipio']
+		departamentos = form_data['Departamento']
+		estaciones = form_data['EstacionDeLluvia']
+		include_lluvia = form_data['IncluirLluvia']
+		start_date = form_data['Desde']
+		end_date = form_data['Hasta']
+		for departamento in departamentos:
+		  	if len(departamento.municipios.all()) > 0:
+			  	if len(municipios) > 0:
+					municipios = municipios | departamento.municipios.all()
+				else:
+				  	municipios = departamento.municipios.all()
+		if include_lluvia:
+			for municipio in municipios:
+			  	if len(municipio.estaciondelluvia_set.all()) > 0:
+				  	if len(estaciones) > 0:
+						estaciones = estaciones | municipio.estaciondelluvia_set.all()
+					else:
+					  	estaciones = municipio.estaciondelluvia_set.all()
+
+		# Aqui se llaman las funciones para hacer cada uno de los graficos
+
+		for frequency in frequencies:
+			for d in estaciones:
+				graph,pk_list=lluvia_graph(estacion=d,frequency=frequency,start_date=start_date,end_date=end_date,pk_list=pk_list)
+				if not graph==None:
+					graphs.append(graph)
+					
+		return graphs,pk_list
+
+def lluvia_graph(estacion,frequency,start_date,end_date,pk_list):
 	queryset = None
 	if frequency=='daily':
 		queryset =LLuviaPrueba.objects.filter(estacion=estacion).filter(fecha__range=[start_date,end_date]).values('fecha','pk','milimetros_de_lluvia').order_by('fecha')
@@ -20,7 +57,6 @@ def lluvia_graph(estacion,frequency,start_date,end_date,pk_list,ctype):
 			row_dic={'fecha':row[1],'milimetros_de_lluvia':row[2],'estacion':row[0]}
 			queryset.append(row_dic)
 		source='computed'
-	content_type=ctype.id
 	if len(queryset)==0:
 		return None,pk_list
 	data=[]

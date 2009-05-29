@@ -1,8 +1,33 @@
+# -*- coding: utf-8 -*-
 from datetime import date
 from time import mktime
 from cosecha.models import Cosecha
 #from django.db import connection
+from django.contrib.contenttypes.models import ContentType
 
+
+content_type = ContentType.objects.get(app_label__exact='cosecha', name__exact='cosecha').id
+
+def cosecha_builder(form_data,frequencies):
+	# Recogiendo datos del formulario, mas es campo frecuencias, ya truducido a ingles
+	municipios = form_data['Municipio']
+	cosecha_variable = form_data['CosechaVariable']
+	cosecha_producto = form_data['CosechaProducto']
+	start_date = form_data['Desde']
+	end_date = form_data['Hasta']
+
+	
+	# Aqui se llama la funcion para hacer cada uno de los graficos
+	pk_list=[]
+	graphs=[]
+	for frequency in frequencies:
+		for d in cosecha_variable:
+			for e in municipios:
+				for i in cosecha_producto:
+					graph,pk_list=cosecha_graph(variable=d,municipio=e,producto=i,start_date=start_date,end_date=end_date,pk_list=pk_list)
+					if not graph==None:
+						graphs.append(graph)	
+	return graphs,pk_list
 # Esta es para traducir las fechas de los tiempos
 def traducir_fecha(date):
 	cosecha_tiempo={}
@@ -29,7 +54,7 @@ def traducir_tiempo(ano,tiempo):
 		return date(year=ano,month=9,day=1)
 	return None
 	
-def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,ctype):
+def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list):
 	cosecha_start=traducir_fecha(start_date)
 	cosecha_end=traducir_fecha(end_date)
 	a= Cosecha.objects.filter(ano=cosecha_start['ano']).filter(tiempo__gt= cosecha_start['tiempo']-1)
@@ -37,7 +62,6 @@ def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,ctype)
 	c= Cosecha.objects.filter(ano=cosecha_end['ano']).filter(tiempo__lt=cosecha_end['tiempo']+1)
 	d= a | b| c
 	queryset=d.filter(producto=producto).filter(municipio=municipio)
-	content_type=ctype.id
 	if len(queryset)==0:
 		return None,pk_list
 	data=[]
