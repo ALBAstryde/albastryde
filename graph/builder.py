@@ -32,19 +32,22 @@ def build_graph(query,user):
 		for frecuencia in frecuencias:
 			frequencies.append(eng_dic[frecuencia])
 
-# MUY IMPORTANTE. AQUI ESTAN TRES LINEAS PARA CADA UNO DE LOS TIPOS DE GRAFICOS!!!
+# MUY IMPORTANTE. AQUI ESTAN 4 LINEAS PARA CADA UNO DE LOS TIPOS DE GRAFICOS!!!
 
 		precio_graphs,precio_pk_list,dollar,euro=precio_builder(form_data=form.cleaned_data,frequencies=frequencies)
-		graphs+=precio_graphs
-		pk_list+=precio_pk_list
+		if not precio_graphs == None:
+			graphs+=precio_graphs
+			pk_list+=precio_pk_list
 
 		cosecha_graphs,cosecha_pk_list=cosecha_builder(form_data=form.cleaned_data,frequencies=frequencies)
-		graphs+=cosecha_graphs
-		pk_list+=cosecha_pk_list
+		if not cosecha_graphs == None:
+			graphs+=cosecha_graphs
+			pk_list+=cosecha_pk_list
 		
 		lluvia_graphs,lluvia_pk_list=lluvia_builder(form_data=form.cleaned_data,frequencies=frequencies)
-		graphs+=lluvia_graphs
-		pk_list+=lluvia_pk_list
+		if not lluvia_graphs == None:
+			graphs+=lluvia_graphs
+			pk_list+=lluvia_pk_list
 
 		rdict.update({'graphs':graphs})
 		if len(precio_graphs) > 0:

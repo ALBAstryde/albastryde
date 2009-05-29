@@ -13,6 +13,8 @@ content_type = ContentType.objects.get(app_label__exact='precios', name__exact='
 def precio_builder(form_data,frequencies):
 		pk_list=[]
 		graphs=[]
+		dollar={}
+		euro={}
 		mercados = form_data['Mercado']	
 		productos = form_data['Producto']
 		start_date = form_data['Desde']
@@ -40,7 +42,8 @@ def precio_builder(form_data,frequencies):
 				euro={'unit':'Euro','monthly':{},'annualy':{},'daily':{}}
 
 
-		# Aqui se llaman las funciones para hacer cada uno de los graficos
+		# Aqui se llaman la funcion para hacer cada uno de los graficos
+
 
 				for frequency in frequencies:
 					for i in mercados:
