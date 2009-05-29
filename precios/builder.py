@@ -1,9 +1,29 @@
 from precios.models import Prueba as PrecioPrueba
 #from precios.models import Mercado
 from valuta.models import USD,Euro
-#from datetime import date
+import datetime
+from calendar import monthrange
 from time import mktime
 from django.db import connection
+
+
+
+def add_month(datum, n=1):
+	OneDay = datetime.timedelta(days=1)
+	q,r = divmod(datum.month+n, 12)
+	eom = datetime.date(datum.year+q, r+1, 1) - OneDay
+	if datum.month != (datum+OneDay).month or datum.day >= eom.day:
+        	return eom
+	return eom.replace(day=datum.day)
+
+def add_year(datum, n=1):
+	if datum.month==2 and datum.day==monthrange(year=datum.year,month=2)[1]:
+		return datetime.date(year=datum.year+n,month=2,day=monthrange(year+datum.year+n,month=2)[1])
+	else:
+		return datetime.date(year=datum.year+1,month=datum.month,day=datum.day)
+
+
+	
 
 def precio_graph(mercado,producto,frequency,start_date,end_date,dollar,euro,pk_list,ctype):
 	queryset = None
@@ -28,47 +48,50 @@ def precio_graph(mercado,producto,frequency,start_date,end_date,dollar,euro,pk_l
 	min_data_dic={}
 	list_of_pk=[]
 	for i in queryset:
-		fecha=mktime(i['fecha'].timetuple())
-		adjusted_fecha=fecha
+		fecha=i['fecha']
+		now_fecha=mktime(fecha.timetuple())
 		if frequency=='daily':
-			adjusted_fecha+=22000
+			next_fecha=now_fecha+86399
 		elif frequency=='monthly':
-			adjusted_fecha+=1365000
+			next_fecha=mktime(add_month(fecha).timetuple())-1
 		elif frequency=='annualy':
-			adjusted_fecha+=15800000
+			next_fecha=mktime(add_year(fecha).timetuple())-1
+		else:
+			next_fecha=now_fecha
 		precio=int(i['maximo'])		
 		if i['maximo'] != i['minimo']:
-			min_data_dic[int(adjusted_fecha)]=int(i['minimo'])
-		if not str(int(adjusted_fecha)) in dollar[frequency]:
+			min_data_dic[int(now_fecha)]=int(i['minimo'])
+		if not str(int(now_fecha)) in dollar[frequency]:
 			if frequency=='daily':
-				dollar[frequency][str(int(adjusted_fecha))]=float(USD.objects.get(fecha__exact=i['fecha']).cordobas)
-				euro[frequency][str(int(adjusted_fecha))]=float(Euro.objects.get(fecha__exact=i['fecha']).cordobas)
+				dollar[frequency][str(int(now_fecha))]=float(USD.objects.get(fecha__exact=i['fecha']).cordobas)
+				euro[frequency][str(int(now_fecha))]=float(Euro.objects.get(fecha__exact=i['fecha']).cordobas)
 			else:
 				cursor = connection.cursor()
 				if frequency=='monthly':
 					cursor.execute("select avg(cordobas) from valuta_usd where date_trunc('month',fecha)='"+i['fecha'].strftime('%Y-%m-%d')+"';")
 				elif frequency=='annualy':
 					cursor.execute("select avg(cordobas) from valuta_usd where date_trunc('year',fecha)='"+i['fecha'].strftime('%Y-%m-%d')+"';")
-				dollar[frequency][str(int(adjusted_fecha))]= float(cursor.fetchone()[0])
+				dollar[frequency][str(int(now_fecha))]= float(cursor.fetchone()[0])
 				if frequency=='monthly':
 					cursor.execute("select avg(cordobas) from valuta_euro where date_trunc('month',fecha)='"+i['fecha'].strftime('%Y-%m-%d')+"';")
 				elif frequency=='annualy':
 					cursor.execute("select avg(cordobas) from valuta_euro where date_trunc('year',fecha)='"+i['fecha'].strftime('%Y-%m-%d')+"';")
-				euro[frequency][str(int(adjusted_fecha))]= float(cursor.fetchone()[0])				
-		adjusted_fecha=int(adjusted_fecha)
+				euro[frequency][str(int(now_fecha))]= float(cursor.fetchone()[0])				
+		now_fecha=int(now_fecha)
+		next_fecha=int(next_fecha)
 		if frequency=='daily':
 			unique_pk=str(content_type)+"_"+str(i['pk'])		
 			list_of_pk.append(str(i['pk']))
-			max_data.append([adjusted_fecha,precio,unique_pk])
+			max_data.append([[now_fecha,next_fecha],precio,unique_pk])
 		else:
-			max_data.append([adjusted_fecha,precio])
+			max_data.append([[now_fecha,next_fecha],precio])
 	if frequency=='daily':
 		pk_list.append([content_type,list_of_pk])
 	result={'included_variables':{'producto':producto.nombre,'mercado':mercado.nombre},'unit':'C$','type':'precio','source':source,'frequency':frequency,'main_variable_js':'this.included_variables.producto','place_js':'this.included_variables.mercado','normalize_factor_js':'this.start_value','display':'lines'}
 	if len(min_data_dic)==0:
 		result['data']=max_data
 	else:
-		result['max_data']=max_data
+		result['data']=max_data
 		result['min_data_dic']=min_data_dic
 	return result,dollar,euro,pk_list
 

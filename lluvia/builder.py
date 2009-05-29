@@ -2,6 +2,7 @@ from lluvia.models import Prueba as LLuviaPrueba
 #from datetime import date
 from time import mktime
 from django.db import connection
+from precios.builder import add_month, add_year
 
 def lluvia_graph(estacion,frequency,start_date,end_date,pk_list,ctype):
 	queryset = None
@@ -27,14 +28,24 @@ def lluvia_graph(estacion,frequency,start_date,end_date,pk_list,ctype):
 	for i in queryset:
 		if i['milimetros_de_lluvia'] > 0:
 			value=str(i['milimetros_de_lluvia'])
-			fecha=mktime(i['fecha'].timetuple())
-			fecha=int(fecha)
+			fecha=i['fecha']
+                	now_fecha=mktime(fecha.timetuple())
+                	if frequency=='daily':
+                        	next_fecha=now_fecha+86399
+                	elif frequency=='monthly':
+                        	next_fecha=mktime(add_month(fecha).timetuple())-1
+                	elif frequency=='annualy':
+                        	next_fecha=mktime(add_year(fecha).timetuple())-1
+                	else:
+                        	next_fecha=now_fecha
+			now_fecha=int(now_fecha)
+			next_fecha=int(next_fecha)
 			if frequency=='daily':
 				unique_pk=str(content_type)+"_"+str(i['pk'])		
 				list_of_pk.append(str(i['pk']))
-				data.append([fecha,value,unique_pk])
+				data.append([[now_fecha,next_fecha],value,unique_pk])
 			else:
-				data.append([fecha,value])
+				data.append([[now_fecha,next_fecha],value])
 	if frequency=='daily':
 		pk_list.append([content_type,list_of_pk])
 	result={'included_variables':{'station':estacion.nombre},'data':data,'unit':'mm','type':'lluvia','source':source,'frequency':frequency,'main_variable_js':'"lluvia"','place_js':'this.included_variables.station','normalize_factor_js':'this.top_value','display':'bars'}

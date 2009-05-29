@@ -358,8 +358,10 @@ JOHANNESNEW=[];
                     if (data[j] == null)
                         continue;
                     
-                    var x = data[j][0], y = data[j][1];
-
+//interval                    var x = data[j][0], y = data[j][1];
+                    var x, y = data[j][1];
+		    x = (typeof(data[j][0])=='object') ? data[j][0][0] : data[j][0];  
+//interval end
                     // convert to number
                     if (x != null && !isNaN(x = +x)) {
                         if (x + mindelta < axisx.datamin)
@@ -1207,8 +1209,12 @@ JOHANNES3=axes;
                     if (prev == null || cur == null)
                         continue;
                     
-                    var x1 = prev[0], y1 = prev[1],
-                        x2 = cur[0], y2 = cur[1];
+//interval                    var x1 = prev[0], y1 = prev[1],
+//                        x2 = cur[0], y2 = cur[1];
+		    var x1,y1=prev[1],x2,y2=cur[1];
+		    x1 = (typeof(prev[0])=='object') ? (prev[0][0]+(prev[0][1] - prev[0][0])/2) : prev[0];                    
+		    x2 = (typeof(cur[0])=='object') ? (cur[0][0]+(cur[0][1] - cur[0][0])/2) : cur[0];    
+//interval end
 
                     // clip with ymin
                     if (y1 <= y2 && y1 < axisy.min) {
@@ -1300,9 +1306,12 @@ JOHANNES3=axes;
                     if (prev == null || cur == null)
                         continue;
                         
-                    var x1 = prev[0], y1 = prev[1],
-                        x2 = cur[0], y2 = cur[1];
-
+//interval                    var x1 = prev[0], y1 = prev[1],
+//                        x2 = cur[0], y2 = cur[1];
+		    var x1,y1=prev[1],x2,y2=cur[1];
+		    x1 = (typeof(prev[0])=='object') ? (prev[0][0]+(prev[0][1] - prev[0][0])/2) : prev[0];                    
+		    x2 = (typeof(cur[0])=='object') ? (cur[0][0]+(cur[0][1] - cur[0][0])/2) : cur[0];    
+//interval end
                     // clip x values
                     
                     // clip with xmin
@@ -1470,7 +1479,10 @@ JOHANNES3=axes;
                     if (data[i] == null)
                         continue;
                     
-                    var x = data[i][0], y = data[i][1];
+//interval                    var x = data[i][0], y = data[i][1];
+                    var x, y = data[i][1];
+                    x = (typeof(data[i][0]) == 'object') ? (data[i][0][0]+(data[i][0][1] - data[i][0][0])/2) : data[i][0];
+//interval end
                     if (x < axisx.min || x > axisx.max || y < axisy.min || y > axisy.max)
                         continue;
                     if(series.points.drawCall == false) {
@@ -1492,7 +1504,10 @@ JOHANNES3=axes;
                     if (data[i] == null)
                         continue;
                     
-                    var x = data[i][0], y = data[i][1];
+//interval                    var x = data[i][0], y = data[i][1];
+                    var y = data[i][1], x;
+		    x = (typeof(data[i][0]) == 'object') ? (data[i][0][0]+(data[i][0][1] - data[i][0][0])/2): data[i][0];
+//interval end
                     if (x < axisx.min || x > axisx.max || y < axisy.min || y > axisy.max)
                         continue;
                     ctx.beginPath();
@@ -1613,7 +1628,13 @@ JOHANNES3=axes;
                 for (var i = 0; i < data.length; i++) {
                     if (data[i] == null)
                         continue;
-                    drawBar(data[i][0], data[i][1], barLeft, barRight, offset, fillStyleCallback, axisx, axisy, ctx);
+//interval                    drawBar(data[i][0], data[i][1], barLeft, barRight, offset, fillStyleCallback, axisx, axisy, ctx);
+		    if (typeof(data[i][0])=='object') {
+                        drawBar(data[i][0][0], data[i][1], barLeft, barLeft+(data[i][0][1]-data[i][0][0]), offset, fillStyleCallback, axisx, axisy, ctx);
+		    } else {
+                        drawBar(data[i][0], data[i][1], barLeft, barRight, offset, fillStyleCallback, axisx, axisy, ctx);
+		    }
+//interval end
                 }
             }
 
@@ -1798,8 +1819,10 @@ JOHANNES1=selection;
                     if (data[j] == null)
                         continue;
 
-                    var x = data[j][0], y = data[j][1];
- 
+//interval                    var x = data[j][0], y = data[j][1];
+                    var x, y = data[j][1];
+		    x = (typeof(data[j][0])=='object') ? data[j][0][0] : data[j][0];  
+//interval end
                     if (checkbar) {
                         // For a bar graph, the cursor must be inside the bar
                         // and no other point can be nearby
@@ -1944,7 +1967,10 @@ JOHANNES1=selection;
 
             if (item) {
                 // fill in mouse pos for any listeners out there
-                item.pageX = parseInt(item.series.xaxis.p2c(item.datapoint[0]) + offset.left + plotOffset.left);
+//interval                item.pageX = parseInt(item.series.xaxis.p2c(item.datapoint[0]) + offset.left + plotOffset.left);
+		var time_value = (typeof(item_datapoint[0])=='object') ? (item_datapoint[0][0]+(item_datapoint[0][1]-item_datapoint[0][0])/2) : item_datapoint[0];
+                item.pageX = parseInt(item.series.xaxis.p2c(time_value) + offset.left + plotOffset.left,10);
+//interval end
                 item.pageY = parseInt(item.series.yaxis.p2c(item.datapoint[1]) + offset.top + plotOffset.top);
             }
 
@@ -2068,9 +2094,12 @@ JOHANNES1=selection;
         }
         
         function drawPointHighlight(series, point) {
-            var x = point[0], y = point[1],
+//interval            var x = point[0], y = point[1],
+//                axisx = series.xaxis, axisy = series.yaxis;
+            var x, y = point[1],
                 axisx = series.xaxis, axisy = series.yaxis;
-            
+            x = (typeof(point[0])=='object') ? (point[0][0]+(point[0][1]-point[0][0])/2): point[0];
+//interval end            
             if (x < axisx.min || x > axisx.max || y < axisy.min || y > axisy.max)
                 return;
             
@@ -2089,8 +2118,16 @@ JOHANNES1=selection;
             octx.strokeStyle = parseColor(series.color).scale(1, 1, 1, 0.5).toString();
             var fillStyle = parseColor(series.color).scale(1, 1, 1, 0.5).toString();
             var barLeft = series.bars.align == "left" ? 0 : -series.bars.barWidth/2;
-            drawBar(point[0], point[1], barLeft, barLeft + series.bars.barWidth,
+//interval            drawBar(point[0], point[1], barLeft, barLeft + series.bars.barWidth,
+//                    0, function () { return fillStyle; }, series.xaxis, series.yaxis, octx);
+	    if (typeof(point[0])=='object') {
+                drawBar(point[0][0], point[1], barLeft, barLeft + (point[0][1]-point[0][0]),
                     0, function () { return fillStyle; }, series.xaxis, series.yaxis, octx);
+	    } else {
+                drawBar(point[0], point[1], barLeft, barLeft + series.bars.barWidth,
+                    0, function () { return fillStyle; }, series.xaxis, series.yaxis, octx);
+	    }
+//interval end
         }
 
         function setPositionFromEvent(pos, e) {

@@ -77,10 +77,17 @@ def cosecha_graph(variable,producto,municipio,start_date,end_date,pk_list,ctype)
 			value=0
 			unit=""
 		fecha=int(mktime(traducir_tiempo(ano=i.ano,tiempo=i.tiempo).timetuple()))
-#		fecha_numero=mktime(fecha.timetuple())
+		if i.tiempo==3:
+			to_tiempo=1
+			to_ano=i.ano+1
+		else:
+			to_tiempo=i.tiempo+1
+			to_ano=i.ano
+		to_fecha=int(mktime(traducir_tiempo(ano=to_ano,tiempo=to_tiempo).timetuple())-1)
 		unique_pk=str(content_type)+"_"+str(i.pk)
 		list_of_pk.append(str(i.pk))
-		data.append([fecha,value,unique_pk])
+#		data.append([fecha,value,unique_pk])
+		data.append([[fecha,to_fecha],value,unique_pk])
 	pk_list.append([content_type,list_of_pk])
 	result = {'included_variables':{'municipio':municipio.nombre, 'cosecha_producto':producto.nombre, 'tipovariable':variable},'data':data,'source':'raw','unit':unit,'type':'cosecha '+variable,'frequency':'monthly','main_variable_js':'"'+variable+' de "+this.included_variables.cosecha_producto','place_js':'this.included_variables.municipio','normalize_factor_js':'this.start_value','display':'bars'}
 	return result,pk_list

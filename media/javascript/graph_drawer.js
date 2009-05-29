@@ -1,4 +1,3 @@
-JOHANNESOLD=[];
 var e_msg, errors;
 function create_graphs(jsondata, wiki_mode, graphsheader) {
 	var query_id, id, headline, has_comments, plot, comments, datapoint_dictionary, graph_height, raw_graphs, converted_graphs, dollargraphs, eurographs, normalized_graphs, normalized_dollargraphs, normalized_eurographs, graphs;
@@ -114,8 +113,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	for (i=0;i<yaxis.length;i++) { 
 		converted_graphs.yaxis.push(yaxis[i]);
 	}
-//	converted_graphs.yaxis = [yaxis[0],yaxis[1]];
-//	converted_graphs.y2axis = y2axis;
 	query_id = String(new Date().getTime());
 	e_msg = _('New graph generated!');
 
@@ -263,7 +260,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			data = [],
 			max_data,
 			minData,
-			min_data_dic;
+			min_data_dic,
+			intervals;
 			
 
 			//create dictionary of ists of all variables used by some graph or other (mercado, producto, lluvia estacion, etc.)
@@ -279,22 +277,27 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			if (! (this.type in graph_types)) {
 				graph_types[this.type] = this.unit;
 			}
+			typeof(this.data[0][0])=='object' ? intervals = true : intervals = false;
+			new_graph.intervals=intervals;
+			intervals ? new_graph.start_date = this.data[0][0][0] : new_graph.start_date = this.data[0][0];
 			if ('min_data_dic' in this) {
 				minData=[];
-				max_data = this.max_data;
+				max_data = this.data;
 				min_data_dic = this.min_data_dic;
 				$.each(max_data,
 				function() {
-					var pk, max_value, min_value, time, new_time;
+					var pk, max_value, min_value, time, time_start;
 					time = this[0];
+					intervals ? time_start = time[0] : time_start = time;
+					//timestart=time;
 					max_value = parseFloat(this[1]);
 					if (max_value > new_graph.top_value) {
 						new_graph.top_value = max_value;
-						new_graph.top_date = time;
+						new_graph.top_date = time_start;
 					}
 					pk = this[2];
-					if (String(time) in min_data_dic) {
-						min_value = min_data_dic[String(time)];
+					if (String(time_start) in min_data_dic) {
+						min_value = min_data_dic[String(time_start)];
 					} else {
 						min_value = max_value;
 					}
@@ -303,25 +306,31 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				new_graph.data = max_data;
 				new_graph.minData = minData;
 			} else if ('min_data' in this) {
-				new_graph.data = this.max_data;
+				new_graph.data = this.data;
 				new_graph.minData = this.minData;
-				$.each(this.max_data,function() {
+				$.each(this.data,function() {
+					var time, max_value, time_start;
 					time = this[0];
+					intervals ? time_start = time[0] : time_start = time;
+					//time_start=time;
 					max_value = parseFloat(this[1]);
 					if (max_value > new_graph.top_value) {
 						new_graph.top_value = max_value;
-						new_graph.top_date = time;
+						new_graph.top_date = time_start;
 					}
 				});
 			} else {
 				new_graph.data = this.data;
 				minData = false;
 				$.each(this.data,function() {
+					var time, time_start, max_value;
 					time = this[0];
+					intervals ? time_start = time[0] : time_start = time;
+					//time_start=time;
 					max_value = parseFloat(this[1]);
 					if (max_value > new_graph.top_value) {
 						new_graph.top_value = max_value;
-						new_graph.top_date = time;
+						new_graph.top_date = time_start;
 					}
 				});
 
@@ -332,8 +341,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			if ( !(eval(this.main_variable_js) in all_main_variable)) {
 				all_main_variable[eval(this.main_variable_js)]=true;
 			}
-			new_graph.start_date = new_graph.data[0][0];
-			new_graph.end_date = new_graph.data[new_graph.data.length-1][0];
+//			new_graph.start_date = new_graph.data[0][0];
+			intervals ? new_graph.end_date = new_graph.data[new_graph.data.length-1][0]:new_graph.data[new_graph.data.length-1][0][1];
+			
 			if (new_graph.start_date < first_date) {
 				first_date=new_graph.start_date
 			}
@@ -450,13 +460,12 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	}
 
 	function calculate_currencygraphs(currency_dic, cordobagraphs) {
-		var new_graphs = [];
-		var graph_types = {};
+		var new_graphs = [], graph_types = {};
 		$.each(cordobagraphs,
 		function() {
-			var new_data;
-			var frequency=this.frequency;
-			var new_graph = {
+			var new_data,
+			frequency=this.frequency,
+			new_graph = {
 				'type': this.type,
 				'yaxis': this.yaxis,
 				'points': this.points,
@@ -468,13 +477,14 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'normalize_factor_js': this.normalize_factor_js,
 				'included_variables': this.included_variables,
 				'color': this.color,
-				//'relevance': this.relevance,
 				'start_date': this.start_date,
 				'top_date': this.top_date,
 				'shadowSize': this.shadowSize,
 				'clickable': this.clickable,
-				'hoverable': this.hoverable
-			};
+				'hoverable': this.hoverable,
+				'intervals': this.intervals
+			},
+			intervals=this.intervals;
 			if ('advanced_label' in this) {
 				new_graph.advanced_label = this.advanced_label;
 			}
@@ -484,10 +494,12 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				new_data = [];
 				$.each(this.data,
 				function() {
-					var time = this[0];
-					var cordoba = this[1];
-					var pk = this[2];
-					var currency = currency_dic[frequency][String(time)]; //convert to transfer time format to get currency timestamp
+					var time=this[0],
+					cordoba = this[1],
+					pk = this[2],
+					time_start;
+					intervals ? time_start = time[0] : time_start = this[0];
+					var currency = currency_dic[frequency][String(time_start)];
 					var currency_value = parseFloat(cordoba) * parseFloat(currency);
 					new_data.push([time, currency_value, pk]);
 				});
@@ -496,10 +508,11 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					var minData = [];
 					$.each(this.minData,
 					function() {
-						var time = this[0];
-						var cordoba = this[1];
-						var pk = this[2];
-						var currency = currency_dic[frequency][String(time)]; //convert to transfer time format to get currency timestamp
+						var time = this[0],
+						cordoba = this[1],
+						pk = this[2];
+						intervals ? time_start = time[0] : time_start = this[0];
+						var currency = currency_dic[frequency][String(time_start)];
 						var currency_value = parseFloat(cordoba) * parseFloat(currency);
 						minData.push([time, currency_value, pk]);
 					});
@@ -528,11 +541,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		new_graphs.yaxis=[];
 		for (var item in graph_types) {
 			new_graphs.yaxis[yaxis_finder] = graph_types[item];
-//XXX			if (yaxis_finder == 1) {
-//totalt sluder?				new_graphs.yaxis[0] = graph_types[item];
-//			} else if (yaxis_finder == 2) {
-//				new_graphs.yaxis[1] = graph_types[item];
-//			}
 			yaxis_finder += 1;
 		}
 		return new_graphs.sort();
@@ -570,7 +578,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					'frequency': median_data[graph_series][2][0]['frequency'],
 					'type': median_data[graph_series][2][0]['type'],
 					'yaxis': median_data[graph_series][2][0]['yaxis'],
-					//'relevance': 'mediano',
 					'color': color_counter,
 					'data': new_data
 				};
@@ -663,6 +670,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				});
 				for (date_item in graph_dic[median_variable_item][graph_item]['data']) {
 					data_string = graph_dic[median_variable_item][graph_item]['data'][date_item][0];
+					if (graph_dic[median_variable_item][graph_item]['intervals']) 
+						data_string = data_string[1] - data_string[0];
 					value_string = graph_dic[median_variable_item][graph_item]['data'][date_item][1];
 					if (data_string in graph_time_dic) {
 						empty_values = graph_counter - graph_time_dic[data_string].length;
@@ -761,9 +770,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		var new_graphs = [];
 		$.each(unitgraphs,
 		function() {
-			var new_data = [];
-			var normalize_factor = eval(this.normalize_factor_js);
-			var new_graph = {
+			var new_data = [],
+			normalize_factor = eval(this.normalize_factor_js),
+			new_graph = {
 				'unit': '%',
 				'type': 'normalizado',
 				'yaxis': 1,
@@ -778,7 +787,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'shadowSize': this.shadowSize,
 				'included_variables': this.included_variables,
 				'clickable': this.clickable,
-				'hoverable': this.hoverable
+				'hoverable': this.hoverable,
+				'intervals': this.intervals
 			};
 			if ('advanced_label' in this) {
 				new_graph.label = this.advanced_label + ' (1 = ' + String(start_value) + ' ' + this.unit + 's '+_(new_graph.frequency)+')';
@@ -787,10 +797,10 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			}
 			$.each(this.data,
 			function() {
-				var time = this[0];
-				var unit_value = this[1];
-				var pk = this[2];
-				var normalized_value = parseFloat(unit_value) / parseFloat(normalize_factor) * 100;
+				var time = this[0],
+				unit_value = this[1],
+				pk = this[2],
+				normalized_value = parseFloat(unit_value) / parseFloat(normalize_factor) * 100;
 				new_data.push([time, normalized_value, pk]);
 			});
 			new_graph.data = new_data;
@@ -798,10 +808,10 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				var minData = [];
 				$.each(this.minData,
 				function() {
-					var time = this[0];
-					var unit_value = this[1];
-					var pk = this[2];
-					var normalized_value = parseFloat(unit_value) / parseFloat(normalize_factor) * 100;
+					var time = this[0],
+					unit_value = this[1],
+					pk = this[2],
+					normalized_value = parseFloat(unit_value) / parseFloat(normalize_factor) * 100;
 					minData.push([time, normalized_value, pk]);
 				});
 				new_graph.minData = minData;
@@ -809,7 +819,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			new_graphs.push(new_graph);
 		});
 		new_graphs.yaxis = ['%',''];
-	//	new_graphs.y2axis[1] = '';
 		return new_graphs;
 	}
 	function makeLabelCanvas(width, height) {
@@ -1180,6 +1189,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	}
 
 	function date_string(unixtimestamp) {
+		if (typeof(unixtimestamp) == 'object')
+			unixtimestamp = unixtimestamp[1] - unixtimestamp[0];
 		var raw_date = new Date(unixtimestamp*1000);
 		var day = raw_date.getUTCDate();
 		if (day < 10) {
@@ -1428,15 +1439,12 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				min: ranges.xaxis[0].from,
 				max: ranges.xaxis[0].to
 			}],
-			yaxis: [{
-				min: ranges.yaxis[0].from,
-				max: ranges.yaxis[0].to
-			}]
-		};
-		if (ranges.yaxis.length > 1) {
+			yaxis: [
+			]};
+		for (i in ranges.yaxis) {
 			axis_dic.yaxis.push({
-				min: ranges.yaxis[1].from,
-				max: ranges.yaxis[1].to
+				min: ranges.yaxis[i].from,
+				max: ranges.yaxis[i].to
 			});
 		}
 		return axis_dic;
@@ -1444,22 +1452,23 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 
 	function axis_dic_to_ranges(axis_dic) {
 		var ranges = {
-			xaxis: {
-				from: axis_dic.xaxis.min,
-				to: axis_dic.xaxis.max
-			}
+			xaxis: [{
+				from: axis_dic.xaxis[0].min,
+				to: axis_dic.xaxis[0].max
+			}]
 		};
 		if ('yaxis' in axis_dic) {
 			ranges.yaxis = [{
 				from: axis_dic.yaxis[0].min,
 				to: axis_dic.yaxis[0].max
 			}];
-			if (axis_dic.yaxis.length > 1) {
-				ranges.yaxis.push({
-					from: axis_dic.yaxis[1].min,
-					to: axis_dic.yaxis[1].max
-				});
-			}
+			//ranges.yaxis=[];
+			//for (i in axis_dic.yaxis) {
+			//	ranges.yaxis.push({
+			//		from: axis_dic.yaxis[i].min,
+			//		to: axis_dic.yaxis[i].max
+			//	});
+			//}
 		}
 		return ranges;
 	}
@@ -1474,16 +1483,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				monthNames: [_('Jan'), _("Feb"), _("Mar"), _("Apr"), _("May"), _("Jun"), _("Jul"), _("Aug"), _("Sep"), _("Oct"), _("Nov"), _("Dec")]
 			}],
 			yaxis: [],
-//				{
-//				tickFormatter: function(v, axis) {
-//					return v.toFixed(axis.tickDecimals) + graphs.yaxis[0];
-//				}
-//			},
-//			{
-//				tickFormatter: function(v, axis) {
-//					return v.toFixed(axis.tickDecimals) + graphs.yaxis[1];
-//				}
-//			}],
 			legend: {
 				container: '#' + query_id + 'legend'
 			},
@@ -1496,7 +1495,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			}
 		};
 		for (i=0;i<total_yaxis;i++) {
-			eval('options.yaxis.push({tickFormatter: function(v, axis) {JOHANNESOLD.push([v,axis]);return v.toFixed(axis.tickDecimals) + graphs.yaxis['+String(i)+'];}});');
+			eval('options.yaxis.push({tickFormatter: function(v, axis) {return v.toFixed(axis.tickDecimals) + graphs.yaxis['+String(i)+'];}});');
 		}
 		if (editor_mode) {
 			options.legend.checkboxes = true;
@@ -1510,7 +1509,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			};
 		}
 		plot = $.plot($('#' + query_id + 'stats'), graphs, options);
-JOHANNESOUT=[graphs,options];
 		if (editor_mode) {
 			overview_options = {
 				lines: {
@@ -1558,11 +1556,11 @@ JOHANNESOUT=[graphs,options];
 		function(event, ranges) {
 			reset_comments();
 			// clamp the zooming to prevent eternal zoom
-			if (ranges.xaxis.to - ranges.xaxis.from < 0.00001) {
-				ranges.xaxis.to = ranges.xaxis.from + 0.00001;
+			if (ranges.xaxis[0].to - ranges.xaxis[0].from < 0.00001) {
+				ranges.xaxis[0].to = ranges.xaxis[0].from + 0.00001;
 			}
-			if (ranges.yaxis.to - ranges.yaxis.from < 0.00001) {
-				ranges.yaxis.to = ranges.yaxis.from + 0.00001;
+			if (ranges.yaxis[0].to - ranges.yaxis[0].from < 0.00001) {
+				ranges.yaxis[0].to = ranges.yaxis[0].from + 0.00001;
 			}
 			// do the zooming
 			axis_dic = ranges_to_axis_dic(ranges);
