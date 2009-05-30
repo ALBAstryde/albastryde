@@ -10,16 +10,27 @@ content_type = ContentType.objects.get(app_label__exact='cosecha', name__exact='
 
 def cosecha_builder(form_data,frequencies):
 	# Recogiendo datos del formulario, mas es campo frecuencias, ya truducido a ingles
+	departamentos = form_data['Departamento']
 	municipios = form_data['Municipio']
 	cosecha_variable = form_data['CosechaVariable']
 	cosecha_producto = form_data['CosechaProducto']
 	start_date = form_data['Desde']
 	end_date = form_data['Hasta']
 
-	
-	# Aqui se llama la funcion para hacer cada uno de los graficos
+
+
+# juntar todos los municipios de cada uno de los departamentos seleccionados con la lista de muncipios selecionados directamente
+	for departamento in departamentos:
+		if len(departamento.municipios.all()) > 0:
+			if len(municipios) > 0:
+				municipios = municipios | departamento.municipios.all()
+			else:
+				municipios = departamento.municipios.all()
+
 	pk_list=[]
 	graphs=[]
+	
+	# Aqui se llama la funcion para hacer cada uno de los graficos
 	for frequency in frequencies:
 		for d in cosecha_variable:
 			for e in municipios:
