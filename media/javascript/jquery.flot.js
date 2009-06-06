@@ -523,8 +523,9 @@
             else if (axis in axes.xaxis)
                 noTicks = canvasWidth / 100;
             else
-                noTicks = canvasHeight / 60;
+                noTicks = canvasHeight / 100;
             
+// 60 is correct was not working
             var delta = (axis.max - axis.min) / noTicks;
             var size, generator, unit, formatter, i, magn, norm;
 
