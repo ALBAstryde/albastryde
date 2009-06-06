@@ -377,7 +377,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			}
 			if (this.display == 'bars') {
 				new_graph.bars = {
-					'show': true,
+					'show': true
 				};
 				if (this.frequency == 'daily') {
 					new_graph.bars.barWidth=86400;

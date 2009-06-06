@@ -35,6 +35,6 @@ class albamarkup:
 		text='[div id="graph'+str(self.graph_counter)+'" class="graph"][/div]'
 		rdict = build_graph(translated_query,self.user)
 		json = simplejson.dumps(rdict, ensure_ascii=False)
- 		self.json_data+='graph'+str(self.graph_counter)+'='+json+';'
+ 		self.json_data+='graphs['+str(self.graph_counter)+']='+json+';'
 		self.graph_counter += 1
 	       	return text

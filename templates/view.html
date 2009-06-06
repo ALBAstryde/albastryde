@@ -5,14 +5,20 @@
 
 {% block extrastatisticsheader %}
 <script language="javascript" type="text/javascript">
+graphs=[];
 {{ json_data|safe }}
 
 $(document).ready(function() {
-	$('div.graph').each(function (index,domEle) {
-		var graph_name=$(domEle).attr('id');
-		var graph_data=eval(graph_name);
-		create_graphs(graph_data,true,'#'+graph_name);
-	});
+	var graph_name;
+	for (i in graphs) {
+		graph_name='#graph'+String(i);
+		create_graphs(graphs[i],true,graph_name);
+	}
+//	$('div.graph').each(function (index,domEle) {
+//		var graph_name=$(domEle).attr('id');
+//		var graph_data=eval(graph_name);
+//		create_graphs(graph_data,true,'#'+graph_name);
+//	});
 });
 
 </script>

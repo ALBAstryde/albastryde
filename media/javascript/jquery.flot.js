@@ -358,17 +358,24 @@
                         continue;
                     
 //interval                    var x = data[j][0], y = data[j][1];
-                    var x, y = data[j][1];
-		    x = (typeof(data[j][0])=='object') ? data[j][0][0] : data[j][0];  
+                    var xMin, xMax, y = data[j][1];
+		    xMin = (typeof(data[j][0])=='object') ? data[j][0][0] : data[j][0];  
+		    xMax = (typeof(data[j][0])=='object') ? data[j][0][1] : data[j][0];  
 //interval end
                     // convert to number
-                    if (x != null && !isNaN(x = +x)) {
-                        if (x + mindelta < axisx.datamin)
-                            axisx.datamin = x + mindelta;
-                        if (x + maxdelta > axisx.datamax)
-                            axisx.datamax = x + maxdelta;
+//                    if (x != null && !isNaN(x = +x)) {
+//                        if (x + mindelta < axisx.datamin)
+//                            axisx.datamin = x + mindelta;
+//                        if (x + maxdelta > axisx.datamax)
+//                           axisx.datamax = x + maxdelta;
+//interval                    }
+                    if (xMin != null && !isNaN(xMin = +xMin) && xMax != null && !isNaN(xMax = +xMax)) {
+                        if (xMin + mindelta < axisx.datamin)
+                            axisx.datamin = xMin + mindelta;
+                        if (xMax + maxdelta > axisx.datamax)
+                            axisx.datamax = xMax + maxdelta;
                     }
-                    
+//interval end                    
                     if (y != null && !isNaN(y = +y)) {
                         if (y < axisy.datamin)
                             axisy.datamin = y;
@@ -376,7 +383,8 @@
                             axisy.datamax = y;
                     }
                     
-                    if (x == null || y == null || isNaN(x) || isNaN(y))
+//interval                    if (x == null || y == null || isNaN(x) || isNaN(y))
+                    if (xMin == null || xMax == null || y == null || isNaN(xMin) || isNaN(xMax) || isNaN(y))
                         data[j] = null; // mark this point as invalid
                 }
 	      } 
@@ -406,8 +414,9 @@
             if (target.css("position") == 'static')
                 target.css("position", "relative"); // for positioning labels and overlay
 
-            if (canvasWidth <= 0 || canvasHeight <= 0)
-                throw "Invalid dimensions for plot, width = " + canvasWidth + ", height = " + canvasHeight;
+// these two lines throw an IE error
+//            if (canvasWidth <= 0 || canvasHeight <= 0)
+//                throw "Invalid dimensions for plot, width = " + canvasWidth + ", height = " + canvasHeight;
 
             // the canvas
             canvas = $(makeCanvas(canvasWidth, canvasHeight)).appendTo(target).get(0);
