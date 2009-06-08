@@ -10,6 +10,9 @@ from django.conf import settings
 from django.contrib.gis import admin
 admin.autodiscover()
 
+#import django_cron
+#django_cron.autodiscover()
+
 def gotowiki(request):
 	return HttpResponseRedirect("/wiki/"+settings.WIKI_STARTPAGE)
 
