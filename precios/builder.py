@@ -54,10 +54,10 @@ def precio_builder(form_data,frequencies):
 							else:
 								medida_unidad=producto.medida.medida_menor
 							if medida_tipo=='mayor' and mercado.mayor==False:
-								factor=producto.medida.factor_para_convertir
+								factor=float(producto.medida.factor_para_convertir)
 								action='multiply'						
 							elif medida_tipo=='menor' and mercado.mayor==True:
-								factor=producto.medida.factor_para_convertir
+								factor=float(producto.medida.factor_para_convertir)
 								action='divide'
 							else:
 								factor=1
