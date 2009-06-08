@@ -1,9 +1,10 @@
-from precios.models import Producto, Mercado, Prueba
+from precios.models import Producto, Mercado, Prueba, Medida
 #from django.contrib import admin
 import admin_extensions as admin
 
 admin.site.register(Producto)
 admin.site.register(Mercado)
+admin.site.register(Medida)
 
 
 class PruebaAdmin(admin.ModelAdmin):
