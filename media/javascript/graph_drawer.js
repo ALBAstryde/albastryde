@@ -1181,7 +1181,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 
 	function date_string(unixtimestamp) {
 		if (typeof(unixtimestamp) == 'object')
-			unixtimestamp = unixtimestamp[1] - unixtimestamp[0];
+			unixtimestamp = unixtimestamp[0];
 		var raw_date = new Date(unixtimestamp*1000);
 		var day = raw_date.getUTCDate();
 		if (day < 10) {
