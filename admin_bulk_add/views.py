@@ -116,7 +116,11 @@ def precios(request,ano=None,mes=None,dia=None,mercado=None):
 				return HttpResponseRedirect("/admin/precios/")
 		else:
 			queryset=PreciosPrueba.objects.filter(fecha__year=int(ano)).filter(fecha__month=int(mes)).filter(fecha__day=int(dia)).filter(mercado=int(mercado))
-			productos=Producto.objects.all()
+			mercado_object=Mercado.objects.get(id=int(mercado))
+			if mercado_object.mayor==True:
+				productos=Producto.objects.filter(se_vende_en_mayor=True)
+			else:
+				productos=Producto.objects.filter(se_vende_en_menor=True)
 			if len(queryset) > 0:
 				PreciosPruebaFormSet = modelformset_factory(PreciosPrueba,extra=(len(productos)-len(queryset)))
 				form = LluviaPruebaFormSet(queryset=queryset)
