@@ -58,7 +58,7 @@ function beforeForm() {
 	//$('#AjaxFormWarning').fadeOut('slow'); //Get rid of the main error message
 	$('#AjaxFormWarning').html('<img src="/media/icons/ajax-loader.gif" />').fadeIn('slow');
 	$('#AjaxFormWarning').ajaxError(function() {
-		$(this).html('We are experiencing network errors!').fadeIn('slow');
+		$(this).html(_('We are experiencing network errors!')).fadeIn('slow');
 		$('#AjaxFormSubmit').attr('disabled', '');
 
 	});
