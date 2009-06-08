@@ -10,21 +10,7 @@ class Medida(models.Model):
 	factor_para_convertir=models.DecimalField(max_digits=10,decimal_places=2,blank=True)
 
 	def __unicode__(self):
-		convert=True
-		if self.medida_mayor == '':
-			mayor_medida='--'
-			convert=False
-		else:
-			mayor_medida=self.medida_mayor
-		if self.medida_menor == '':
-			menor_medida='--'
-			convert=False
-		else:
-			menor_medida=self.medida_menor
-		if convert:
-			return str(self.factor_para_convertir)+' '+menor_medida+ ' = '+mayor_medida
-		else:
-			return menor_medida+'/'+mayor_medida
+		return str(self.factor_para_convertir)+' '+medida_menor+ ' = '+medida_mayor
 
 	
 class Producto(StatisticsFormVariable):
@@ -72,15 +58,15 @@ class Prueba(Approvable):
 
 	def get_medida(self):
 		if self.mercado.mayor==True:
-			return self.mayor_medida()
+			return self.medida_mayor()
 		else:
-			return self.menor_medida()
+			return self.medida_menor()
 
-	def mayor_medida(self):
-		return self.producto.medida_mayor
+	def medida_mayor(self):
+		return self.producto.medida.medida_mayor
 
-	def menor_medida(self):
-		return self.producto.medida_menor
+	def medida_menor(self):
+		return self.producto.medida.medida_menor
 
 	def __unicode__(self):
 		if self.minimo==self.maximo:
