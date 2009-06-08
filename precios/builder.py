@@ -119,14 +119,14 @@ def precio_graph(mercado,producto,frequency,start_date,end_date,dollar,euro,pk_l
 			next_fecha=mktime(add_year(fecha).timetuple())-1
 		else:
 			next_fecha=now_fecha
-		precio=int(i['maximo'])		
-		min_precio=int(i['minimo'])
+		precio=float(i['maximo'])		
+		min_precio=float(i['minimo'])
 		if action=='multiply':
-			precio=int(precio*factor)
-			min_precio=int(min_precio*factor)
+			precio=float(precio*factor)
+			min_precio=float(min_precio*factor)
 		elif action=='divide':
-			precio=int(precio/factor)
-			min_precio=int(min_precio/factor)
+			precio=float(precio/factor)
+			min_precio=float(min_precio/factor)
 		if precio != min_precio:
 			min_data_dic[int(now_fecha)]=min_precio
 		if not str(int(now_fecha)) in dollar[frequency]:
