@@ -524,9 +524,10 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				}
 				new_graph.unit = this.unit;
 			}
-			label = eval(this.main_variable_js) + ' '+_('in')+' ' + eval(this.place_js) + ' (' + eval(this.unit_legend_js)+')';
 			if ('advanced_label' in this) {
 				new_graph.label = this.advanced_label + ' (' + new_graph.unit + ' ' +_(new_graph.frequency)+')';
+			} else {
+				new_graph.label = eval(this.main_variable_js) + ' '+_('in')+' ' + eval(this.place_js) + ' (' + eval(this.unit_legend_js)+')';
 			}
 			if (! (new_graph.unit in unit_types)) {
 				unit_types[new_graph.unit] = true;
@@ -769,7 +770,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			var new_data = [],
 			normalize_factor = eval(this.normalize_factor_js),
 			new_graph = {
-				'unit': '%',
+				'unit': this.unit,
 				'type': 'normalizado',
 				'yaxis': 1,
 				'bars': this.bars,
@@ -792,6 +793,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			} else {
 				new_graph.label = eval(this.main_variable_js) + ' '+_('in')+' ' + eval(this.place_js) + ' (100% = ' + String(normalize_factor)+ ' ' + eval(this.unit_legend_js)+')';
 			}
+			new_graph.unit='%';
 			$.each(this.data,
 			function() {
 				var time = this[0],
