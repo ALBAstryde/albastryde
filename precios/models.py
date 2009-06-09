@@ -10,7 +10,7 @@ class Medida(models.Model):
 	factor_para_convertir=models.DecimalField(max_digits=10,decimal_places=2,blank=True)
 
 	def __unicode__(self):
-		return str(self.factor_para_convertir)+' '+medida_menor+ ' = '+medida_mayor
+		return str(self.factor_para_convertir)+' '+self.medida_menor+ ' = '+self.medida_mayor
 
 	
 class Producto(StatisticsFormVariable):
