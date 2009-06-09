@@ -11,7 +11,7 @@ date_inputformats=['%d.%m.%Y','%d/%m/%Y','%Y-%m-%d']
 FRECUENCIA_CHOICES=(('diario','todos los datos'),('mensual','promedio mensual'),('anual','promedio anual'))
 COSECHA_CHOICES=(('area estimada', 'Area estimada'),('producto estimado','Producto estimado'),('area sembrada','Area sembrada'),('area cosechada', 'Area Cosechada'),('producto obtenido','Producto obtenido'),('rendimiento estimado','Rendimiento estimado'),('rendimiento obtenido','Rendimiento obtenido'),('a    rea perdida','Area perdida'))
 #COSECHA_CHOICES=(('area estimada', 'Area estimada'),('producto estimado','Producto estimado'),('area sembrada','Area sembrada'),('area cosechada', 'Area Cosechada'),('producto obtenido','Producto obtenido'),('rendimiento estimado','Rendimiento estimado'),('rendimiento obtenido','Rendimiento obtenido'),('a    rea perdida','Area perdida'),('area miscalculada','Area miscalculada'),('producto miscalculado','Producto miscalculado'))
-PRECIO_MEDIDA_CHOICES=(('nativo','Unidades nativos del mercado'),('mayor','Unidades convertido a los del mayoreo'),('menor','Unidades convertido a los del detallista'))
+PRECIO_MEDIDA_CHOICES=(('nativo','Unidades nativas del mercado'),('mayor','Unidades convertido a los del mayoreo'),('menor','Unidades convertido a los del detallista'))
 
 
 class DbForm(forms.Form):
