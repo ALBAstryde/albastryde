@@ -273,7 +273,13 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					all_variables[e].push(v);
 				}
 			});
-			new_graph.label = eval(this.main_variable_js) + ' '+_('in')+' ' + eval(this.place_js) + ' (' + this.unit + ' '+_(this.frequency)+')';
+			JOHANNES1=new_graph;
+			if ('unit_legend_js' in this) {
+				new_graph.unit_legend_js=this.unit_legend_js;
+			} else {
+				new_graph.unit_legend_js='new_graph.unit+" "+_(new_graph.frequency)';
+			}
+			new_graph.label = eval(this.main_variable_js) + ' '+_('in')+' ' + eval(this.place_js) + ' (' + eval(new_graph.unit_legend_js)+')';
 			if (! (this.unit in unit_types)) {
 				unit_types[this.unit] = true;
 			}
@@ -339,7 +345,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				all_main_variable[eval(this.main_variable_js)]=true;
 			}
 			new_graph.end_date = intervals ? new_graph.data[new_graph.data.length-1][0][1] : new_graph.data[new_graph.data.length-1][0];
-			JOHANNES=new_graph.end_date;
 			if (new_graph.start_date < first_date) {
 				first_date=new_graph.start_date
 			}
@@ -464,6 +469,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'place_js': this.place_js,
 				'main_variable_js': this.main_variable_js,
 				'normalize_factor_js': this.normalize_factor_js,
+				'unit_legend_js': this.unit_legend_js,
 				'included_variables': this.included_variables,
 				'color': this.color,
 				'start_date': this.start_date,
@@ -493,7 +499,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					new_data.push([time, currency_value, pk]);
 				});
 				new_graph.data = new_data;
-				JOHANNES_euro=new_graph.data;
 				if ('minData' in this) {
 					var minData = [];
 					$.each(this.minData,
@@ -519,12 +524,12 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				}
 				new_graph.unit = this.unit;
 			}
-			label = eval(this.main_variable_js) + ' '+_('in')+' ' + eval(this.place_js) + ' (' + new_graph.unit + ' '+_(new_graph.frequency)+')';
+			label = eval(this.main_variable_js) + ' '+_('in')+' ' + eval(this.place_js) + ' (' + eval(this.unit_legend_js)+')';
 			if ('advanced_label' in this) {
 				new_graph.label = this.advanced_label + ' (' + new_graph.unit + ' ' +_(new_graph.frequency)+')';
 			}
-			if (! (this.unit in unit_types)) {
-				unit_types[this.unit] = true;
+			if (! (new_graph.unit in unit_types)) {
+				unit_types[new_graph.unit] = true;
 			}
 			new_graphs.push(new_graph);
 		});
@@ -771,6 +776,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'frequency': this.frequency,
 				'place_js': this.place_js,
 				'main_variable_js': this.main_variable_js,
+				'unit_legend_js': this.unit_legend_js,
 				'points': this.points,
 				'lines': this.lines,
 				'color': this.color,
@@ -782,9 +788,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'intervals': this.intervals
 			};
 			if ('advanced_label' in this) {
-				new_graph.label = this.advanced_label + ' (1 = ' + String(start_value) + ' ' + this.unit + 's '+_(new_graph.frequency)+')';
+				new_graph.label = this.advanced_label + ' (100% = ' + String(start_value) + ' ' + this.unit + 's '+_(new_graph.frequency)+')';
 			} else {
-				label = eval(this.main_variable_js) + ' '+_('in')+' ' + eval(this.place_js) + ' (1 = ' + String(normalize_factor)+ ' ' + this.unit + 's '+_(new_graph.frequency)+')';
+				new_graph.label = eval(this.main_variable_js) + ' '+_('in')+' ' + eval(this.place_js) + ' (100% = ' + String(normalize_factor)+ ' ' + eval(this.unit_legend_js)+')';
 			}
 			$.each(this.data,
 			function() {
