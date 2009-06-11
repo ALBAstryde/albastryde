@@ -84,5 +84,5 @@ def lluvia_graph(estacion,frequency,start_date,end_date,pk_list):
 				data.append([[now_fecha,next_fecha],value])
 	if frequency=='daily':
 		pk_list.append([content_type,list_of_pk])
-	result={'included_variables':{'station':estacion.nombre},'data':data,'unit':'mm','type':'lluvia','source':source,'frequency':frequency,'main_variable_js':'"lluvia"','place_js':'this.included_variables.station','normalize_factor_js':'this.top_value','display':'bars'}
+	result={'included_variables':{'station':estacion.nombre},'data':data,'unit':'mm','type':'lluvia','source':source,'frequency':frequency,'main_variable_js':'"lluvia"','place_js':'new_graph.included_variables.station','normalize_factor_js':'new_graph.top_value','display':'bars'}
 	return result,pk_list
