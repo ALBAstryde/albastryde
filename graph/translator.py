@@ -3,6 +3,8 @@ from django.db.models.options import get_verbose_name
 
 from django.http import QueryDict
 
+fixed_fields=[u'desde',u'hasta',u'frecuencia',u'preciomedida']
+
 def camelcase(string):
 	decamelcase_list= string.strip().split()
 	camelcase_string=''
@@ -17,7 +19,7 @@ def translate_query_string(query_string):
 	for i in word_query.lists():
 		modelname=i[0].strip().lower()
 		values= i[1]
-		if modelname==u'desde' or modelname==u'hasta' or modelname==u'frecuencia':
+		if modelname in fixed_fields:
 			new_query_string+="&"+camelcase(modelname)+"="+values[0]
 		elif modelname[0:7]==u'incluir':
 			new_query_string+="&"+camelcase(modelname)+"=on"
@@ -60,7 +62,7 @@ def reverse_translate_query(query):
 	for i in query.lists():
 		modelname=get_verbose_name(i[0])
 		value=i[1]
-		if modelname=='desde' or modelname=='hasta' or modelname=='frecuencia':
+		if modelname in fixed_fields:
 			new_query_string+="&"+modelname+"="+value[0]
 		elif modelname[0:7]=='incluir':
 			new_query_string+="&"+modelname
