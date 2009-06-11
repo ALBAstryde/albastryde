@@ -607,6 +607,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			'yaxis': median_data[0]['yaxis'],
 			'included_variables':{},
 			'color': color_counter,
+			'top_value':0,
 			'start_date': median_data[0]['data'][0],
 			'place_js': median_data[0].place_js,
 			'main_variable_js': median_data[0].main_variable_js,
@@ -628,11 +629,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				new_graph.included_variables[included_variable]=_('median');
 			}
 		});
-		new_graph.label = _('median');
-		for (median_variable=0;median_variable<median_variables.length;median_variable++) {
-			new_graph.label+=' '+median_variables[median_variable][0]+ ': '+median_variables[median_variable][1];
-		}
-		new_graph.label += ' (' + eval(new_graph.unit_legend_js)+')';
+
 JOHANNES3=[new_graph,median_data];//XXX
 		new_graph.data=[];
 		for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
@@ -647,11 +644,19 @@ JOHANNES3=[new_graph,median_data];//XXX
 				}
 			}
 			value_item=total_value/(median_data.length*2);
+			if (value_item > new_graph.top_value) {
+				new_graph.top_value=value_item;
+			}
 //			value_item=total_value;
 			new_graph.data.push([date_value,value_item]);
 		}
-//		new_graph.data=median_data[0].data;//erase!XXX
 		new_graph.start_value=new_graph.data[0][1];
+		new_graph.label = _('median');
+		for (median_variable=0;median_variable<median_variables.length;median_variable++) {
+			new_graph.label+=' '+median_variables[median_variable][0]+ ': '+median_variables[median_variable][1];
+		}
+		new_graph.label += ' (' + eval(new_graph.unit_legend_js)+')';//		new_graph.data=median_data[0].data;//erase!XXX
+
 		return new_graph;
 	}
 
@@ -812,7 +817,8 @@ JOHANNES3=[new_graph,median_data];//XXX
 		$.each(unitgraphs,
 		function() {
 			var new_data = [],
-			normalize_factor = eval(this.normalize_factor_js),
+			new_graph=this,
+			normalize_factor = eval(this.normalize_factor_js);
 			new_graph = {
 				'unit': this.unit,
 				'type': 'normalizado',
