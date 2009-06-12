@@ -625,7 +625,7 @@ for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
 			new_graph.data.push([date_value,value_item]);
 		}
 		new_graph.start_value=new_graph.data[0][1];
-		new_graph.label = _('median');
+		new_graph.label = new_graph.type+' '+_('median');
 		for (median_variable=0;median_variable<median_variables.length;median_variable++) {
 			new_graph.label+=' '+median_variables[median_variable][0]+ ': '+median_variables[median_variable][1];
 		}
