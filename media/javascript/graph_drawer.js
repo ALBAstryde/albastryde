@@ -1,37 +1,6 @@
-//Check if two arrays' contents are the same
-//returns true if they are, otherwise false
-equals = function(a,b)
-{
-  //Check if the arrays are undefined/null
-  if(!a || !b) {
-    return false;
-}
-  //first compare their lengths
-  if(a.length == b.length)
-  {
-    //go thru all the vars
-    for(var i = 0; i < a.length;i++)
-    {
-      //if the var is an array, we need to make a recursive check
-      //otherwise we'll just compare the values
-      if(typeof a[i] == 'object') {
-        if(!equals(a[i],b[i])) {
-          return false;
-	}
-      }
-      else if(a[i] != b[i]) {
-        return false;
-      }
-    }
-    return true;
-  }
-  else {
-  return false;
-  }
-};
-
 var e_msg, errors;
 JOHANNES6=[];
+JOHANNES9=[];
 function create_graphs(jsondata, wiki_mode, graphsheader) {
 	var query_id, id, headline, has_comments, plot, comments, datapoint_dictionary, graph_height, raw_graphs, converted_graphs, dollargraphs, eurographs, normalized_graphs, normalized_dollargraphs, normalized_eurographs, graphs;
 	var color_counter = 0,
@@ -112,6 +81,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		var does_not_exist,all_tables_list;
 		table_data[type]={};
 		$.each(frequencies,function(frequency,variables) {
+			var graphs_to_be_filled,median_graph;
 			table_data[type][frequency]={};
 			all_tables_list=[];
 			$.each(variables,function(variable,variable_values) {
@@ -119,7 +89,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				$.each(variable_values,function(variable_value,graph_numbers) {
 				  	does_not_exist=true;
 					for (i=0;i<all_tables_list.length;i++) {
-						if (equals(all_tables_list[i][1],graph_numbers)) {
+						if (String(all_tables_list[i][1])==String(graph_numbers)) {
 							all_tables_list[i][0].push([variable,variable_value]);
 							does_not_exist=false;
 							break;
@@ -132,15 +102,15 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			});
 			JOHANNES7=all_tables_list;
 			for (i=0;i<all_tables_list.length;i++) {
-				var graphs_to_be_filled=[];
-				for (f in all_tables_list[i][1]) {
+				graphs_to_be_filled=[];
+				for (f=0;f<all_tables_list[i][1].length;f++) {
 					graphs_to_be_filled.push(converted_graphs[all_tables_list[i][1][f]]);
 				}
 				table_data[type][frequency][all_tables_list[i][0]] = calculate_estimated_data(graphs_to_be_filled);
-				if (all_tables_list[i][1].length > 1) {
-					var median_graph=calculate_mediangraph(table_data[type][frequency][all_tables_list[i][0]],all_tables_list[i][0]);
+				if ((all_tables_list[i][1].length > 1) && (all_tables_list[i][1].length < 12)){
+					median_graph=calculate_mediangraph(table_data[type][frequency][all_tables_list[i][0]],all_tables_list[i][0]);
 					converted_graphs = converted_graphs.concat(median_graph);
-					JOHANNES9=all_tables_list[i][1];
+					JOHANNES9.push(all_tables_list[i]);
 				}
 			}
 				
@@ -590,7 +560,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	}
 
 	function calculate_mediangraph(median_data,median_variables) {
-		var graph_series, date_item, new_data, date_value, value_value, total_value, value_item, new_graph, graph;
+		var graph_series, date_item, new_data, date_value, value_value, total_value, value_item, new_graph, graph, i;
 		new_graph = {
 			'points': {
 				'show': false
@@ -616,11 +586,15 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		
 		color_counter += 1;
 		var is_included;
+		JOHANNES10=[];
 		$.each(median_data[0].included_variables,function(included_variable,included_variable_value) {
+		JOHANNES10.push([included_variable,included_variable_value]);
 		  	is_included=false;
 			for (i=0;i<median_variables.length;i++) {
-				if ((included_variable=median_variables[i][0]) && (included_variable_value=median_variables[i][1])) {
+				JOHANNES10.push(median_variables[i]);
+				if ((included_variable==median_variables[i][0]) && (included_variable_value==median_variables[i][1])) {
 					is_included=true;
+					break;
 				}
 			}
 			if (is_included===true) {
@@ -632,7 +606,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 
 JOHANNES3=[new_graph,median_data];//XXX
 		new_graph.data=[];
-		for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
+for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
 			date_value=median_data[0]['data'][date_item][0];
 			total_value=0;
 			for (graph=0;graph<median_data.length;graph++) {
