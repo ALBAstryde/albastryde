@@ -3,7 +3,7 @@ from django.db.models.options import get_verbose_name
 
 from django.http import QueryDict
 
-fixed_fields=[u'desde',u'hasta',u'frecuencia',u'preciomedida']
+fixed_fields=[u'desde',u'hasta',u'frecuencia',u'precio medida']
 
 def camelcase(string):
 	decamelcase_list= string.strip().split()

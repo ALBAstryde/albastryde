@@ -49,7 +49,7 @@ def precio_builder(form_data,frequencies):
 				for frequency in frequencies:
 					for mercado in mercados:
 						for producto in productos:
-							if medida_tipo=='mayor' or mercado.mayor==True and medida_tipo=='nativo':
+							if medida_tipo=='mayor' or mercado.mayor==True and medida_tipo=='nativa':
 								medida_unidad=producto.medida.medida_mayor
 							else:
 								medida_unidad=producto.medida.medida_menor
