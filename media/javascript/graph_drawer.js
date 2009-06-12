@@ -604,7 +604,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			}
 		});
 
-JOHANNES3=[new_graph,median_data];//XXX
 		new_graph.data=[];
 for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
 			date_value=median_data[0]['data'][date_item][0];
@@ -629,7 +628,7 @@ for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
 		for (median_variable=0;median_variable<median_variables.length;median_variable++) {
 			new_graph.label+=' '+median_variables[median_variable][0]+ ': '+median_variables[median_variable][1];
 		}
-		new_graph.label += ' (' + eval(new_graph.unit_legend_js)+')';//		new_graph.data=median_data[0].data;//erase!XXX
+		new_graph.label += ' (' + eval(new_graph.unit_legend_js)+')';
 
 		return new_graph;
 	}
@@ -760,7 +759,7 @@ for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
 				'place_js': this.place_js,
 				'main_variable_js': this.main_variable_js,
 				'unit_legend_js': this.unit_legend_js,
-				'legend': this.legend,
+				'label': this.label,
 				'points': this.points,
 				'lines': this.lines,
 				'color': this.color,
@@ -1233,28 +1232,94 @@ for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
 		html='';
 		html+='<div id="'+dialog_id+'currencytabs">';
 		html+='<ul>';
+		type_counter=0;
 		for (type in table_data) {
+			frequency_counter=0;
 			for (frequency in table_data[type]) {
-				for (variable in table_data[type][frequency]) {
-					for (variable_value in table_data[type][frequency][variable]) {
-						html+='<li><a href="#'+dialog_id+type+frequency+variable+variable_value+'">'+type+': '+variable+' = '+variable_value+' ('+_(frequency)+')</li>';
+				variables_counter=0;
+				for (variables in table_data[type][frequency]) {
+					variable_html='';
+					variable_array=variables.split(',');
+					for (i=0;i<variable_array.length;i=i+2) {
+						variable_html+=variable_array[i]+' = ';
+						variable_html+=variable_array[i+1]+' ';
 					}
+					html+='<li><a href="#'+dialog_id+'tables_'+String(type_counter)+'_'+String(frequency_counter)+'_'+String(variables_counter)+'">'+type+': '+variable_html;
+					html+='('+_(frequency)+')</li>';
+				variables_counter++;
 				}
+			frequency_counter++;
 			}
+		type_counter++;
 		}
 		html+='</ul>';
+		type_counter=0;
 		for (type in table_data) {
+			frequency_counter=0;
 			for (frequency in table_data[type]) {
-				for (variable in table_data[type][frequency]) {
-					for (variable_value in table_data[type][frequency][variable]) {
-						html += '<div id="'+dialog_id+type+frequency+variable+variable_value+'">';
+				variables_counter=0;
+				for (variables in table_data[type][frequency]) {
+						html += '<div id="'+dialog_id+'tables_'+String(type_counter)+'_'+String(frequency_counter)+'_'+String(variables_counter)+'">';
 						html += '<table style="font-size: smaller; color: rgb(84, 84, 84);"><tr><td><div style="border: 1px solid rgb(204, 204, 204); padding: 1px;"><div style="border: 5px solid #C1609D; overflow: hidden; width: 4px; height: 0pt;"/></div></div></td><td>'+_('estimated value')+'</td></tr></table>';
 						html += '<table>';
 						html += '<tr>';
 						html += '<th>&nbsp;</th>';
-					}
+						for (graph=0;graph<table_data[type][frequency][variables].length;graph++) {
+							if ('minData' in table_data[type][frequency][variables][graph]) {
+								html+='<th colspan=2>';
+							} else {
+								html+='<th>';
+							}
+							html+=table_data[type][frequency][variables][graph]['label']+'</th>';
+						}
+						html += '</tr>';
+						html += '<tr>';
+						html += '<th>&nbsp;</th>';						
+						for (graph=0;graph<table_data[type][frequency][variables].length;graph++) {
+							if ('minData' in table_data[type][frequency][variables][graph]) {
+								html+='<td>min</td><td>max</td>';
+							} else {
+								html+='<td>&nbsp;</td>';
+							}
+						}
+						html += '</tr>';
+						for (i=0;i<table_data[type][frequency][variables][0]['data'].length;i++) {
+							html+='<tr>';
+							html+='<td><i>';
+							date_line=date_string(table_data[type][frequency][variables][0]['data'][i][0]);
+							if (table_data[type][frequency][variables][0]['frequency']=='monthly') {
+                                                                html+=date_line.substring(0,7);
+                                                        } else if (table_data[type][frequency][variables][0]['frequency']=='annualy') {
+                                                                html+=date_line.substring(0,4);
+                                                        } else {
+                                                                html+=date_line;
+                                                        }
+							'</i></td>';
+							for (graph=0;graph<table_data[type][frequency][variables].length;graph++) {
+								if ('minData' in table_data[type][frequency][variables][graph]) {
+									if (table_data[type][frequency][variables][graph]['minData'][i][2]==false) {
+										html+='<td class="estimated" style="background-color:#C1609D;">';
+									} else {
+										html+='<td>';
+									}
+									html+=table_data[type][frequency][variables][graph]['minData'][i][1]+'</td>';
+								}
+								if (table_data[type][frequency][variables][graph]['data'][i][2]==false) {
+									html+='<td class="estimated" style="background-color:#C1609D;">';
+								} else {
+									html+='<td>';
+								}
+								html+=table_data[type][frequency][variables][graph]['data'][i][1]+'</td>'
+							}
+							html+='</tr>';
+						}
+						html += '</table>';
+						html += '</div>';
+				variables_counter++;
 				}
+			frequency_counter++;
 			}
+		type_counter++;
 		}
 		html +='</div>';
 		return html;
