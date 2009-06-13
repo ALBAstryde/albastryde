@@ -172,8 +172,10 @@ def cosecha_graph(variable,producto,start_date,end_date,pk_list,frequency,depart
 			source='computed'
 	if departamento:
 		included_variables={'departamento':departamento.nombre, 'producto':producto.nombre}
+		place_js='new_graph.included_variables.departamento'
 	else:
 		included_variables={'municipio':municipio.nombre, 'producto':producto.nombre}
-	result = {'included_variables':included_variables,'data':data,'source':source,'unit':unit,'type':variable,'frequency':frequency,'main_variable_js':'new_graph.type+" de "+new_graph.included_variables.producto','place_js':'new_graph.included_variables.departamento','normalize_factor_js':'new_graph.start_value','display':'bars'}
+		place_js='new_graph.included_variables.municipio'
+	result = {'included_variables':included_variables,'data':data,'source':source,'unit':unit,'type':variable,'frequency':frequency,'main_variable_js':'new_graph.type+" de "+new_graph.included_variables.producto','place_js':place_js,'normalize_factor_js':'new_graph.start_value','display':'bars'}
 	return result,pk_list
 
