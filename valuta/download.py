@@ -5,10 +5,12 @@ from valuta.pyQ import getTickers
 
 
 def get_Euros():
+	previous_data=True
 	try:
 		first_date=Euro.objects.aggregate(Max('fecha'))['fecha__max'].strftime('%Y%m%d')
 	except:
 		first_date='19900101'
+		previous_data=False
 	last_date=datetime.date.today().strftime('%Y%m%d')
 	if not first_date==last_date:
 		valuta_list=getTickers(first_date,last_date,["NIOEUR=X"])
