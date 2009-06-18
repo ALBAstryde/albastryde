@@ -157,7 +157,7 @@ def ajax_comment_post(request, next=None):
     if comment.is_removed == True:
 	status = simplejson.dumps({'status': "success",'pk': comment.pk,'remove':comment.is_removed})
     else:
-	status = simplejson.dumps({'status': "success",'pk': comment.pk,'public':comment.is_public})
+	status = simplejson.dumps({'status': "success",'pk': comment.pk,'is_public':comment.is_public})
     return http.HttpResponse(status, mimetype="application/json")
 
 
