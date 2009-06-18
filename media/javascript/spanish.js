@@ -1,4 +1,4 @@
-spanish_dic={
+i18n={
 //graph_drawer.js
 'To open these data in another program, copy the text below into a text editor. Then save it with the ending".csv". This file can now be openes with Open Office and similar programs.':'Para usar estos datos en otros programas, copia el texto abajo a un editor de archivos de texto. Guardalo como un archivo del tipo ".csv". Este archivo se puede abrir en Open Office y otros programas parecidos.',
 'Export data':'Exportar datos',

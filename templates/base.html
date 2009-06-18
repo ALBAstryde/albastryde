@@ -4,35 +4,10 @@
 <title>
 {% block title %}{% endblock %}
 </title>
-<link rel="stylesheet" type="text/css" href="/media/css/base-style.css" />
-<link rel="stylesheet" type="text/css" href="/media/css/{{site_theme}}/style.css" />
-<script type="text/javascript" src="/media/javascript/{{site_language}}.js"></script>
-<script language="javascript" type="text/javascript">
-if (typeof({{site_language}}_dic)!='undefined'){
-	i18n={{site_language}}_dic;
-}
-</script>
-<script type="text/javascript" src="/media/javascript/translator.js"></script>
-<script type="text/javascript" src="/media/javascript/jquery.js"></script>
-<script language="javascript" type="text/javascript">
-$(document).ready(function() {
-	$('ul#maintabs li').hover(function(){$(this).addClass("ui-state-hover")},function(){$(this).removeClass("ui-state-hover")});
-});
-$(document).ready(function() {
-	$('form#menu_search').submit(function() {
-		searchterm=$('#menu_search_field').val();
-		window.location.href='/busqueda/'+searchterm;
-		return false;
-	});
-});
-$(document).ready(function() {
-	$('form#page_search').submit(function() {
-		searchterm=$('#page_search_field').val();
-		window.location.href='/busqueda/'+searchterm;
-		return false;
-	});
-});
-</script>
+{{ compressed_css_all | safe }}
+<!--[if IE]><script language="javascript" type="text/javascript" src="/media/javascript/excanvas.js"></script><![endif]-->
+{{ compressed_js_all | safe }}
+<!--[if IE]><script language="javascript" type="text/javascript" src="/media/javascript/jquery.bgiframe.js"></script><![endif]-->
 {% block extraheader %}
 {% endblock %}
 </head>

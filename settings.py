@@ -2,7 +2,10 @@
 
 from local_settings import *
 LOGIN_REDIRECT_URL="/"
-DEBUG = True
+COMPRESS_JS_FILTERS=('compress.filters.jsmin.JSMinFilter','compress.filters.yui.YUICompressorFilter',)
+COMPRESS_CSS_FILTERS=('compress.filters.csstidy.CSSTidyFilter','compress.filters.yui.YUICompressorFilter',)
+
+
 TEMPLATE_DEBUG = DEBUG
 AUTH_PROFILE_MODULE = "profiles.UserProfile"
 DEFAULT_CHARSET = 'utf-8'
@@ -13,6 +16,37 @@ ACCOUNT_ACTIVATION_DAYS = 7
 SITE_ID = 1
 USE_I18N = True
 ADMIN_MEDIA_PREFIX = '/media/admin/'
+
+COMPRESS_CSS = {
+	'all': {
+        	'source_filenames': ('css/base-style.css', 'css/'+SITE_THEME+'/style.css'),
+        	'output_filename': 'css/'+SITE_THEME+'/all_compressed.css',
+	}
+}
+
+COMPRESS_JS = {
+	'all': {
+        	'source_filenames': (
+			'javascript/jquery.js',
+			'javascript/'+SITE_LANGUAGE+'.js',             
+			'javascript/translator.js',
+			'javascript/date.js',
+			'javascript/jquery.dimensions.js',
+			'javascript/jquery.form.js',
+			'javascript/jquery.ui.js',
+#			'javascript/excanvas.js',
+			'javascript/jquery.bgiframe.js',
+			'javascript/jquery.flot.js',
+			'javascript/graph_drawer.js',
+			'javascript/statistics_form.js',
+			'javascript/site_setup.js'
+		),
+        	'output_filename': 'javascript/all_'+SITE_LANGUAGE+'_compressed.js',
+	}
+}
+
+
+
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.auth', 
     'django.core.context_processors.debug', 
@@ -20,6 +54,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'context_processors.site_theme',
     'context_processors.site_language',
     'context_processors.menu_list',
+    'context_processors.compress',
 )
 
 TEMPLATE_LOADERS = (
@@ -45,7 +80,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.admindocs',
-#    'django_cron',
+    'compress',
     'albastryde.wiki',
     'albastryde.precios',
     'albastryde.graph',
