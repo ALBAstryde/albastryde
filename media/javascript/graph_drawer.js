@@ -369,7 +369,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			var new_data = [],
 			new_graph=this,
 			normalize_factor = eval(this.normalize_factor_js),
-			label = eval(this.label_js) + ' (100% = ' + String(normalize_factor) + ' ' + eval(this.unit_legend_js) +')';;
+			label = eval(this.label_js) + ' (100% = ' + String(normalize_factor) + ' ' + eval(this.unit_legend_js) +')';
 			new_graph = {
 				'unit': this.unit,
 				'type': 'normalizado',
