@@ -81,7 +81,12 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			} else {
 				new_graph.unit_legend_js='new_graph.unit+" "+_(new_graph.frequency)';
 			}
-			new_graph.label = eval(new_graph.main_variable_js) + ' '+_('in')+' ' + eval(new_graph.place_js) + ' (' + eval(new_graph.unit_legend_js)+')';
+			if ('label_js' in this) {
+				new_graph.label_js=this.label_js;
+			} else { 
+				new_graph.label_js = "eval(new_graph.main_variable_js) + ' '+_('in')+' ' + eval(new_graph.place_js)";
+			}
+			new_graph.label=eval(new_graph.label_js)+ ' (' + eval(new_graph.unit_legend_js)+')';
 			if (! (this.unit in unit_types)) {
 				unit_types[this.unit] = true;
 			}
@@ -363,14 +368,17 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		function() {
 			var new_data = [],
 			new_graph=this,
-			normalize_factor = eval(this.normalize_factor_js);
+			normalize_factor = eval(this.normalize_factor_js),
+			label = eval(this.label_js) + ' (100% = ' + String(normalize_factor) + ' ' + eval(this.unit_legend_js) +')';;
 			new_graph = {
 				'unit': this.unit,
 				'type': 'normalizado',
 				'yaxis': 1,
 				'bars': this.bars,
+				'label': label,
 				'frequency': this.frequency,
 				'place_js': this.place_js,
+				'label_js': this.label_js,
 				'main_variable_js': this.main_variable_js,
 				'unit_legend_js': this.unit_legend_js,
 				'points': this.points,
@@ -383,11 +391,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'hoverable': this.hoverable,
 				'intervals': this.intervals
 			};
-			if ('advanced_label' in this) {
-				new_graph.label = this.advanced_label + ' (100% = ' + String(start_value) + ' ' + this.unit + 's '+_(new_graph.frequency)+')';
-			} else {
-				new_graph.label = eval(new_graph.main_variable_js) + ' '+_('in')+' ' + eval(new_graph.place_js) + ' (100% = ' + String(normalize_factor)+ ' ' + eval(new_graph.unit_legend_js)+')';
-			}
 			new_graph.unit='%';
 			$.each(this.data,
 			function() {
@@ -435,6 +438,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'main_variable_js': this.main_variable_js,
 				'normalize_factor_js': this.normalize_factor_js,
 				'unit_legend_js': this.unit_legend_js,
+				'label_js': this.label_js,
 				'included_variables': this.included_variables,
 				'color': this.color,
 				'start_date': this.start_date,
@@ -445,9 +449,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'intervals': this.intervals
 			},
 			intervals=this.intervals;
-			if ('advanced_label' in this) {
-				new_graph.advanced_label = this.advanced_label;
-			}
 			if (this.unit == 'C$') {
 				new_graph.start_value = currency_dic[this.frequency][String(this.start_date)] * this.start_value;
 				new_graph.top_value = currency_dic[this.frequency][String(this.top_date)] * this.top_value;
@@ -489,11 +490,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				}
 				new_graph.unit = this.unit;
 			}
-			if ('advanced_label' in this) {
-				new_graph.label = this.advanced_label + ' (' + new_graph.unit + ' ' +_(new_graph.frequency)+')';
-			} else {
-				new_graph.label = eval(this.main_variable_js) + ' '+_('in')+' ' + eval(this.place_js) + ' (' + eval(this.unit_legend_js)+')';
-			}
+			new_graph.label = eval(this.label_js) + ' (' + eval(this.unit_legend_js)+')';
 			if (! (new_graph.unit in unit_types)) {
 				unit_types[new_graph.unit] = true;
 			}
@@ -1077,11 +1074,12 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			new_graph.data.push([date_value,value_item]);
 		}
 		new_graph.start_value=new_graph.data[0][1];
-		new_graph.label = new_graph.type+' '+_('median');
+		new_graph.label_js = '"'+new_graph.type+' '+_('median');
 		for (median_variable=0;median_variable<median_variables.length;median_variable++) {
-			new_graph.label+=' '+median_variables[median_variable][0]+ ': '+median_variables[median_variable][1];
+			new_graph.label_js+=' '+median_variables[median_variable][0]+ ': '+median_variables[median_variable][1];
 		}
-		new_graph.label += ' (' + eval(new_graph.unit_legend_js)+')';
+		new_graph.label_js+='"';
+		new_graph.label = eval(new_graph.label_js)+' (' + eval(new_graph.unit_legend_js)+')';
 
 		return new_graph;
 	}
@@ -1205,6 +1203,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'normalize_factor_js': this.normalize_factor_js,
 				'main_variable_js': this.main_variable_js,
 				'unit_legend_js': this.unit_legend_js,
+				'label_js': this.label_js,
 				'label': this.label,
 				'points': this.points,
 				'lines': this.lines,
