@@ -4,6 +4,9 @@
  *
  */
 
+one_pi=Math.PI;
+two_pi=2*Math.PI;
+
 (function($) {
     function Plot(target_, data_, options_) {
         // data is on the form:
@@ -1480,44 +1483,47 @@
         }
 
         function drawSeriesPoints(series) {
+	    var i,x,y;
             function plotPoints(data, radius, fillStyle, axisx, axisy) {
-                for (var i = 0; i < data.length; ++i) {
+		var data_length=data.length;
+                for (i = 0; i < data_length; i++) {
                     if (data[i] == null)
                         continue;
                     
 //interval                    var x = data[i][0], y = data[i][1];
-                    var x, y = data[i][1];
+                    y = data[i][1];
                     x = (typeof(data[i][0]) == 'object') ? (data[i][0][0]+(data[i][0][1] - data[i][0][0])/2) : data[i][0];
 //interval end
                     if (x < axisx.min || x > axisx.max || y < axisy.min || y > axisy.max)
                         continue;
-                    if(series.points.drawCall == false) {
+                    if(series.points.drawCall) {
+			series.points.drawCall.apply(eventHolder,[ctx,axisx.p2c(x),axisy.p2c(y),radius,fillStyle,plotOffset,data[i],series]);
+                    } else {
                         ctx.beginPath();
-                        ctx.arc(axisx.p2c(x), axisy.p2c(y), radius, 0, 2 * Math.PI, true);
+                        ctx.arc(axisx.p2c(x), axisy.p2c(y), radius, 0, two_pi, true);
                         if (fillStyle) {
                             ctx.fillStyle = fillStyle;
                             ctx.fill();
                         }
                         ctx.stroke();
-                    } else {
-			series.points.drawCall.apply(eventHolder,[ctx,axisx.p2c(x),axisy.p2c(y),radius,fillStyle,plotOffset,data[i],series]);
 		    };
                 }
             }
 
             function plotPointShadows(data, offset, radius, axisx, axisy) {
-                for (var i = 0; i < data.length; ++i) {
+		var data_length=data.length, x,y,i;
+                for (i = 0; i < data_length; i++) {
                     if (data[i] == null)
                         continue;
                     
 //interval                    var x = data[i][0], y = data[i][1];
-                    var y = data[i][1], x;
+                    y = data[i][1];
 		    x = (typeof(data[i][0]) == 'object') ? (data[i][0][0]+(data[i][0][1] - data[i][0][0])/2): data[i][0];
 //interval end
                     if (x < axisx.min || x > axisx.max || y < axisy.min || y > axisy.max)
                         continue;
                     ctx.beginPath();
-                    ctx.arc(axisx.p2c(x), axisy.p2c(y) + offset, radius, 0, Math.PI, false);
+                    ctx.arc(axisx.p2c(x), axisy.p2c(y) + offset, radius, 0, one_pi, false);
                     ctx.stroke();
                 }
             }
@@ -2120,7 +2126,7 @@
             octx.strokeStyle = parseColor(series.color).scale(1, 1, 1, 0.5).toString();
             var radius = 1.5 * pointRadius;
             octx.beginPath();
-            octx.arc(axisx.p2c(x), axisy.p2c(y), radius, 0, 2 * Math.PI, true);
+            octx.arc(axisx.p2c(x), axisy.p2c(y), radius, 0, two_pi, true);
             octx.stroke();
         }
 

@@ -302,12 +302,14 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				});
 			});
 			for (i=0;i<all_tables_list.length;i++) {
-				graphs_to_be_filled=[];
-				for (f=0;f<all_tables_list[i][1].length;f++) {
-					graphs_to_be_filled.push(converted_graphs[all_tables_list[i][1][f]]);
-				}
-				table_data[type][frequency][all_tables_list[i][0]] = calculate_estimated_data(graphs_to_be_filled);
-				if ((all_tables_list[i][1].length > 1) && (all_tables_list[i][1].length < 12)){
+				if (all_tables_list[i][1].length == 1){
+					table_data[type][frequency][all_tables_list[i][0]] = [converted_graphs[all_tables_list[i][1][0]]];
+				} else {
+					graphs_to_be_filled=[];
+					for (f=0;f<all_tables_list[i][1].length;f++) {
+						graphs_to_be_filled.push(converted_graphs[all_tables_list[i][1][f]]);
+					}
+					table_data[type][frequency][all_tables_list[i][0]] = calculate_estimated_data(graphs_to_be_filled);
 					median_graph=calculate_mediangraph(table_data[type][frequency][all_tables_list[i][0]],all_tables_list[i][0]);
 					converted_graphs = converted_graphs.concat(median_graph);
 				}
@@ -1013,7 +1015,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	}
 
 	function calculate_mediangraph(median_data,median_variables) {
-		var date_item, date_value, total_value, value_item, new_graph, graph, i;
+		var date_item, date_value, total_value, value_item, graph, i, is_included,
 		new_graph = {
 			'points': {
 				'show': false
@@ -1022,23 +1024,24 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 				'show': true,
 				'fill': false
 			},
-			'hoverable': false,
-			'clickable': false,
+			'hoverable': {},
+			'clickable': {},
 			'unit': median_data[0]['unit'],
+			'intervals': median_data[0]['intervals'],
 			'frequency': median_data[0]['frequency'],
 			'type': median_data[0]['type'],
 			'yaxis': median_data[0]['yaxis'],
 			'included_variables':{},
 			'color': color_counter,
 			'top_value':0,
-			'start_date': median_data[0]['data'][0],
+			'start_date': median_data[0]['start_date'],
 			'place_js': median_data[0].place_js,
 			'main_variable_js': median_data[0].main_variable_js,
+			'normalize_factor_js': median_data[0].normalize_factor_js,
 			'unit_legend_js': median_data[0].unit_legend_js
 			};
 		
 		color_counter += 1;
-		var is_included;
 		$.each(median_data[0].included_variables,function(included_variable,included_variable_value) {
 		  	is_included=false;
 			for (i=0;i<median_variables.length;i++) {
@@ -1055,7 +1058,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		});
 
 		new_graph.data=[];
-for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
+	for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
 			date_value=median_data[0]['data'][date_item][0];
 			total_value=0;
 			for (graph=0;graph<median_data.length;graph++) {
@@ -1069,8 +1072,8 @@ for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
 			value_item=total_value/(median_data.length*2);
 			if (value_item > new_graph.top_value) {
 				new_graph.top_value=value_item;
+				new_graph.top_date=parseInt(date_value,10);
 			}
-//			value_item=total_value;
 			new_graph.data.push([date_value,value_item]);
 		}
 		new_graph.start_value=new_graph.data[0][1];
@@ -1084,9 +1087,8 @@ for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
 	}
 
 	function calculate_estimated_data(graphs_list) {
-		var to_time, from_time, from_value, to_value, last_time, last_value, search_from_counter, search_to_counter, slope, current_time, current_slope_list, time_delta, graph_time_dic = {}, time_string, value_string, time_item, counter, i, graph_time_data_list, date_item, graph_item, header_list = [], empty_data_list, disactivated_columns={};
-		
-		for (graph_item = 0; graph_item < graphs_list.length; graph_item++) {
+		var to_time, from_time, from_value, to_value, last_time, last_value, search_from_counter, search_to_counter, slope, current_time, current_slope_list, time_delta, graph_time_dic = {}, time_string, value_string, time_item, counter, i, graph_time_data_list, date_item, graph_item, header_list = [], empty_data_list, disactivated_columns={}, graphs_list_length=graphs_list.length, start_date;
+		for (graph_item = 0; graph_item < graphs_list_length; graph_item++) {
 			for (date_item in graphs_list[graph_item]['data']) {
 				time_string = graphs_list[graph_item]['data'][date_item][0];
 				if (typeof(time_string)=='object') {
@@ -1131,17 +1133,19 @@ for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
 			current_slope_list[i]=null;
 		}
 		graph_time_data_list = graph_time_data_list.sort();
-		for (counter = 0; counter < graph_time_data_list.length; counter++) {
+		start_date = parseInt(graph_time_data_list[0][1],10);
+		var graph_time_data_list_length=graph_time_data_list.length;
+		for (counter = 0; counter < graph_time_data_list_length; counter++) {
 			for (i=0;i< graph_time_data_list[counter][2].length;i++) {
 			    if (!(i in disactivated_columns)) {
 				if (graph_time_data_list[counter][2][i][0] === null) {
 					if (counter === 0) {
 						from_time = to_time = from_value = to_value = null;
-						for (search_from_counter = 0; search_from_counter < graph_time_data_list.length; search_from_counter++) {
+						for (search_from_counter = 0; search_from_counter < graph_time_data_list_length; search_from_counter++) {
 							if (! (graph_time_data_list[search_from_counter][2][i][0] === null)) {
 								from_time = graph_time_data_list[search_from_counter][0];
 								from_value = graph_time_data_list[search_from_counter][2][i][0];
-								for (search_to_counter = search_from_counter + 1; search_to_counter < graph_time_data_list.length; search_to_counter++) {
+								for (search_to_counter = search_from_counter + 1; search_to_counter < graph_time_data_list_length; search_to_counter++) {
 									if (! (graph_time_data_list[search_to_counter][2][i][0] === null)) {
 										to_time = graph_time_data_list[search_to_counter][0];
 										to_value = graph_time_data_list[search_to_counter][2][i][0];
@@ -1160,7 +1164,7 @@ for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
 							from_value = graph_time_data_list[counter - 1][2][i][0];
 							to_time = null;
 							to_value = null;
-							for (finder = counter; finder < graph_time_data_list.length; finder++) {
+							for (finder = counter; finder < graph_time_data_list_length; finder++) {
 								if (! (graph_time_data_list[finder][2][i][0] === null)) {
 									to_time = graph_time_data_list[finder][0];
 									to_value = graph_time_data_list[finder][2][i][0];
@@ -1198,12 +1202,14 @@ for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
 				'bars': this.bars,
 				'frequency': this.frequency,
 				'place_js': this.place_js,
+				'normalize_factor_js': this.normalize_factor_js,
 				'main_variable_js': this.main_variable_js,
 				'unit_legend_js': this.unit_legend_js,
 				'label': this.label,
 				'points': this.points,
 				'lines': this.lines,
 				'color': this.color,
+				'start_date':start_date,
 				'relevance': this.relevance,
 				'shadowSize': this.shadowSize,
 				'included_variables': this.included_variables,
@@ -1212,12 +1218,12 @@ for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
 				'intervals': this.intervals
 			},i;
 			new_graph.data=[];
-			for (i=0;i<graph_time_data_list.length;i++) {
+			for (i=0;i<graph_time_data_list_length;i++) {
 				new_graph.data.push([graph_time_data_list[i][1],graph_time_data_list[i][2][graph_index*2][0],graph_time_data_list[i][2][graph_index*2][1]]);
 			}
 			if ('minData' in this) {
 			  	new_graph.minData=[];
-				for (i=0;i<graph_time_data_list.length;i++) {
+				for (i=0;i<graph_time_data_list_length;i++) {
 					new_graph.minData.push([graph_time_data_list[i][1],graph_time_data_list[i][2][graph_index*2+1][0],graph_time_data_list[i][2][graph_index*2+1][1]]);
 				}
 			}
@@ -1237,9 +1243,10 @@ for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
 		return c;
 	}
 	function drawPoint(ctx, x, y, radius, fillStyle, plotOffset, dataitem, series) {
-		var unique_pk = dataitem[2],
-		comment_pk;
-		if ((has_comments) && unique_pk in comments) {
+		var unique_pk,comment_pk;
+		if (has_comments) {
+			unique_pk = dataitem[2];
+			if (unique_pk in comments) {
 			if (! (labelCanvas)) {
 				var canvasHeight = $('#' + query_id + 'stats canvas:first').outerHeight();
 				var canvasWidth = $('#' + query_id + 'stats canvas:first').outerWidth();
@@ -1314,6 +1321,17 @@ for (date_item=0;date_item<median_data[0]['data'].length;date_item++) {
 			}
 
 			labelCanvas.stroke();
+		} else {
+			ctx.zIndex = 1;
+			ctx.beginPath();
+			ctx.arc(x, y, radius, 0, 2 * Math.PI, true);
+			if (fillStyle) {
+				ctx.fillStyle = fillStyle;
+				ctx.fill();
+			}
+			ctx.stroke();
+		}
+
 		} else {
 			ctx.zIndex = 1;
 			ctx.beginPath();
