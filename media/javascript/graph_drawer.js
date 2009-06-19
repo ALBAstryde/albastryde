@@ -512,10 +512,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		eurographs = calculate_currencygraphs(eval(jsondata.euro), converted_graphs);
 		normalized_dollargraphs = calculate_normalizedgraphs(dollargraphs);
 		normalized_eurographs = calculate_normalizedgraphs(eurographs);
-//		for (frequency in frequency_list) {
-//			table_data[frequency_list[frequency]].USD=calculate_currencytables(eval(jsondata.dollar),table_data[frequency_list[frequency]].Cordoba);
-//			table_data[frequency_list[frequency]].Euro=calculate_currencytables(eval(jsondata.euro),table_data[frequency_list[frequency]].Cordoba);
-//		}
 	}
 	var graph_html;
 
@@ -975,41 +971,6 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		$('div.graph').remove();
 	}
 
-
-	function calculate_currencytables(currency_dic, cordobatables) {
-		var new_currencytables = [];
-		var new_unit=currency_dic.unit;
-		$.each(cordobatables,
-		function() {
-			var new_tablerow, i, j;
-			var frequency=this[2][0]['frequency'];
-			if (this[2][0]['unit']=='cordoba') {
-				new_tablerow=[];
-				new_tablerow[0]=this[0];
-				new_tablerow[1]=this[1];
-				new_tablerow[2]=[];
-				for (i in this[2]) {
-					new_tablerow[2][i]={};
-					new_tablerow[2][i]['datatype']=this[2][i]['datatype'];
-					new_tablerow[2][i]['independent']=this[2][i]['independent'];
-					new_tablerow[2][i]['unit']=new_unit;
-				}
-				new_tablerow[3]=[];
-				for (i in this[3]) {
-					new_tablerow[3][i]=[];
-					new_tablerow[3][i][0]=this[3][i][0];
-					new_tablerow[3][i][1]=[];
-					for (j in this[3][i][1]) {
-						new_tablerow[3][i][1][j]=[];
-						new_tablerow[3][i][1][j][0]=currency_dic[frequency][String(parseInt(this[3][i][0],10))] * this[3][i][1][j][0];
-						new_tablerow[3][i][1][j][1]=this[3][i][1][j][1];
-					}
-				}
-				new_currencytables.push(new_tablerow);
-			}
-		});
-		return new_currencytables;
-	}
 
 	function calculate_mediangraph(median_data,median_variables) {
 		var date_item, date_value, total_value, value_item, graph, i, is_included,
