@@ -40,6 +40,7 @@ i18n={
 'Aug':'Ago',
 'Dec':'Dic',
 'all':'todos',
+'estimated value':'valor estimado',
 'median of all markets and all products':'mediano de todos los mercados y todos los productos',
 'New graph generated!':'Nuevo gráfico generado!',
 'There is no data available for the selection!':'No hay datos para la seleccion!',
@@ -83,5 +84,10 @@ i18n={
 'De':'Di',
 'We are experiencing network errors!':'Hay problemas con el red!',
 'Please check the form!':'Por favor compruebe el formulario!',
-'Ajax error: no data received.':'Eror de Ajax: ningunos datos recibido.'
+'Ajax error: no data received.':'Eror de Ajax: ningunos datos recibido.',
+// jquery.badBrowser.js
+'ALBAstryde is a powerful application that requires a modern and professional browser. Unfortunately your current browser does not seem to fulfill the minimum criteria. However, there are many free ones that do, available on the internet. Please switch to':
+'ALBAstryde es un programa muy poderoso que requiere un navegador moderno y profesional. Su navegador actual no cumple con los requisitos mínimos. Hay muchos otros navegadores que cumplen todos los requisitos en el Internet. Por favor, descarge',
+'Thanks':'Gracias',
+'or':'o',
 };

@@ -30,6 +30,7 @@ COMPRESS_JS = {
 			'javascript/jquery.js',
 			'javascript/'+SITE_LANGUAGE+'.js',             
 			'javascript/translator.js',
+			'javascript/jquery.badBrowser.js',
 			'javascript/date.js',
 			'javascript/jquery.dimensions.js',
 			'javascript/jquery.form.js',
