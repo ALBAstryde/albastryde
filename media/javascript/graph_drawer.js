@@ -1608,7 +1608,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 					date = date_string(graphs[series]['data'][datapoint][0]);
 					html += date + ', ' + graphs[series]['data'][datapoint][1] + ', ' + graphs[series].unit + ', ' + graphs[series].type;
 					$.each(graphs[series].included_variables,function(e,v) {
-						new_headerline += ', '+v;
+						html += ', '+v;
 					});
 					html += '\n';
 				}
