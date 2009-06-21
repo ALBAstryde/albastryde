@@ -417,9 +417,11 @@ two_pi=2*Math.PI;
             if (target.css("position") == 'static')
                 target.css("position", "relative"); // for positioning labels and overlay
 
-// these two lines throw an IE error
-//            if (canvasWidth <= 0 || canvasHeight <= 0)
-//                throw "Invalid dimensions for plot, width = " + canvasWidth + ", height = " + canvasHeight;
+            if (canvasWidth <= 0 || canvasHeight <= 0)
+                throw "Invalid dimensions for plot, width = " + canvasWidth + ", height = " + canvasHeight;
+
+            if ($.browser.msie) // excanvas hack
+ 	        window.G_vmlCanvasManager.init_(document); // make sure everything is setup
 
             // the canvas
             canvas = $(makeCanvas(canvasWidth, canvasHeight)).appendTo(target).get(0);
