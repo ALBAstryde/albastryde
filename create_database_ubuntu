@@ -11,3 +11,14 @@ read -e DBNAME
 
 createdb -U postgres -T template_postgis $DBNAME
 
+echo -n "Pick a username: "
+read -e USERNAME
+
+echo -n "Pick a password: "
+read -e PASSWORD
+
+psql -c "create user $USERNAME with password '$PASSWORD';" $DBNAME
+psql -c "grant all privileges on database $DBNAME to $USERNAME;" $DBNAME
+echo "DATABASE_NAME = '$DBNAME'" >> local_settings.py                                                         
+echo "DATABASE_USER = '$USERNAME'" >> local_settings.py                                                         
+echo "DATABASE_PASSWORD = '$PASSWORD'" >> local_settings.py                                                         
