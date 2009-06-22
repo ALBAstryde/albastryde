@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import datetime
-import markdown
 from django.db import models
 import djangosearch
-from django.conf import settings
 from wiki.albamarkup import albamarkup
-import unicodedata
-from django import forms  
 from graph.models import StatisticsFormVariable
 
 

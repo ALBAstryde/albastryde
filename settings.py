@@ -13,7 +13,7 @@ MANAGERS = ADMINS
 DATABASE_ENGINE = 'postgresql_psycopg2'     
 SEARCH_ENGINE = 'postgresql' 
 ACCOUNT_ACTIVATION_DAYS = 7
-SITE_ID = 1
+SITE_ID = 15
 USE_I18N = True
 ADMIN_MEDIA_PREFIX = '/media/admin/'
 
@@ -35,8 +35,6 @@ COMPRESS_JS = {
 			'javascript/jquery.dimensions.js',
 			'javascript/jquery.form.js',
 			'javascript/jquery.ui.js',
-#			'javascript/excanvas.js',
-			'javascript/jquery.bgiframe.js',
 			'javascript/jquery.flot.js',
 			'javascript/graph_drawer.js',
 			'javascript/statistics_form.js',
@@ -70,17 +68,17 @@ MIDDLEWARE_CLASSES = (
 MEDIA_ROOT = SITE_ROOT+'/media/'
 MEDIA_URL = '/media/'
 TEMPLATE_DIRS = (
-     SITE_ROOT+"/templates",
+    SITE_ROOT+"/templates",
 )
 ROOT_URLCONF = 'urls'
 INSTALLED_APPS = (
-    'django_evolution',
-    'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.admindocs',
+    'django_evolution',
     'compress',
     'albastryde.wiki',
     'albastryde.precios',
