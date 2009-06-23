@@ -13,7 +13,7 @@ MANAGERS = ADMINS
 DATABASE_ENGINE = 'postgresql_psycopg2'     
 SEARCH_ENGINE = 'postgresql' 
 ACCOUNT_ACTIVATION_DAYS = 7
-SITE_ID = 15
+SITE_ID = 1
 USE_I18N = True
 ADMIN_MEDIA_PREFIX = '/media/admin/'
 

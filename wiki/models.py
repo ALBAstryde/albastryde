@@ -4,7 +4,7 @@ from django.db import models
 import djangosearch
 from wiki.albamarkup import albamarkup
 from graph.models import StatisticsFormVariable
-
+import markdown
 
 class Tag(StatisticsFormVariable):
 	pass
