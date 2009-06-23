@@ -10,10 +10,7 @@ class PhoneNumberField(Field):
 	       	return "PhoneNumberField"
 
 	def db_type(self):
- 	      	if settings.DATABASE_ENGINE == 'oracle':
-            		return 'VARCHAR2(20)'
-        	else:
-            		return 'varchar(20)'
+            	return 'varchar(20)'
 
 	def formfield(self, **kwargs):
       		defaults = {'form_class': NIPhoneNumberField}
