@@ -3,6 +3,8 @@
 from local_settings import *
 LOGIN_REDIRECT_URL="/"
 COMPRESS_JS_FILTERS=('compress.filters.jsmin.JSMinFilter','compress.filters.yui.YUICompressorFilter',)
+#COMPRESS_JS_FILTERS=('compress.filters.yui.YUICompressorFilter',)
+#COMPRESS_JS_FILTERS=('compress.filters.jsmin.JSMinFilter',)
 COMPRESS_CSS_FILTERS=('compress.filters.csstidy.CSSTidyFilter','compress.filters.yui.YUICompressorFilter',)
 
 
@@ -19,7 +21,7 @@ ADMIN_MEDIA_PREFIX = '/media/admin/'
 
 COMPRESS_CSS = {
 	'all': {
-        	'source_filenames': ('css/base-style.css', 'css/'+SITE_THEME+'/style.css'),
+        	'source_filenames': ('css/base-style.css','css/'+SITE_THEME+'/jquery-ui.css','css/'+SITE_THEME+'/style.css',),
         	'output_filename': 'css/'+SITE_THEME+'/all_compressed.css',
 	}
 }
@@ -38,7 +40,7 @@ COMPRESS_JS = {
 			'javascript/jquery.flot.js',
 			'javascript/graph_drawer.js',
 			'javascript/statistics_form.js',
-			'javascript/site_setup.js'
+			'javascript/site_setup.js',
 		),
         	'output_filename': 'javascript/all_'+SITE_LANGUAGE+'_compressed.js',
 	}

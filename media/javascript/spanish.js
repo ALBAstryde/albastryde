@@ -1,4 +1,4 @@
-i18n={
+var i18n={
 //graph_drawer.js
 'To open these data in another program, copy the text below into a text editor. Then save it with the ending".csv". This file can now be openes with Open Office and similar programs.':'Para usar estos datos en otros programas, copia el texto abajo a un editor de archivos de texto. Guardalo como un archivo del tipo ".csv". Este archivo se puede abrir en Open Office y otros programas parecidos.',
 'Export data':'Exportar datos',
@@ -27,7 +27,6 @@ i18n={
 'Real':'Real',
 'Normalized':'Normalizado',
 'Comments':'Comentarios',
-'product':'producto',
 'market':'mercado',
 'rain water station':'estacion de lluvia',
 'date':'fecha',
@@ -89,5 +88,5 @@ i18n={
 'ALBAstryde is a powerful application that requires a modern and professional browser. Unfortunately your current browser does not seem to fulfill the minimum criteria. However, there are many free ones that do, available on the internet. Please switch to':
 'ALBAstryde es un programa muy poderoso que requiere un navegador moderno y profesional. Su navegador actual no cumple con los requisitos mínimos. Hay muchos otros navegadores que cumplen todos los requisitos en el Internet. Por favor, descarge',
 'Thanks':'Gracias',
-'or':'o',
+'or':'o'
 };

@@ -65,19 +65,6 @@ function beforeForm() {
 	return true;
 }
 
-$(document).ready(function() {
-	// prepare Options Object 
-	var options = {
-		url: '.',
-		dataType: 'json',
-		success: processJson,
-		//What to call after a reply from Django
-		beforeSubmit: beforeForm
-	};
-	// bind form using ajaxForm 
-	$('#AjaxForm').ajaxForm(options); //My form id is 'AjaxForm'
-});
-
 function processJson(jsondata) {
 	//Do we have any data at all?
 	if (jsondata) {
@@ -102,3 +89,18 @@ function processJson(jsondata) {
 	$('#AjaxFormSubmit').attr('disabled', '');
 
 }
+
+
+$(document).ready(function() {
+	// prepare Options Object 
+	var options = {
+		url: '.',
+		dataType: 'json',
+		success: processJson,
+		//What to call after a reply from Django
+		beforeSubmit: beforeForm
+	};
+	// bind form using ajaxForm 
+	$('#AjaxForm').ajaxForm(options); //My form id is 'AjaxForm'
+});
+
