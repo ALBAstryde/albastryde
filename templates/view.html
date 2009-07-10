@@ -10,15 +10,14 @@ graphs=[];
 
 $(document).ready(function() {
 	var graph_name;
+	contents_height=$("div#contents").height();
 	for (i in graphs) {
 		graph_name='#graph'+String(i);
 		create_graphs(graphs[i],true,graph_name);
+		graph_height=$(graph_name).next().height();
+		contents_height+=graph_height;
 	}
-//	$('div.graph').each(function (index,domEle) {
-//		var graph_name=$(domEle).attr('id');
-//		var graph_data=eval(graph_name);
-//		create_graphs(graph_data,true,'#'+graph_name);
-//	});
+	$("div#contents").height(contents_height);
 });
 
 </script>
