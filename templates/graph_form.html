@@ -46,20 +46,20 @@ Departamento:<br /> {{form.Departamento|safe}}
 <table>
 <tr>
 <td valign="top">
-Producto:<br /> {{ form.Producto|safe }}
+Producto:<br /> {{ form.PreciosProducto|safe }}
 </td><td valign="top">
-Mercado:<br /> {{ form.Mercado|safe }} 
+Mercado:<br /> {{ form.PreciosMercado|safe }} 
 </td>
 </tr>
 </table>
 Medida:<br />
-{{form.PrecioMedida | safe}}
+{{form.PreciosMedida | safe}}
 </div>
 <h3><a href="#">Variables climaticos</a></h3>
 
 <div>
 Incluir lluvia de municipios/departamentos: {{ form.IncluirLluvia|safe }}<br />
-Estacion de lluvia:<br /> {{ form.EstacionDeLluvia|safe }}
+Estacion de lluvia:<br /> {{ form.LluviaEstacionDeLluvia|safe }}
 </div>
 <h3><a href="#">Variables cosechas</a></h3>
 <div>

@@ -3,7 +3,7 @@ from django.db.models.options import get_verbose_name
 
 from django.http import QueryDict
 
-fixed_fields=[u'desde',u'hasta',u'frecuencia',u'precio medida']
+fixed_fields=[u'desde',u'hasta',u'frecuencia',u'precios medida',u'cosecha variable']
 
 def camelcase(string):
 	decamelcase_list= string.strip().split()
@@ -17,14 +17,16 @@ def translate_query_string(query_string):
 	word_query=QueryDict(query_string)
 	new_query_string=u''
 	for i in word_query.lists():
-		modelname=i[0].strip().lower()
+		modelstring=i[0].strip().lower()
 		values= i[1]
-		if modelname in fixed_fields:
-			new_query_string+="&"+camelcase(modelname)+"="+values[0]
-		elif modelname[0:7]==u'incluir':
-			new_query_string+="&"+camelcase(modelname)+"=on"
+		if modelstring in fixed_fields:
+			new_query_string+="&"+camelcase(modelstring)+"="+values[0]
+		elif modelstring[0:7]==u'incluir':
+			new_query_string+="&"+camelcase(modelstring)+"=on"
 		else:
-			ctype_list = ContentType.objects.filter(name=modelname)
+			modelname=' '.join(modelstring.split()[1:])
+			appname=modelstring.split()[0]
+			ctype_list = ContentType.objects.filter(app_label=appname,name=modelname)
 			if len(ctype_list) > 0:
 				ctype=ctype_list[0]
 				if len(ctype_list) > 1:
@@ -45,35 +47,40 @@ def translate_query_string(query_string):
 								if len(i.nombre)<name_length:
 									variable_value=i
 									name_length=len(variable_value.nombre)
-						new_query_string+="&"+camelcase(modelname)+"="+str(variable_value.pk)
+						new_query_string+="&"+camelcase(modelstring)+"="+str(variable_value.pk)
 					else:
 						try:
 							int(value)
 							e=model_class.objects.filter(pk=int(value))
 							if len(e) > 0:
-								new_query_string+="&"+camelcase(modelname)+"="+str(value)
+								new_query_string+="&"+camelcase(modelstring)+"="+str(value)
 						except ValueError:
 							pass
+			else:
+				new_query_string+="TEST"+modelstring+"TEST"
 	new_query_string=new_query_string.lstrip("&")
 	return new_query_string
 
 def reverse_translate_query(query):
 	new_query_string=u''
 	for i in query.lists():
-		modelname=get_verbose_name(i[0])
+#		modelname=i[0]
+		modelstring=get_verbose_name(i[0])
 		value=i[1]
-		if modelname in fixed_fields:
-			new_query_string+="&"+modelname+"="+value[0]
-		elif modelname[0:7]=='incluir':
-			new_query_string+="&"+modelname
+		if modelstring in fixed_fields:
+			new_query_string+="&"+modelstring+"="+value[0]
+		elif modelstring[0:7]=='incluir':
+			new_query_string+="&"+modelstring
 		else:
-			ctype_list = ContentType.objects.filter(name=modelname)
+			modelname=' '.join(modelstring.split()[1:])
+			appname=modelstring.split()[0]
+			ctype_list = ContentType.objects.filter(app_label=appname,name=modelname)
 			if len(ctype_list) > 0:
 				ctype=ctype_list[0]
 				model_class=ctype.model_class()
 				for b in value:
 					d=model_class.objects.filter(pk=b)
 					if len(d) > 0:
-						new_query_string+="&"+modelname+"="+d[0].nombre
+						new_query_string+="&"+modelstring+"="+d[0].nombre
 	new_query_string=new_query_string.lstrip("&")
 	return new_query_string

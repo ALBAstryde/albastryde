@@ -15,13 +15,13 @@ def precio_builder(form_data,frequencies):
 		graphs=[]
 		dollar={}
 		euro={}
-		mercados = form_data['Mercado']	
-		productos = form_data['Producto']
+		mercados = form_data['PreciosMercado']	
+		productos = form_data['PreciosProducto']
 		start_date = form_data['Desde']
 		end_date = form_data['Hasta']
-		municipios = form_data['Municipio']
-		departamentos = form_data['Departamento']
-		medida_tipo = form_data['PrecioMedida']
+		municipios = form_data['LugarMunicipio']
+		departamentos = form_data['LugarDepartamento']
+		medida_tipo = form_data['PreciosMedida']
 
 		if len(productos) > 0:		
 			for departamento in departamentos:

@@ -11,9 +11,9 @@ content_type = ContentType.objects.get(app_label__exact='lluvia', name__exact='p
 def lluvia_builder(form_data,frequencies):
   		pk_list=[]
 		graphs=[]
-		municipios = form_data['Municipio']
-		departamentos = form_data['Departamento']
-		estaciones = form_data['EstacionDeLluvia']
+		municipios = form_data['LugarMunicipio']
+		departamentos = form_data['LugarDepartamento']
+		estaciones = form_data['LluviaEstacionDeLluvia']
 		include_lluvia = form_data['IncluirLluvia']
 		start_date = form_data['Desde']
 		end_date = form_data['Hasta']

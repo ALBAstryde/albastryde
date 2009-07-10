@@ -11,8 +11,8 @@ content_type = ContentType.objects.get(app_label__exact='cosecha', name__exact='
 
 def cosecha_builder(form_data,frequencies):
 	# Recogiendo datos del formulario, mas es campo frecuencias, ya truducido a ingles
-	departamentos = form_data['Departamento']
-	municipios = form_data['Municipio']
+	departamentos = form_data['LugarDepartamento']
+	municipios = form_data['LugarMunicipio']
 	cosecha_variable = form_data['CosechaVariable']
 	cosecha_producto = form_data['CosechaProducto']
 	start_date = form_data['Desde']

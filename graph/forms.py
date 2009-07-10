@@ -15,15 +15,15 @@ PRECIO_MEDIDA_CHOICES=(('nativa','Unidades nativas del mercado'),('mayor','Unida
 
 
 class DbForm(forms.Form):
-	Departamento=forms.ModelMultipleChoiceField(queryset=Departamento.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
-	Municipio=forms.ModelMultipleChoiceField(queryset=Municipio.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
-	Mercado=forms.ModelMultipleChoiceField(queryset=Mercado.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
-	Producto=forms.ModelMultipleChoiceField(queryset=Producto.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
-	PrecioMedida=forms.ChoiceField(choices=PRECIO_MEDIDA_CHOICES,required=True,initial='nativo')
 	Frecuencia=forms.MultipleChoiceField(choices=FRECUENCIA_CHOICES,required=True,initial=['diario'])
-	CosechaVariable=forms.MultipleChoiceField(choices=COSECHA_CHOICES,required=False)
-	EstacionDeLluvia=forms.ModelMultipleChoiceField(queryset=EstacionDeLluvia.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
-	CosechaProducto=forms.ModelMultipleChoiceField(queryset=CosechaProducto.objects.all(), required=False) #Esto es lo nuevo crocha
-	IncluirLluvia=forms.BooleanField(required=False)
+	LugarDepartamento=forms.ModelMultipleChoiceField(queryset=Departamento.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
+	LugarMunicipio=forms.ModelMultipleChoiceField(queryset=Municipio.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
 	Desde=forms.DateField(input_formats=date_inputformats)
 	Hasta=forms.DateField(input_formats=date_inputformats)
+	PreciosMercado=forms.ModelMultipleChoiceField(queryset=Mercado.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
+	PreciosProducto=forms.ModelMultipleChoiceField(queryset=Producto.objects.all(), required=False,widget=forms.SelectMultiple(attrs={'size':'5'}))
+	PreciosMedida=forms.ChoiceField(choices=PRECIO_MEDIDA_CHOICES,required=True,initial='nativo')
+	CosechaVariable=forms.MultipleChoiceField(choices=COSECHA_CHOICES,required=False)
+	LluviaEstacionDeLluvia=forms.ModelMultipleChoiceField(queryset=EstacionDeLluvia.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
+	CosechaProducto=forms.ModelMultipleChoiceField(queryset=CosechaProducto.objects.all(), required=False) #Esto es lo nuevo crocha
+	IncluirLluvia=forms.BooleanField(required=False)
