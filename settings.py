@@ -92,6 +92,7 @@ INSTALLED_APPS = (
     'albastryde.lugar',
 #    'albastryde.climate',
     'albastryde.cosecha',
+    'albastryde.semilla',
     'albastryde.lluvia',
     'django.contrib.comments',
     'albastryde.ajax_comments',
