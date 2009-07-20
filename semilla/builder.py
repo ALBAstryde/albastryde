@@ -7,7 +7,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Sum
 
 
-content_type = ContentType.objects.get(app_label__exact='semilla', name__exact='semilla').id
+content_type_query = ContentType.objects.filter(app_label__exact='semilla', name__exact='semilla')
+
+if len(content_type_query)>0:
+	content_type=content_type_query[0].id
+else:
+	content_type=None
 
 def semilla_builder(form_data,frequencies):
 	# Recogiendo datos del formulario, mas es campo frecuencias, ya truducido a ingles
