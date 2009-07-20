@@ -2,6 +2,7 @@
 from precios.builder import precio_graph, precio_builder
 from lluvia.builder import lluvia_graph, lluvia_builder
 from cosecha.builder import cosecha_graph, cosecha_builder
+from semilla.builder import semilla_graph, semilla_builder
 
 from graph.forms import DbForm
 from django.contrib.contenttypes.models import ContentType
@@ -43,6 +44,11 @@ def build_graph(query,user):
 		if not cosecha_graphs == None:
 			graphs+=cosecha_graphs
 			pk_list+=cosecha_pk_list
+		
+		semilla_graphs,semilla_pk_list=semilla_builder(form_data=form.cleaned_data,frequencies=frequencies)
+		if not semilla_graphs == None:
+			graphs+=semilla_graphs
+			pk_list+=semilla_pk_list
 		
 		lluvia_graphs,lluvia_pk_list=lluvia_builder(form_data=form.cleaned_data,frequencies=frequencies)
 		if not lluvia_graphs == None:

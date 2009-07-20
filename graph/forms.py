@@ -3,6 +3,7 @@ from django.forms import ModelForm
 from precios.models import Producto
 from precios.models import Mercado
 from lluvia.models import EstacionDeLluvia
+from semilla.models import Producto as SemillaProducto,Variedad as SemillaVariedad, CATEGORIA_CHOICES as SemillaCategoriaChoices
 from lugar.models import Departamento, Municipio
 from cosecha.models import Producto as CosechaProducto #esto es lo nuevo crocha
 
@@ -27,3 +28,7 @@ class DbForm(forms.Form):
 	LluviaEstacionDeLluvia=forms.ModelMultipleChoiceField(queryset=EstacionDeLluvia.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
 	CosechaProducto=forms.ModelMultipleChoiceField(queryset=CosechaProducto.objects.all(), required=False) #Esto es lo nuevo crocha
 	IncluirLluvia=forms.BooleanField(required=False)
+	SemillaProducto=forms.ModelMultipleChoiceField(queryset=SemillaProducto.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
+	SemillaVariedad=forms.ModelMultipleChoiceField(queryset=SemillaVariedad.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
+	SemillaCategoria=forms.MultipleChoiceField(choices=SemillaCategoriaChoices,required=False)
+

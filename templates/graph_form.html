@@ -61,7 +61,22 @@ Medida:<br />
 Incluir lluvia de municipios/departamentos: {{ form.IncluirLluvia|safe }}<br />
 Estacion de lluvia:<br /> {{ form.LluviaEstacionDeLluvia|safe }}
 </div>
-<h3><a href="#">Variables cosechas</a></h3>
+<h3><a href="#">Variables de la semilla</a></h3>
+<div>
+<table>
+<tr>
+<td valign="top">
+Categoria:<br /> {{ form.SemillaCategoria |safe }}
+</td><td valign="top">
+Producto:<br /> {{ form.SemillaProducto |safe }}
+</td><td valign="top">
+Variedad:<br /> {{ form.SemillaVariedad |safe }}
+</td>
+</tr>
+</table>
+
+</div>
+<h3><a href="#">Variables de la cosecha</a></h3>
 <div>
 <table>
 <tr>

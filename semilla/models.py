@@ -8,18 +8,45 @@ from lugar.models import Departamento
 class Producto(StatisticsFormVariable):
         pass
 
-class Variedad(StatisticsFormVariable):
+class Variedad(models.Model):
+        nombre = models.CharField(max_length="60")
 	producto=models.ForeignKey(Producto)
 
-class Productor(StatisticsFormVariable):
-	pass
+        def save(self):
+                self.nombre=self.nombre.translate({91: None, 61: None, 38: None, 93: None}).strip() # delete u'[]=&' from string and whitespace from ends
+                super(StatisticsFormVariable, self).save()
 
-CATEGORIA_CHOICES=(
+        def __unicode__(self):
+                return self.producto.nombre +' ('+self.nombre+')'
+
+        class Meta:
+                ordering = ['producto','nombre']
+		unique_together=['nombre','producto']
+
+
+class Productor(models.Model):
+        nombre = models.CharField(max_length="60")
+	departamento=models.ForeignKey(Departamento)
+
+        def save(self):
+                self.nombre=self.nombre.translate({91: None, 61: None, 38: None, 93: None}).strip() # delete u'[]=&' from string and whitespace from ends
+                super(StatisticsFormVariable, self).save()
+
+        def __unicode__(self):
+                return self.nombre +' ('+self.departamento+')'
+
+        class Meta:
+                ordering = ['nombre']
+		unique_together=['nombre','departamento']
+
+
+
+CATEGORIA_CHOICES=[
 (1,'certificada'),
 (2,'registrada'),
 (3,'basica'),
 (4,'genetica'),
-)
+]
 
 ANOS_CHOICES=[]
 
@@ -41,8 +68,7 @@ MES_CHOICES=(
 (11,11),
 (12,12),
 )
-class Cosecha(models.Model):
-	departamento=models.ForeignKey(Departamento)
+class Semilla(models.Model):
         ano=models.PositiveIntegerField(choices=ANOS_CHOICES,verbose_name='año')
 	mes=models.IntegerField(choices=MES_CHOICES)
 	variedad=models.ForeignKey(Variedad)
