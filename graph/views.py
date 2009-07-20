@@ -15,7 +15,7 @@ import datetime
 from time import mktime
 from django.http import QueryDict
 
-def show_form(request,query_set=None,javascript=False,model=None):
+def show_form(request,query_set=None,javascript=False,model=None,statistics_variable=None):
         if request.method == "POST" and request.is_ajax():
 		query = request.POST
 		user = request.user
@@ -34,7 +34,14 @@ def show_form(request,query_set=None,javascript=False,model=None):
 			if username=="":
 				username = request.user.username
 		form = DbForm()
-		return render_to_response("/graph_form.html", {"form":form,"request":request,"username":username},context_instance=RequestContext(request))	
+		
+		response_dic= {"form":form,"request":request,"username":username}
+		if statistics_variable:
+			response_dic['statistics_variable']=statistics_variable
+			response_template="/simple_graph_form.html"	
+		else:
+			response_template="/graph_form.html"	
+		return render_to_response(response_template, response_dic,context_instance=RequestContext(request))	
 
 def show_graph(request,query_string):
 	query_string=smart_unicode(b64decode(query_string))

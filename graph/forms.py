@@ -23,7 +23,7 @@ class DbForm(forms.Form):
 	Hasta=forms.DateField(input_formats=date_inputformats)
 	PreciosMercado=forms.ModelMultipleChoiceField(queryset=Mercado.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
 	PreciosProducto=forms.ModelMultipleChoiceField(queryset=Producto.objects.all(), required=False,widget=forms.SelectMultiple(attrs={'size':'5'}))
-	PreciosMedida=forms.ChoiceField(choices=PRECIO_MEDIDA_CHOICES,required=True,initial='nativo')
+	PreciosMedida=forms.ChoiceField(choices=PRECIO_MEDIDA_CHOICES,required=False,initial='nativo')
 	CosechaVariable=forms.MultipleChoiceField(choices=COSECHA_CHOICES,required=False)
 	LluviaEstacionDeLluvia=forms.ModelMultipleChoiceField(queryset=EstacionDeLluvia.objects.all(), required=False, widget=forms.SelectMultiple(attrs={'size':'5'}))
 	CosechaProducto=forms.ModelMultipleChoiceField(queryset=CosechaProducto.objects.all(), required=False) #Esto es lo nuevo crocha
