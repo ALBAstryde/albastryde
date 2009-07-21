@@ -3,7 +3,7 @@
 {% block extrastatisticsheader %}
 <script language="javascript" type="text/javascript">
 $(document).ready(function() {
-	form_html=$('a#{{statistics_variable}}').parent().next().html();
+	var form_html=$('a#{{statistics_variable}}').parent().next().html();
 	$('div#variables').replaceWith(form_html);
 });
 </script>
