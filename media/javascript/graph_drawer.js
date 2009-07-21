@@ -807,29 +807,31 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 						converted_graphs[i].show = state;
 					}
 				}
-				for (i=0;i<eurographs.length;i++) {
-					if (eurographs[i].color == color_value) {
-						eurographs[i].show = state;
-					}
-				}
-				for (i=0;i<dollargraphs.length;i++) {
-					if (dollargraphs[i].color == color_value) {
-						dollargraphs[i].show = state;
-					}
-				}
 				for (i=0;i<normalized_graphs.length;i++) {
 					if (normalized_graphs[i].color == color_value) {
 						normalized_graphs[i].show = state;
 					}
 				}
-				for (i=0;i<normalized_eurographs.length;i++) {
-					if (normalized_eurographs[i].color == color_value) {
-						normalized_eurographs[i].show = state;
+				if ('precio' in all_variables) {
+					for (i=0;i<eurographs.length;i++) {
+						if (eurographs[i].color == color_value) {
+							eurographs[i].show = state;
+						}
 					}
-				}
-				for (i=0;i<normalized_dollargraphs.length;i++) {
-					if (normalized_dollargraphs[i].color == color_value) {
-						normalized_dollargraphs[i].show = state;
+					for (i=0;i<dollargraphs.length;i++) {
+						if (dollargraphs[i].color == color_value) {
+							dollargraphs[i].show = state;
+						}
+					}
+					for (i=0;i<normalized_eurographs.length;i++) {
+						if (normalized_eurographs[i].color == color_value) {
+							normalized_eurographs[i].show = state;
+						}
+					}
+					for (i=0;i<normalized_dollargraphs.length;i++) {
+						if (normalized_dollargraphs[i].color == color_value) {
+							normalized_dollargraphs[i].show = state;
+						}
 					}
 				}
 				reset_comments();
