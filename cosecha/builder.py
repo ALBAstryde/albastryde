@@ -6,12 +6,15 @@ from cosecha.models import Cosecha
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Sum
 
-content_type_query = ContentType.objects.filter(app_label__exact='cosecha', name__exact='cosecha')
+try:
+	content_type_query = ContentType.objects.filter(app_label__exact='cosecha', name__exact='cosecha')
 
-if len(content_type_query)>0:
-        content_type=content_type_query[0].id
-else:
-        content_type=None
+	if len(content_type_query)>0:
+        	content_type=content_type_query[0].id
+	else:
+        	content_type=None
+except:
+	pass
 
 def cosecha_builder(form_data,frequencies):
 	# Recogiendo datos del formulario, mas es campo frecuencias, ya truducido a ingles

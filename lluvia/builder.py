@@ -6,12 +6,15 @@ from django.db import connection
 from django.contrib.contenttypes.models import ContentType
 from precios.builder import add_month, add_year
 
-content_type_query = ContentType.objects.filter(app_label__exact='lluvia', name__exact='prueba')
+try:
+	content_type_query = ContentType.objects.filter(app_label__exact='lluvia', name__exact='prueba')
 
-if len(content_type_query)>0:
-        content_type=content_type_query[0].id
-else:
-        content_type=None
+	if len(content_type_query)>0:
+        	content_type=content_type_query[0].id
+	else:
+        	content_type=None
+except:
+	pass
 
 def lluvia_builder(form_data,frequencies):
   		pk_list=[]

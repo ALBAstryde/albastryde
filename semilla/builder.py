@@ -6,13 +6,15 @@ from semilla.models import Semilla, CATEGORIA_CHOICES
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Sum
 
+try:
+	content_type_query = ContentType.objects.filter(app_label__exact='semilla', name__exact='semilla')
 
-content_type_query = ContentType.objects.filter(app_label__exact='semilla', name__exact='semilla')
-
-if len(content_type_query)>0:
-	content_type=content_type_query[0].id
-else:
-	content_type=None
+	if len(content_type_query)>0:
+		content_type=content_type_query[0].id
+	else:
+		content_type=None
+except:
+	pass
 
 def semilla_builder(form_data,frequencies):
 	# Recogiendo datos del formulario, mas es campo frecuencias, ya truducido a ingles

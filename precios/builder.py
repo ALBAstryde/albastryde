@@ -8,15 +8,18 @@ from time import mktime
 from django.db import connection
 from django.contrib.contenttypes.models import ContentType
 
+try:
 
-content_type_query = ContentType.objects.filter(app_label__exact='precios', name__exact='prueba')
+	content_type_query = ContentType.objects.filter(app_label__exact='precios', name__exact='prueba')
 
-if len(content_type_query)>0:
-        content_type=content_type_query[0].id
-else:
-        content_type=None
-
+	if len(content_type_query)>0:
+        	content_type=content_type_query[0].id
+	else:
+        	content_type=None
+except:
+	pass
 def precio_builder(form_data,frequencies):
+	if 1==1:
 		pk_list=[]
 		graphs=[]
 		dollar={}
