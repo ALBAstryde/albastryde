@@ -6,15 +6,9 @@ from cosecha.models import Cosecha
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Sum
 
-try:
-	content_type_query = ContentType.objects.filter(app_label__exact='cosecha', name__exact='cosecha')
 
-	if len(content_type_query)>0:
-        	content_type=content_type_query[0].id
-	else:
-        	content_type=None
-except:
-	pass
+def content_type():
+	return ContentType.objects.get(app_label__exact='cosecha', name__exact='cosecha').id
 
 def cosecha_builder(form_data,frequencies):
 	# Recogiendo datos del formulario, mas es campo frecuencias, ya truducido a ingles
@@ -169,10 +163,10 @@ def cosecha_graph(variable,producto,start_date,end_date,pk_list,frequency,depart
 		else:
 			value=i[value_name+'__sum']
 		if municipio and frequency=='monthly':
-			unique_pk=str(content_type)+"_"+str(i['pk'])
+			unique_pk=str(content_type())+"_"+str(i['pk'])
 			list_of_pk.append(str(i['pk']))
 			data.append([[fecha,to_fecha],value,unique_pk])
-			pk_list.append([content_type,list_of_pk])
+			pk_list.append([content_type(),list_of_pk])
 			source='raw'
 		else:
 			data.append([[fecha,to_fecha],value])

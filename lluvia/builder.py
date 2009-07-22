@@ -6,15 +6,8 @@ from django.db import connection
 from django.contrib.contenttypes.models import ContentType
 from precios.builder import add_month, add_year
 
-try:
-	content_type_query = ContentType.objects.filter(app_label__exact='lluvia', name__exact='prueba')
-
-	if len(content_type_query)>0:
-        	content_type=content_type_query[0].id
-	else:
-        	content_type=None
-except:
-	pass
+def content_type():
+	return ContentType.objects.get(app_label__exact='lluvia', name__exact='prueba').id
 
 def lluvia_builder(form_data,frequencies):
   		pk_list=[]
@@ -85,12 +78,12 @@ def lluvia_graph(estacion,frequency,start_date,end_date,pk_list):
 			now_fecha=int(now_fecha)
 			next_fecha=int(next_fecha)
 			if frequency=='daily':
-				unique_pk=str(content_type)+"_"+str(i['pk'])		
+				unique_pk=str(content_type())+"_"+str(i['pk'])		
 				list_of_pk.append(str(i['pk']))
 				data.append([[now_fecha,next_fecha],value,unique_pk])
 			else:
 				data.append([[now_fecha,next_fecha],value])
 	if frequency=='daily':
-		pk_list.append([content_type,list_of_pk])
+		pk_list.append([content_type(),list_of_pk])
 	result={'included_variables':{'station':estacion.nombre},'data':data,'unit':'mm','type':'lluvia','source':source,'frequency':frequency,'main_variable_js':'"lluvia"','place_js':'new_graph.included_variables.station','normalize_factor_js':'new_graph.top_value','display':'bars'}
 	return result,pk_list

@@ -8,74 +8,66 @@ from time import mktime
 from django.db import connection
 from django.contrib.contenttypes.models import ContentType
 
-try:
+def content_type():
+	return ContentType.objects.get(app_label__exact='precios', name__exact='prueba').id
 
-	content_type_query = ContentType.objects.filter(app_label__exact='precios', name__exact='prueba')
-
-	if len(content_type_query)>0:
-        	content_type=content_type_query[0].id
-	else:
-        	content_type=None
-except:
-	pass
 def precio_builder(form_data,frequencies):
-	if 1==1:
-		pk_list=[]
-		graphs=[]
-		dollar={}
-		euro={}
-		mercados = form_data['PreciosMercado']	
-		productos = form_data['PreciosProducto']
-		start_date = form_data['Desde']
-		end_date = form_data['Hasta']
-		municipios = form_data['LugarMunicipio']
-		departamentos = form_data['LugarDepartamento']
-		medida_tipo = form_data['PreciosMedida']
+	pk_list=[]
+	graphs=[]
+	dollar={}
+	euro={}
+	mercados = form_data['PreciosMercado']	
+	productos = form_data['PreciosProducto']
+	start_date = form_data['Desde']
+	end_date = form_data['Hasta']
+	municipios = form_data['LugarMunicipio']
+	departamentos = form_data['LugarDepartamento']
+	medida_tipo = form_data['PreciosMedida']
 
-		if len(productos) > 0:		
-			for departamento in departamentos:
-		  		if len(departamento.municipios.all()) > 0:
-			  		if len(municipios) > 0:
-						municipios = municipios | departamento.municipios.all()
-					else:
-				  		municipios = departamento.municipios.all()
+	if len(productos) > 0:		
+		for departamento in departamentos:
+	  		if len(departamento.municipios.all()) > 0:
+		  		if len(municipios) > 0:
+					municipios = municipios | departamento.municipios.all()
+				else:
+			  		municipios = departamento.municipios.all()
 
-			for municipio in municipios:
-			  	if len(municipio.mercado_set.all()) > 0:
-				  	if len(mercados) > 0:
-						mercados = mercados | municipio.mercado_set.all()
-					else:
-					  	mercados = municipio.mercado_set.all()				  
+		for municipio in municipios:
+		  	if len(municipio.mercado_set.all()) > 0:
+			  	if len(mercados) > 0:
+					mercados = mercados | municipio.mercado_set.all()
+				else:
+				  	mercados = municipio.mercado_set.all()				  
 
-			if len(mercados) > 0:
-				dollar={'unit':'US$','monthly':{},'annualy':{},'daily':{}}
-				euro={'unit':u'€','monthly':{},'annualy':{},'daily':{}}
+		if len(mercados) > 0:
+			dollar={'unit':'US$','monthly':{},'annualy':{},'daily':{}}
+			euro={'unit':u'€','monthly':{},'annualy':{},'daily':{}}
 
 
 		# Aqui se llaman la funcion para hacer cada uno de los graficos
 
 
-				for frequency in frequencies:
-					for mercado in mercados:
-						for producto in productos:
-							if medida_tipo=='mayor' or mercado.mayor==True and medida_tipo=='nativa':
-								medida_unidad=producto.medida.medida_mayor
-							else:
-								medida_unidad=producto.medida.medida_menor
-							if medida_tipo=='mayor' and mercado.mayor==False:
-								factor=float(producto.medida.factor_para_convertir)
-								action='multiply'						
-							elif medida_tipo=='menor' and mercado.mayor==True:
-								factor=float(producto.medida.factor_para_convertir)
-								action='divide'
-							else:
-								factor=1
-								action='nothing'
-							graph,dollar,euro,pk_list=precio_graph(mercado=mercado,producto=producto,frequency=frequency,start_date=start_date,end_date=end_date,dollar=dollar,euro=euro,pk_list=pk_list,factor=factor,action=action,medida_unidad=medida_unidad)
-							if not graph==None:
-								graphs.append(graph)
+			for frequency in frequencies:
+				for mercado in mercados:
+					for producto in productos:
+						if medida_tipo=='mayor' or mercado.mayor==True and medida_tipo=='nativa':
+							medida_unidad=producto.medida.medida_mayor
+						else:
+							medida_unidad=producto.medida.medida_menor
+						if medida_tipo=='mayor' and mercado.mayor==False:
+							factor=float(producto.medida.factor_para_convertir)
+							action='multiply'						
+						elif medida_tipo=='menor' and mercado.mayor==True:
+							factor=float(producto.medida.factor_para_convertir)
+							action='divide'
+						else:
+							factor=1
+							action='nothing'
+						graph,dollar,euro,pk_list=precio_graph(mercado=mercado,producto=producto,frequency=frequency,start_date=start_date,end_date=end_date,dollar=dollar,euro=euro,pk_list=pk_list,factor=factor,action=action,medida_unidad=medida_unidad)
+						if not graph==None:
+							graphs.append(graph)
 
-		return graphs,pk_list,dollar,euro
+	return graphs,pk_list,dollar,euro
 
 
 
@@ -157,7 +149,7 @@ def precio_graph(mercado,producto,frequency,start_date,end_date,dollar,euro,pk_l
 		now_fecha=int(now_fecha)
 		next_fecha=int(next_fecha)
 		if frequency=='daily':
-			unique_pk=str(content_type)+"_"+str(i['pk'])		
+			unique_pk=str(content_type())+"_"+str(i['pk'])		
 			list_of_pk.append(str(i['pk']))
 #			max_data.append([now_fecha,precio,unique_pk])
 			max_data.append([[now_fecha,next_fecha],precio,unique_pk])
@@ -165,7 +157,7 @@ def precio_graph(mercado,producto,frequency,start_date,end_date,dollar,euro,pk_l
 #			max_data.append([now_fecha,precio])
 			max_data.append([[now_fecha,next_fecha],precio])
 	if frequency=='daily':
-		pk_list.append([content_type,list_of_pk])
+		pk_list.append([content_type(),list_of_pk])
 	result={'included_variables':{'producto':producto.nombre,'mercado':mercado.nombre,'medida':medida_unidad},'unit':'C$','type':'precio','source':source,'frequency':frequency,'main_variable_js':'new_graph.included_variables.producto','place_js':'new_graph.included_variables.mercado','normalize_factor_js':'this.start_value','unit_legend_js':'new_graph.unit+"/"+new_graph.included_variables.medida+", "+_(new_graph.frequency)','display':'lines'}
 	if len(min_data_dic)==0:
 		result['data']=max_data
