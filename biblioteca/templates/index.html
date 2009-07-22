@@ -1,0 +1,78 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="es">
+{% load pagination_tags %}
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+	
+	{% block css %}
+	<link href="/media/biblioteca/css/estilo.css" type="text/css" rel="stylesheet" />
+	<link href="/media/biblioteca/css/searchfield.css" type="text/css" rel="stylesheet" media="screen" />
+<!-- aqui van los tooltip -->
+	<link rel="stylesheet" type="text/css" href="/media/biblioteca/css/vtip.css" />
+	<script type="text/javascript" src="/media/biblioteca/js/searchfield.js"> </script>
+	<script type="text/javascript" src="/media/biblioteca/js/jquery.js"></script>
+	<script type="text/javascript" src="/media/biblioteca/js/vtip.js"></script>
+	{% endblock %}
+<title>{% block title %}Biblioteca{% endblock %}</title>
+</head>
+<body>
+    <!-- aqui seria un extend del base del chele -->
+{% block content %} 
+	<div id="ultimo" >
+		<div id="ultimo_titulo" >
+			Ultimos Añadidos
+		</div>
+		<div id="ultimo_content" >
+		{% block left_content %}
+			<ul>
+			{% for pdf in a %}
+				<li><a href="/biblio/detalle/{{ pdf.id }}">{{ pdf.name }}</a> <br> Descripcion: {{ pdf.decrip|truncatewords:3 }}</li>
+			{% endfor %}
+			</ul>
+		 {% endblock left_content %}
+		</div>
+	</div>
+{% block center_content %}
+<div id="busqueda">
+	<div id="buscador">
+		<!-- aqui seria el block content de la otra template -->
+		<form id="searchform" action="." method="GET">
+			<!-- <label for="q">Buscar: </label> -->
+			<input type="text" id="searchfield" class="nose" name="q" value="{{ query|escape }}">
+			<input type="submit" value="Consultar">
+		</form>
+		</div>
+		<div id="mensaje">
+		{% if query %}
+				Se encontraron {{c}} resultados para: "{{ query|escape }}":
+		</div>
+		<div id="resultado">
+			{% if results %}
+		{% autopaginate results 2 %}
+				{% for attachment in results %} 
+			<ul>
+				<li><span class="titulo">Nombre:</span><b>{{ attachment.name }}</b></li>
+				<li><span class="titulo">Fecha:</span>{{ attachment.fecha|date:"D, d -m-Y" }}</li>
+				<li><span class="titulo">Descripcion:</span>{{ attachment.decrip|truncatewords:10 }}</li>
+				<li><span class="titulo">Enlace:</span><a href="#">{{ attachment.enlace }}</a></li>
+				<span class="vermas"><a href="/biblio/detalle/{{ attachment.id }}" title="Ver mas detalle por aqui." class="vtip">Ver mas <img src="/media/biblioteca/imagen/mas.png"> </a></span>
+				<hr><br>
+			</ul>
+				{% endfor %}
+		{% paginate %}
+			{% else %} 
+					<p>PDF NO encontrado</p> 
+			{% endif %} 
+		{% endif %}
+
+	</div>
+	</div>
+	<div id="separador" ></div>
+		
+	</div>
+		{% endblock center_content %}
+{% endblock content %}
+</body>
+</html>

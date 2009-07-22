@@ -1,0 +1,29 @@
+{% extends "index.html" %}
+
+{% block center_content %}
+
+<div id="busqueda">
+		<!-- aqui seria el block content de la otra template -->
+		<div id="mensaje">
+			{{ results.name }}
+		</div>
+		<div id="resultado">
+			<ul>
+				<li><span class="titulo">Autor:</span><b>{{ results.autor }}</b></li>
+				<li><span class="titulo">Año del documento:</span><b>{{ results.ano }}</b></li>
+				<li><span class="titulo">Fecha de subida:</span>{{results.fecha|date:"D, d -m-Y"}}</li>
+				<li><span class="titulo">Descargar:</span> {% if results.attachment %}<a href="{{results.get_download_url}}">{{results.name}}<img src="/media/imagen/pdf.png">{% else %} {% endif %}</a></li>
+				<li><span class="titulo">Tamaño:</span>{% if results.attachment %}{{ results.attachment.size }} bytes {% endif %}</li>
+				<li><span class="titulo">Enlace:</span><a href="{{ results.enlace }}">{{ results.enlace }}</a></li>
+				<li><span class="titulo">Organizacion:</span>{{ results.organizacion }}</li>
+				<li><span class="titulo">Descripcion:</span></br>{{ results.decrip }}</li>
+			</ul>            
+			<br><br>
+			<a href="/biblio/index/" title="Clic aqui para nueva busqueda" class="vtip" >Nueva Busqueda <img src="/media/imagen/lupa.png"></a>
+		</div>
+	</div>
+	<div id="separador" ></div>
+		
+	</div>
+{% endblock center_content %}
+
