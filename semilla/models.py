@@ -33,7 +33,7 @@ class Productor(models.Model):
                 super(StatisticsFormVariable, self).save()
 
         def __unicode__(self):
-                return self.nombre +' ('+self.departamento+')'
+                return self.nombre +' ('+self.departamento.nombre+')'
 
         class Meta:
                 ordering = ['nombre']
@@ -75,3 +75,7 @@ class Semilla(models.Model):
 	productor=models.ForeignKey(Productor)
 	categoria=models.IntegerField(choices=CATEGORIA_CHOICES)
 	cantidad=models.DecimalField(max_digits=9,decimal_places=2)
+
+        def __unicode__(self):
+                return self.productor.nombre +': '+self.variedad.nombre +' de '+ self.variedad.producto.nombre +' ('+str(self.ano)+'-'+str(self.mes)+')' 
+
