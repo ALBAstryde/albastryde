@@ -38,4 +38,6 @@ urlpatterns = patterns('',
     (r'^ajax/', include('albastryde.ajax_comments.urls')),
     (r'^accounts/', include('registration.urls')),
     (r'^profiles/', include('profiles.urls')),
+    (r'^biblioteca/', include('biblioteca.urls')),
+    (r'^bibliotecasearch/$', 'biblio.views.search'),
 )

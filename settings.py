@@ -65,7 +65,10 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.doc.XViewMiddleware',
+    'pagination.middleware.PaginationMiddleware',
 )
 MEDIA_ROOT = SITE_ROOT+'/media/'
 MEDIA_URL = '/media/'
@@ -82,6 +85,7 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'django_evolution',
     'compress',
+    'pagination',
     'albastryde.wiki',
     'albastryde.precios',
     'albastryde.graph',
@@ -98,4 +102,5 @@ INSTALLED_APPS = (
     'albastryde.ajax_comments',
     'albastryde.registration',
     'albastryde.profiles',
+    'albastryde.biblioteca',
 )
