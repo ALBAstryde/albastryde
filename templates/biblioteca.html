@@ -1,4 +1,12 @@
 {% extends "/base_graph.html" %}
+{% block extrastatisticsheader %}
+<script language="javascript" type="text/javascript">
+$(document).ready(function() {
+var content_height=$("div.colmask").height(); 
+$("div#contents").height(content_height);
+});
+</script>
+{% endblock %}
 
 {% block contents %} 
 <div class="colmask threecol">
