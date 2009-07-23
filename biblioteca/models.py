@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 
+import djangosearch
 from django.db import models
 from django.conf import settings
 from djutils.features.fuzzydate import FuzzyDateField
@@ -18,10 +19,10 @@ class Editorial(models.Model):
 		return self.nombre
 
 class PalabraClave(models.Model):
-	nombre = models.CharField(primary_key=True,max_length=50)
+	palabra = models.CharField(unique=True,max_length=50)
 
 	def __unicode__(self):
-		return self.nombre
+		return self.palabra
 
 
 class Documento(models.Model):
@@ -32,6 +33,7 @@ class Documento(models.Model):
 	descripcion = models.TextField(max_length=200, verbose_name="Descripcion")
 	organizacion = models.ForeignKey(Editorial, verbose_name="Organizacion")
 	enlace = models.URLField(verbose_name="Enlace o Link", null=True, blank=True)
+        index = djangosearch.ModelIndex(text=['nombre','descripcion'])
 	palabras_claves = models.ManyToManyField(PalabraClave)
 	attachment = models.FileField(upload_to="upload/documentos", verbose_name="Archivo adjunto", help_text="ADVERTENCIA: solo añadir un archivo *.pdf", null=True, blank=True)
 

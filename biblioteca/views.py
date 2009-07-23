@@ -1,50 +1,46 @@
  # -*- coding: UTF-8 -*-
 
+from wiki.models import Pagina,Tag
+from coffin.shortcuts import render_to_response
 from django.conf import settings 
 from django.template import RequestContext
-from django.http import HttpResponseRedirect, HttpResponse 
-from django.shortcuts import render_to_response
-from biblioteca.models import Documento
-from django.db.models import Q
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from biblioteca.models import Documento,PalabraClave
 
-import os 
+def render_to_html(request,template,variables):
+        variables['request']=request
+        new_variables=variables
+        return render_to_response(template, new_variables,context_instance=RequestContext(request))
 
-def search(request):
-	count = 0
+
+def palabra_clave(request,pk):
+	all_palabras_claves=PalabraClave.objects.all()	
 	a = Documento.objects.order_by('-fecha_anadido')[:5]
-	query = request.GET.get('q', '')
-	query = query.replace(",","")
-	if query:
-		qset = (
-			Q(palabra_clave__icontains=query)
-				)
-		results = Biblioteca.objects.filter(qset).distinct()
-		for b in results:
-			count += 1
-	else:
-		results = []
-	return render_to_response(
-		"biblioteca_search.html", {
-        		"results": results,
-        		"query": query,
-        		"a": a,
-        		"c": count
-		},
-		context_instance = RequestContext(request)
+	palabra_clave=PalabraClave.objects.get(pk=pk)
+	documentos=palabra_clave.documento_set.all()
+        return render_to_html(request,"/biblioteca_palabra_clave.html", {
+			"palabra_clave": palabra_clave,
+			"all_palabras_claves": all_palabras_claves,
+			"documentos": documentos,
+			"a": a,
+		}
+	)
+
+def index(request):
+	all_palabras_claves=PalabraClave.objects.all()	
+	a = Documento.objects.order_by('-fecha_anadido')[:5]
+        return render_to_html(request,"/biblioteca.html", {
+			"all_palabras_claves": all_palabras_claves,
+        		"a": a
+		}
 	)
     
 def detalle(request, libro):
+	all_palabras_claves=PalabraClave.objects.all()	
 	a = Documento.objects.order_by('-fecha_anadido')[:5]
-	resultado = Documento.objects.get(id=libro)
-	return render_to_response("biblioteca_detalle.html", {
-        	"results": resultado,
+	resultado = Documento.objects.get(pk=libro)
+	return render_to_html(request,"/biblioteca_detalle.html", {
+		"all_palabras_claves": all_palabras_claves,
+	       	"results": resultado,
         	"a": a
 	})
        
-def handles_uploaded_file(f):
-	file_name = os.path.join(settings.ATTACHMENT_PATH, f.name)
-	destination = open(file_name, 'wb+')
-	for chunk in f.chunk():
-		destination.write(chunk)
-	destination.close()

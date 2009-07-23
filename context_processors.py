@@ -12,8 +12,9 @@ def menu_list(request):
 	index_menuitem = {'url' : '/wiki/', 'name' : 'Wiki'}
 	list_menuitem = {'url' : '/list/', 'name' : 'Lista de p&aacute;ginas'}
 	estadisticas_menuitem = {'url' : '/estadisticas/', 'name' : 'Estad&iacute;sticas'}
+	biblioteca_menuitem = {'url' : '/biblioteca/', 'name' : 'Biblioteca'}
 	busqueda_menuitem = {'url' : '/busqueda/', 'name' : 'Buscar'}
-	menu_list = (index_menuitem, list_menuitem, estadisticas_menuitem, busqueda_menuitem)
+	menu_list = (index_menuitem, list_menuitem, estadisticas_menuitem, biblioteca_menuitem, busqueda_menuitem)
 	return {'menu_list':menu_list}
 
 

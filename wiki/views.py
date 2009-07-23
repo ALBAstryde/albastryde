@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from wiki.models import Pagina,Tag
+from biblioteca.models import Documento
 from coffin.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
@@ -48,8 +49,9 @@ def view_page(request, page_name):
 
 def search_page(request, search_term=None):
 	if search_term!=None:
-		found_entries = Pagina.index.search(search_term)
-		return render_to_html(request,'/search_results.html',{ 'query_string': search_term, 'found_entries': found_entries })
+		found_paginas = Pagina.index.search(search_term)
+		found_documentos = Documento.index.search(search_term)
+		return render_to_html(request,'/search_results.html',{ 'query_string': search_term, 'found_paginas': found_paginas, 'found_documentos': found_documentos })
 	else:
 		return render_to_html(request,'/search_form.html',{ })
 

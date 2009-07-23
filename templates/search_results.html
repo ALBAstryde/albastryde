@@ -6,14 +6,38 @@ resultados
 busqueda por "{{ query_string }}"
 {% endblock %}
 {% block contents %}
-{% if found_entries %}
+{% if found_paginas or found_documentos %}
+{% if found_paginas %}
+<h2>Paginas</h2>
 <ul>
-{% for result in found_entries %}
+{% for result in found_paginas %}
 <li><a href="/wiki/{{ result.nombre }}">
 {{ result.nombre }}</a></li>
 {% endfor %}
 </ul>
-{% else %}
-<div class="warning">Lo siento, pero no hay ningunos articulos con esta palabra.</div>
 {% endif %}
+{% if found_documentos %}
+<h2>Documentos</h2>
+{% for result in found_documentos %}
+
+                        <ul>
+                                <li><span class="titulo">Nombre:</span><b>{{ result.name }}</b></li>
+                                <li><span class="titulo">Fecha publicada:</span>{{ result.fecha_publicado }}</li>
+                                <li><span class="titulo">Fecha añadida:</span>{{ result.fecha_anadido }}</li>
+                                <li><span class="titulo">Descripcion:</span>{{ result.descripcion }}</li>
+                                <li><span class="titulo">Enlace:</span><a href="#">{{ result.enlace }}</a></li>
+                                <span class="vermas"><a href="/biblio/detalle/{{ result.id }}" title="Ver mas detalle por aqui." class="vtip">
+Ver mas <img src="/media/biblioteca/imagen/mas.png"> </a></span>
+                                <hr/><br/>
+                        </ul>
+
+
+
+{% endfor %}
+{% endif %}
+
+{% else %}
+<div class="warning">Lo siento, pero no hay ningunos paginas o documentos con esta palabra.</div>
+{% endif %}
+
 {% endblock %}

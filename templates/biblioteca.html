@@ -1,0 +1,44 @@
+{% extends "/base_graph.html" %}
+
+{% block contents %} 
+<div class="colmask threecol">
+	<div class="colmid">
+		<div class="colleft">
+<div class="col1">
+{% block center_content %}
+	<h2>Busqueda</h2>
+	<div id="buscador">
+
+<form method="get" action="/busqueda_html">
+<input type="text" name="q"><input type="submit" value="buscar"></form>
+	</div>
+{% endblock %}
+	</div>
+	<div class="col2">
+{% block left_content %} 
+		<h2 >
+			Ultimos Añadidos
+		</h2>
+		<div id="ultimo_content" >
+		{% block ultimos_anadidos %}
+			<ul>
+			{% for pdf in a %}
+				<li><a href="/biblioteca/detalle/{{ pdf.pk }}/">{{ pdf.nombre }}</a> <br />{{ pdf.descripcion }}</li>
+			{% endfor %}
+			</ul>
+		 {% endblock %}
+		</div>
+{% endblock %} 
+	</div>
+	<div class="col3">
+{% block right_content %}
+	<h2>Palabras claves</h2>
+	{% for palabra_clave in all_palabras_claves %}
+		<a href="/biblioteca/palabra_clave/{{palabra_clave.pk}}/">
+		{{ palabra_clave }}</a><br />
+	{% endfor %}
+{% endblock %}
+	</div>
+
+</div></div></div>
+{% endblock %}

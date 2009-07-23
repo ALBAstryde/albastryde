@@ -1,0 +1,22 @@
+{% extends "/biblioteca.html" %}
+
+{% block center_content %}
+	<h2>Palabra clave: {{palabra_clave}}</h2>
+{% for documento in documentos %}
+<a href="/biblioteca/detalle/{{documento.pk}}">{{documento}}</a>
+{% endfor %}
+                                {% for attachment in documentos %}
+                        <ul>
+                                <li><span class="titulo">Nombre:</span><b>{{ attachment.nombre }}</b></li>
+                                <li><span class="titulo">Fecha publicada:</span>{{ attachment.fecha_publicado }}</li>
+                                <li><span class="titulo">Fecha añadida:</span>{{ attachment.fecha_anadido }}</li>
+                                <li><span class="titulo">Descripcion:</span>{{ attachment.descripcion }}</li>
+                                <li><span class="titulo">Enlace:</span><a href="{{attachment.enlace}}">{{ attachment.enlace }}</a></li>
+                                <span class="vermas"><a href="/biblioteca/detalle/{{ attachment.pk }}" title="Ver mas detalle por aqui." class="vtip">Ver mas <img src="/media/biblioteca/imagen/mas.png"> </a></span>
+                                <hr /><br />
+                        </ul>
+                        {% else %}
+                                        <p>PDF NO encontrado</p>
+                                {% endfor %}
+
+{% endblock %}
