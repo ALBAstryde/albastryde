@@ -42,5 +42,4 @@ urlpatterns = patterns('',
     (r'^accounts/', include('registration.urls')),
     (r'^profiles/', include('profiles.urls')),
     (r'^biblioteca/', include('biblioteca.urls')),
-    (r'^bibliotecasearch/$', 'biblioteca.views.search'),
 )
