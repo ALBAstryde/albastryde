@@ -4,7 +4,7 @@ from django.conf import settings
 
 
 
-urlpatterns = patterns('biblio.views',
+urlpatterns = patterns('biblioteca.views',
     # Example:
     (r'^index/$',  'search'),
     (r'^detalle/(?P<libro>[^/]+)/$',  'detalle'),

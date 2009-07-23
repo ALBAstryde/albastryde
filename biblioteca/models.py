@@ -20,6 +20,10 @@ class Editorial(models.Model):
 class PalabraClave(models.Model):
 	nombre = models.CharField(primary_key=True,max_length=50)
 
+	def __unicode__(self):
+		return self.nombre
+
+
 class Documento(models.Model):
 	nombre = models.CharField(max_length=200, help_text="Por favor ingrese le titulo del documento", verbose_name="Titulos")
 	autor = models.ForeignKey(Autor, verbose_name="Autor")
@@ -27,9 +31,9 @@ class Documento(models.Model):
 	fecha_anadido = models.DateTimeField(editable=False, auto_now_add=True, verbose_name="Fecha añadido")
 	descripcion = models.TextField(max_length=200, verbose_name="Descripcion")
 	organizacion = models.ForeignKey(Editorial, verbose_name="Organizacion")
-	palabras_claves = models.ManyToManyField(PalabraClave)
 	enlace = models.URLField(verbose_name="Enlace o Link", null=True, blank=True)
-	attachment = models.FileField(upload_to="attachments", verbose_name="Archivo adjunto", help_text="ADVERTENCIA: solo añadir un archivo *.pdf", null=True, blank=True)
+	palabras_claves = models.ManyToManyField(PalabraClave)
+	attachment = models.FileField(upload_to="upload/documentos", verbose_name="Archivo adjunto", help_text="ADVERTENCIA: solo añadir un archivo *.pdf", null=True, blank=True)
 
 	def get_absolute_url(self):
 		return '%s%s/%s' % (settings.MEDIA_URL, settings.ATTACHMENT_FOLDER, self.id)
@@ -38,5 +42,6 @@ class Documento(models.Model):
 		return '%s%s' % (settings.MEDIA_URL, self.attachment)
 
 	def __unicode__(self):
-		return self.name
+		return self.nombre
 	
+
