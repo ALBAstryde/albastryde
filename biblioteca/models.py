@@ -5,8 +5,8 @@ import djangosearch
 from django.db import models
 from django.conf import settings
 from djutils.features.fuzzydate import FuzzyDateField
-
-
+from biblioteca.ExtFileField import ExtFileField
+from django.forms.util import ValidationError
 
 def pdf_text_extractor(path):
 	import pyPdf
@@ -69,5 +69,8 @@ class Documento(models.Model):
 			if attachment_type=='application/pdf':
 		                super(Documento, self).save()
 				self.text_contents=pdf_text_extractor(self.attachment.path).encode("ascii", "ignore")
+			else:
+				self.attachment=None
+				self.text_contents=None
                 super(Documento, self).save()
 
