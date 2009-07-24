@@ -986,6 +986,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 			},
 			'hoverable': {},
 			'clickable': {},
+			'show': false,
 			'unit': median_data[0]['unit'],
 			'intervals': median_data[0]['intervals'],
 			'frequency': median_data[0]['frequency'],
