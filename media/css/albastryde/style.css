@@ -1,3 +1,11 @@
+.threecol {
+	background:#d0e69c;                /* right column background colour */
+}
+.threecol .colleft {
+	background:#d0e69c;     /* left column background colour */
+}
+
+
 div#header-banner {
         background-image: url(images/ALBAstryde.png);
 	height: 72px;
