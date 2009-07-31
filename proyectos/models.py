@@ -26,15 +26,15 @@ class Cooperativa(models.Model):
 	def __unicode__(self):
 		return self.nombre
 	
-class Variedad(models.Model):
-	nombre = models.CharField(max_length=200, verbose_name="Nombre de la Variedad", help_text="Introduzca por favor el nombre de la variedad")
-	
-	def __unicode__(self):
-		return self.nombre
 	
 class Producto(models.Model): # aqui usar los productos ya existente del albastryde
 	nombre = models.CharField(max_length=200, verbose_name="Nombre del Producto", help_text="Introduzca por favor el nombre del producto")
-	variedad = models.ManyToManyField(Variedad)
+	
+	def __unicode__(self):
+		return self.nombre
+class Variedad(models.Model):
+	nombre = models.CharField(max_length=200, verbose_name="Nombre de la Variedad", help_text="Introduzca por favor el nombre de la variedad")
+	producto = models.ForeignKey(Producto)
 	
 	def __unicode__(self):
 		return self.nombre
@@ -70,7 +70,7 @@ class Beneficiario(models.Model):
 	rend_pro_qq = models.DecimalField(max_digits=6,decimal_places=2, verbose_name="Rendimiento promedio en QQ")
 	rend_pro_oro = models.DecimalField(max_digits=6,decimal_places=2, verbose_name="Rendimiento promedio en ORO")
 	manejo = models.IntegerField(choices=MANE_CHOICE, verbose_name="Manejo")
-	variedad = models.ForeignKey(Producto)
+	variedad = models.ManyToManyField(Variedad)
 	certifica = models.IntegerField(choices=CER_CHOICE, verbose_name="Certificación")
 	
 	class Meta:
