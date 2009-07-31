@@ -10,7 +10,7 @@ from cosecha.models import Producto as CosechaProducto #esto es lo nuevo crocha
 date_inputformats=['%d.%m.%Y','%d/%m/%Y','%Y-%m-%d']
 
 FRECUENCIA_CHOICES=(('diario','todos los datos'),('mensual','promedio mensual'),('anual','promedio anual'))
-COSECHA_CHOICES=(('area estimada', 'Area estimada'),('producto estimado','Producto estimado'),('area sembrada','Area sembrada'),('area cosechada', 'Area Cosechada'),('producto obtenido','Producto obtenido'),('rendimiento estimado','Rendimiento estimado'),('rendimiento obtenido','Rendimiento obtenido'),('a    rea perdida','Area perdida'))
+COSECHA_CHOICES=(('area estimada', 'Area estimada'),('producto estimado','Producto estimado'),('area sembrada','Area sembrada'),('area cosechada', 'Area Cosechada'),('producto obtenido','Producto obtenido'),('rendimiento estimado','Rendimiento estimado'),('rendimiento obtenido','Rendimiento obtenido'),('area perdida','Area perdida'))
 #COSECHA_CHOICES=(('area estimada', 'Area estimada'),('producto estimado','Producto estimado'),('area sembrada','Area sembrada'),('area cosechada', 'Area Cosechada'),('producto obtenido','Producto obtenido'),('rendimiento estimado','Rendimiento estimado'),('rendimiento obtenido','Rendimiento obtenido'),('a    rea perdida','Area perdida'),('area miscalculada','Area miscalculada'),('producto miscalculado','Producto miscalculado'))
 PRECIO_MEDIDA_CHOICES=(('nativa','Unidades nativas del mercado'),('mayor','Unidades convertidas a las del mayoreo'),('menor','Unidades convertidas a las del detallista'))
 
