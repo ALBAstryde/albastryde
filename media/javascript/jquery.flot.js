@@ -411,6 +411,9 @@ two_pi=2*Math.PI;
                 return c;
             }
             
+            if ($.browser.msie) // excanvas hack
+ 	        window.G_vmlCanvasManager.init_(document); // make sure everything is setup
+
             canvasWidth = target.width();
             canvasHeight = target.height();
             target.html(""); // clear target
@@ -418,10 +421,8 @@ two_pi=2*Math.PI;
                 target.css("position", "relative"); // for positioning labels and overlay
 
             if (canvasWidth <= 0 || canvasHeight <= 0)
-                throw "Invalid dimensions for plot, width = " + canvasWidth + ", height = " + canvasHeight;
+               throw "Invalid dimensions for plot, width = " + canvasWidth + ", height = " + canvasHeight;
 
-            if ($.browser.msie) // excanvas hack
- 	        window.G_vmlCanvasManager.init_(document); // make sure everything is setup
 
             // the canvas
             canvas = $(makeCanvas(canvasWidth, canvasHeight)).appendTo(target).get(0);

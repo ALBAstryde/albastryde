@@ -969,9 +969,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 
 	draw_graph_tables_dialog();
 
-	if ($.browser.msie) {
-		$('div.graph').remove();
-	}
+//	if ($.browser.msie) {
+//		$('div.graph').remove();
+//	}
 
 
 	function calculate_mediangraph(median_data,median_variables) {

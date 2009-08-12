@@ -148,14 +148,14 @@ if (!document.createElement('canvas').getContext) {
         el.attachEvent('onresize', onResize);
 
         var attrs = el.attributes;
-        if (attrs.width && attrs.width.specified) {
+        if (attrs.width && attrs.width.specified && attrs.width.nodeValue ) {
           // TODO: use runtimeStyle and coordsize
           // el.getContext().setWidth_(attrs.width.nodeValue);
           el.style.width = attrs.width.nodeValue + 'px';
         } else {
           el.width = el.clientWidth;
         }
-        if (attrs.height && attrs.height.specified) {
+        if (attrs.height && attrs.height.specified && attrs.height.nodeValue ) {
           // TODO: use runtimeStyle and coordsize
           // el.getContext().setHeight_(attrs.height.nodeValue);
           el.style.height = attrs.height.nodeValue + 'px';
