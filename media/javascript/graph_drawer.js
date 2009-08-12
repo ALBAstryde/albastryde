@@ -15,7 +15,11 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 	total_yaxis=1,
 	first_date=parseInt(new Date().getTime()/1000,10),
 	last_date=-2000000000,
-	frequency_list=['daily','monthly','annualy'];
+	frequency_list=['daily','monthly','annualy'],
+	graph_tables_dialog_drawn=false,
+	graph_wiki_dialog_drawn=false,
+	graph_link_dialog_drawn=false,
+	graph_export_dialog_drawn=false;
 	if (wiki_mode) {
 		editor_mode = false;
 	} else {
@@ -335,18 +339,30 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 
 	$('span#' + query_id + 'graph_wiki').live('click',
 	function(e) {
+		if(!(graph_wiki_dialog_drawn)) {
+			draw_wiki_link_dialog();
+		}
 		$('#'+query_id+'graph_wiki_dialog').dialog('open');
 	});
 	$('span#' + query_id + 'graph_link').live('click',
 	function(e) {
+		if(!(graph_link_dialog_drawn)) {
+			draw_graph_link_dialog();
+		}
 		$('#'+query_id+'graph_link_dialog').dialog('open');
 	});
 	$('span#' + query_id + 'graph_export').live('click',
 	function(e) {
+		if(!(graph_export_dialog_drawn)) {
+			draw_graph_export_dialog();
+		}
 		$('#'+query_id+'graph_export_dialog').dialog('open');
 	});
 	$('span#' + query_id + 'graph_tables').live('click',
 	function(e) {
+		if(!(graph_tables_dialog_drawn)) {
+			draw_graph_tables_dialog();
+		}
 		$('#'+query_id+'graph_tables_dialog').dialog('open');
 	});
 	$('span#' + query_id + 'graph_close').live('click',
@@ -916,9 +932,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		dialog_options.width = 700;
 		$('#' + query_id).append(dialog_text);
 		$('#' + dialog_id).dialog(dialog_options);
+		graph_export_dialog_drawn=true;
 	}
 
-	draw_graph_export_dialog();
 
 	function draw_graph_link_dialog() {
 		var dialog_id = query_id+'graph_link_dialog';
@@ -932,9 +948,8 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		dialog_options.title = _('Permanent link');
 		$('#' + query_id).append(dialog_text);
 		$('#' + dialog_id).dialog(dialog_options);
+		graph_link_dialog_drawn=true;
 	}
-
-	draw_graph_link_dialog();
 
 	function draw_graph_wiki_dialog() {
 		var dialog_id = query_id+'graph_wiki_dialog';
@@ -946,9 +961,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		dialog_options.title = _('Code for the wiki');
 		$('#' + query_id).append(dialog_text);
 		$('#' + dialog_id).dialog(dialog_options);
+		graph_wiki_dialog_drawn=true;
 	}
 
-	draw_graph_wiki_dialog();
 
 	function draw_graph_tables_dialog() {
 		var dialog_id = query_id+'graph_tables_dialog';
@@ -965,9 +980,9 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 		$('#' + dialog_id+'currencytabs').tabs();
 		$('.' + dialog_id+'tabletabs').tabs();
 		$('#' + dialog_id).dialog(dialog_options);
+		graph_tables_dialog_drawn=true;
 	}
 
-	draw_graph_tables_dialog();
 
 //	if ($.browser.msie) {
 //		$('div.graph').remove();
@@ -1481,7 +1496,7 @@ function create_graphs(jsondata, wiki_mode, graphsheader) {
 						variable_html+=variable_array[i+1]+' ';
 					}
 					html+='<li><a href="#'+dialog_id+'tables_'+String(type_counter)+'_'+String(frequency_counter)+'_'+String(variables_counter)+'">'+type+': '+variable_html;
-					html+='('+_(frequency)+')</li>';
+					html+='('+_(frequency)+')</a></li>';
 				variables_counter++;
 				}
 			frequency_counter++;
