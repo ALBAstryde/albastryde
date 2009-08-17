@@ -1,15 +1,12 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>{% block title %}Proyectos{% endblock %}</title>
-</head>
+{% extends "/base.html" %}
+{% block title %}Proyectos{% endblock %}
+{% block headline %}Proyectos{% endblock %}
 
-{% block content %}
+{% block contents %}
 <h1> Información General del proyectos </h1>
 <form action="." method="GET" > 
 
-{{ P|escape }}
+{{ P|safe }}
 
 <input type="submit" value="Consultar" /> 
 </form>
@@ -28,5 +25,3 @@
 <hr></hr>
 
 {% endblock %}
-</body>
-</html>

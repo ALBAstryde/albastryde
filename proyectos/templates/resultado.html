@@ -1,11 +1,8 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>{% block title %}Proyectos{% endblock %}</title>
-</head>
+{% extends "/base.html" %}
+{% block title %}Proyectos{% endblock %}
+{% block headline %}Proyectos{% endblock %}
 
-{% block content %}
+{% block contents %}
 <h1> Beneficiarios / linea base por beneficiario </h1>
 <form action="." method="GET" > 
 
@@ -26,16 +23,13 @@
 <ul>area desarrollo: {{ d.area_en_desarollo }}</ul>
 <ul>Rendimiento QQ: {{ d.rendimiento_promedio_en_qq }}</ul>
 <ul>Rendimiento oro: {{ d.rendimiento_promedio_en_oro }}</ul>
-<ul>manejo: {{ d.get_manejo_display }}</ul>
+<ul>manejo: {{ d.get_manejo_display() }}</ul>
 <ul>Variedad:
 {%for x in d.variedad.all%}
      <li> {{ x.nombre }} </li>
 {%endfor%}
 </ul>
-<ul>Certificacion: {{ d.get_certificada_display }}</ul>
+<ul>Certificacion: {{ d.get_certificada_display() }}</ul>
 {% endfor %}
 <hr><hr>
 {% endblock %}
-
-</body>
-</html>

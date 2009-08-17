@@ -17,10 +17,10 @@ def ConsulForm(request):
 	query = request.GET.get('c', '')
 	if query:
 		results = Beneficiario.objects.filter(persona=query)
-		return render_to_response("resultado.html", {'results': results})
+		return render_to_html(request,"resultado.html", {'results': results})
 	else:
 		bene= Persona.objects.all()
-		return render_to_response("resultado.html", locals())
+		return render_to_html(request,"resultado.html", locals())
 
 # Consulta para saber los detalles de las personas con sus detalles y proyectos a los que pertenece
 def Beneficiario(request):
@@ -49,7 +49,7 @@ def ConsulProyecto(request):
 		return render_to_response("proyecto.html", {'j': j, 'contar': contar, 'mujer': mujer, 'hombre': hombre, 'ma': ma})
 	else:
 		k = Proyecto.objects.all()
-		return render_to_response("proyecto.html", locals())
+		return render_to_html(request,"proyecto.html", locals())
 
 #Esto es solo prueba para saber si estaban bien los datos, todos los datos los tenemos en formato CSV 
 
