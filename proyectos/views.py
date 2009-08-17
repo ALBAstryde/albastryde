@@ -1,10 +1,16 @@
 # -*- encoding: utf-8 -*-
-from proyecto.forms import *
+from proyectos.forms import *
 from django.template import RequestContext
-from proyectos.proyecto.models import *
-from django.shortcuts import render_to_response
+from proyectos.models import *
+from coffin.shortcuts import render_to_response
 
 import os
+
+def render_to_html(request,template,variables):
+        variables['request']=request
+        new_variables=variables
+        return render_to_response(template, new_variables,context_instance=RequestContext(request))
+
 
 # Consulta para saber los beneficiarios con sus detalles
 def ConsulForm(request):
@@ -17,16 +23,16 @@ def ConsulForm(request):
 		return render_to_response("resultado.html", locals())
 
 # Consulta para saber los detalles de las personas con sus detalles y proyectos a los que pertenece
-def Benefi(request):
+def Beneficiario(request):
 	F = BeneficiarioForm(request.GET)
 	query = request.GET.get('beneficiarios', '')
 	if query:
 		b = Persona.objects.filter(id=query)
 		c = Beneficiario.objects.filter(persona__id=query)
-		return render_to_response("persona.html", {'b': b, 'c': c})
+		return render_to_html(request,"persona.html", {'b': b, 'c': c})
 	else:
 		i = Persona.objects.all()
-		return render_to_response("persona.html", locals())
+		return render_to_html(request,"persona.html", locals())
 
 # Consulta sobre los datos de los proyectos
 def ConsulProyecto(request):

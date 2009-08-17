@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from proyectos.proyecto.models import *
+from proyectos.models import *
 from django import forms
 
 

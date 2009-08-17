@@ -82,6 +82,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.admindocs',
+    'ajax_filtered_fields',
     'django_evolution',
     'compress',
     'albastryde.wiki',
@@ -101,4 +102,5 @@ INSTALLED_APPS = (
     'albastryde.registration',
     'albastryde.profiles',
     'albastryde.biblioteca',
+    'albastryde.proyectos',
 )
