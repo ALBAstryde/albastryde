@@ -1,4 +1,4 @@
-{% extends "/base_graph.html" %}
+{% extends "/base.html" %}
 
 {% block title %}Persona{% endblock %}
 {% block headline %}Persona{% endblock %}
@@ -18,7 +18,7 @@
     {% endfor %}</ul>
 <ul>Nombre: {{ d.nombre }} </ul>
 <ul>Cedula: {{ d.numero_cedula }}</ul>
-<ul>Sexo: {{ d.get_sexo_display }}</ul>
+<ul>Sexo: {{ d.get_sexo_display() }}</ul>
 {% endfor %}
 <hr><hr>
 {% endblock %}
