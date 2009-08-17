@@ -17,17 +17,21 @@ class Tipo(models.Model):
 
 class Mapa(models.Model):
 	ano = models.DateField("Año", help_text='Fecha del mapa')
-	region = models.IntegerField("Region",choices=REGION,max_length=1)
+	region = models.IntegerField("Region",choices=REGION,max_length=2)
 	tipo = models.ForeignKey(Tipo)
-	Descripicion = models.TextField("Descripcion adicional")
-	adjunto = ImageWithThumbsField(upload_to="attachment",help_text="Subir la imagen del mapa .jpg",sizes=((120,150),(360,480)))
+	descripcion = models.TextField("Descripcion adicional")
+	adjunto = ImageWithThumbsField("Imagen mapa",upload_to="attachment",help_text="Subir la imagen del mapa .jpg",sizes=((120,150),(360,480)))
+	info = ImageWithThumbsField("informacion adicional",upload_to="attachment",help_text="Subir la imagen de informacion adicional")
 
 	class Meta:
 		ordering = ['region']
 		verbose_name_plural = "Mapas tematicos por region"
 		
-	def __unicode__(self):
-		return self.region
+	#def __unicode__(self):
+	#	return self.ano
+
+	#def get_absolute_url(self):
+	#	return '%s%s/%s' % (settings.MEDIA_URL,settings.ATTACHMENT_FOLDER, self.id)
 
 	def imagen(self):
 		return '%s/%s' % (settings.MEDIA_URL, self.adjunto)
