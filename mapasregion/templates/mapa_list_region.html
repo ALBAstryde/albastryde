@@ -1,0 +1,15 @@
+{% extends 'index_mapa.html' %}
+ {% block title %}Detalle de mapas por Region {% endblock %}
+ {% block detalle %}
+Lista de mapas para la <em>{{ reg }}</em><br>
+<table>
+         {% for m in mapa %}
+         <tr>
+                 <td><img src="{{m.adjunto.url_120x150}}"></td>
+                 <td><b>{{ m.tipo }}</b><br> <small>{{m.descripcion}}</small></td>
+                  <td> <small> <a href="/{{ m.adjunto }}">descargar mapa</a></small><br><small><a href="/{{ m.info }}"> descargar informacion </a></small></td>
+         </tr>
+         {% endfor %}
+ </table>
+{% endblock %}
+

@@ -1,0 +1,19 @@
+{% extends 'index_mapa.html' %}
+ {% block title %}Detalle de mapas por tipo{% endblock %}
+ {% block detalle %}
+<p>Lista de mapas del tipo <em>{{ t.nombre }}</em> </p>
+<table>
+
+         {% for m in mapa %}
+         <tr>
+                 <td><img src="{{m.adjunto.url_120x150}}"></a></td>
+                 <td><b>{{ m.get_region_display }}</b> <br> <small>{{m.descripcion}}</small></td>
+                  <td>   <small><a href="/{{ m.adjunto }}"> descargar mapa</a></small><br><small><a href="/{{ m.info }}"> descargar informacion </a></small></td>
+                
+         </tr>
+         {% endfor %}
+ </table>
+{% endblock %}
+
+ 
+
