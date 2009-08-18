@@ -46,7 +46,7 @@ def ConsulProyecto(request):
 		mujer = contmujer.count()
 		conthombre = Beneficiario.objects.filter(proyecto__id=query).filter(persona__sexo=1)
 		hombre = conthombre.count()
-		return render_to_response("proyecto.html", {'j': j, 'contar': contar, 'mujer': mujer, 'hombre': hombre, 'ma': ma})
+		return render_to_html(request,"proyecto.html", {'j': j, 'contar': contar, 'mujer': mujer, 'hombre': hombre, 'ma': ma})
 	else:
 		k = Proyecto.objects.all()
 		return render_to_html(request,"proyecto.html", locals())
