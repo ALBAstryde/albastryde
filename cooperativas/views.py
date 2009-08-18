@@ -16,16 +16,16 @@ def render_to_html(request,template,variables):
 
 def index(request):
 	s = Cooperativa.objects.all()
-	return render_to_html(request,"base.html", { 's':s })
+	return render_to_html(request,"index.html", { 's':s })
 
 def cooperativar(request, listar_id):
 	lista = Cooperativa.objects.get(pk=listar_id)
-	return render_to_html(request,"cooperativa/cooperativa_detail.html", {'lista':lista})
+	return render_to_html(request,"cooperativa_detail.html", {'lista':lista})
 
 def detallelistar(request, deta_id):
 	p = Detallecoop.objects.filter(cooperativa=deta_id)
 	#if k = p.cooperativa == deta_id
-	return render_to_html(request,"cooperativa/cooperativa_list.html", {'p': p})
+	return render_to_html(request,"cooperativa_list.html", {'p': p})
 
 #def comeindex(request):
 #	F = FormLugar(request.GET)
