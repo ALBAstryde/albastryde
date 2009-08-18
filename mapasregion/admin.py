@@ -1,5 +1,5 @@
 from django.contrib import admin
-from mapa.models import Mapa, Tipo
+from mapasregion.models import Mapa, Tipo
 
 class MapaAdmin(admin.ModelAdmin):
 	list_display = ['ano','region','tipo']

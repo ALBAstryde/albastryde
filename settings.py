@@ -103,4 +103,6 @@ INSTALLED_APPS = (
     'albastryde.profiles',
     'albastryde.biblioteca',
     'albastryde.proyectos',
+    'albastryde.mapasregion',
+    'albastryde.cooperativas',
 )

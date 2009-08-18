@@ -1,11 +1,8 @@
-<html>
-     <head>
-	<title>{% block title %}Ejemplo salida cooperativa{% endblock %}</title>
-	
-     </head>
-    <body>
+{% extends "/base.html" %}
+{% block title %}Ejemplo salida cooperativa{% endblock %}
+{% block headline %}Ejemplo salida cooperativa{% endblock %}
 
-{% block content %}
+{% block contents %}
 
 
 <h2>Cooperativa # {{ lista.id }} <span>{{ lista.ecp.nombre }}</span></h2>
@@ -25,5 +22,3 @@
 	
 </div>
 {% endblock %}
-</body>
-</html>

@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 from django.contrib import admin
-from cooperativa.models import  Ecp, Cooperativa, Detallecoop, Comercializacion, Producto
+from cooperativas.models import  Ecp, Cooperativa, Detallecoop, Comercializacion, Producto
 
 class ProductoAdmin(admin.ModelAdmin):
 	list_display = ['nombre']

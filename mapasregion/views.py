@@ -1,6 +1,7 @@
 from coffin.shortcuts import render_to_response
 from django.http import HttpResponse
-from mapamagfor.mapa.models import Mapa, Tipo
+from django.template import RequestContext
+from mapasregion.models import Mapa, Tipo
 
 def render_to_html(request,template,variables):
         variables['request']=request

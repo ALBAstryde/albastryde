@@ -1,12 +1,8 @@
-<html>
-     <head>
-	<title>{% block title %}Ejemplo salida cooperativa{% endblock %}</title>
-	
-     </head>
-    <body>
-{% block content %}
+{% extends "/base.html" %}
+{% block title %}Ejemplo salida cooperativa{% endblock %}
+{% block contents %}
 	<h2>Informacion Detallada de la cooperativa</h2>
-{% for p in b %}
+{% for p in p %}
 	<div class="date">
 		<p class="cr">Nombre completo de cooperativa :{{ p.cooperativa.nombre_completo }}</p>
 		<p class="up">Año inscrito :{{ p.ano }}</p>
@@ -20,5 +16,3 @@
 <hr>
 {% endfor %}
 {% endblock %}
-</body>
-</html>

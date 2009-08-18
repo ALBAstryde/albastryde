@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-from models import Cooperativa, Detallecoop
+from cooperativas.models import Cooperativa, Detallecoop
 
 #info = {
 #	'queryset': Cooperativa.objects.all(),
@@ -17,8 +17,8 @@ from models import Cooperativa, Detallecoop
 #	url(R'^(?P<object_id>\d+)/$', 'object_detail', info, name='Detallecoop-detail'),
 #)
 
-urlpatterns = patterns('mapamagfor.cooperativa.views',
-	(r'^index/$', 'index'),
+urlpatterns = patterns('cooperativas.views',
+	(r'^$', 'index'),
 	(r'^listar/(?P<listar_id>\d+)/$', 'cooperativar'),
 	(r'^detalle/(?P<deta_id>\d+)/$', 'detallelistar'),
 	#(r'^departamento/$', 'comeindex'),

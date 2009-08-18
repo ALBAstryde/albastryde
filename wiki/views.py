@@ -48,12 +48,12 @@ def view_page(request, page_name):
 
 
 def search_page(request, search_term=None):
-	if search_term!=None:
+	if search_term==None:
+		return render_to_html(request,'/search_form.html',{ })
+	else:
 		found_paginas = Pagina.index.search(search_term)
 		found_documentos = Documento.index.search(search_term)
 		return render_to_html(request,'/search_results.html',{ 'query_string': search_term, 'found_paginas': found_paginas, 'found_documentos': found_documentos })
-	else:
-		return render_to_html(request,'/search_form.html',{ })
 
 
 def search_page_html(request):

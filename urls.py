@@ -45,4 +45,5 @@ urlpatterns = patterns('',
     (r'^biblioteca/', include('biblioteca.urls')),
     (r'^proyectos/', include('proyectos.urls')),
     (r'^mapas/', include('mapasregion.urls')),
+    (r'^cooperativas/', include('cooperativas.urls')),
 )
