@@ -1,0 +1,24 @@
+<html>
+     <head>
+	<title>{% block title %}Ejemplo salida cooperativa{% endblock %}</title>
+	
+     </head>
+    <body>
+{% block content %}
+	<h2>Informacion Detallada de la cooperativa</h2>
+{% for p in p %}
+	<div class="date">
+		<p class="cr">Nombre completo de cooperativa :{{ p.cooperativa.nombre_completo }}</p>
+		<p class="up">Año inscrito :{{ p.ano }}</p>
+		<p class="up">Miembros hombre :{{ p.mem_hombre }}</p>
+		<p class="up">Miembros mujeres :{{ p.mem_mujer }}</p>
+		<p class="up">Miembros totales :{{ p.mem_total }}</p>
+		<p class="up">Beneficiarios hombres :{{ p.ben_hombre }}</p>
+		<p class="up">Beneficiarios mujeres :{{ p.ben_mujer }}</p>
+		<p class="up">Beneficiarios totales :{{ p.ben_total }}</p>
+		<p class="up">Mujeres a cargo :{{ p.mujer_cargo }}</p>
+<hr>
+{% endfor %}
+{% endblock %}
+</body>
+</html>

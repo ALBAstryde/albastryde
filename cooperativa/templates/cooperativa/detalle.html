@@ -1,0 +1,21 @@
+<html>
+     <head>
+	<title>{% block title %}Ejemplo salida cooperativa{% endblock %}</title>
+	
+     </head>
+    <body>
+{% block content %}
+	<h2>Datos de Cooperativas</h2>
+{% for p in c %}
+		<p >Nombre completo de cooperativa :{{ p.nombre_completo }}</p>
+		<p >Nombre resumido de cooperativa :{{ p.nombre_resumido }}</p>
+		<p >Metro sobre el nivel del mar :{{ p.msnm }}</p>
+		<p >Fecha de constitucion :{{ p.fecha_constitucion }}</p>
+		<p >Representante legal :{{ p.representante_legal }}</p>
+		<p >Tecnico a cargo :{{ p.tecnico }}</p>
+<li><a href="/detallec/{{ p.id }}">Ver Detalle de Cooperativas</a></li>
+<hr>
+{% endfor %}
+{% endblock %}
+</body>
+</html>

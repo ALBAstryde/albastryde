@@ -1,0 +1,29 @@
+<html>
+     <head>
+	<title>{% block title %}Ejemplo salida cooperativa{% endblock %}</title>
+	
+     </head>
+    <body>
+
+{% block content %}
+
+
+<h2>Cooperativa # {{ lista.id }} <span>{{ lista.ecp.nombre }}</span></h2>
+<div class="ticket">
+	<h2>Informacion General</h2>
+	<div class="date">
+		<p class="cr">Nombre completo :{{ lista.nombre_completo }}</p>
+		<p class="up">Nombre resumido :{{ lista.nombre_resumido }}</p>
+		<p class="up">Metro sobre el nivel del mar :{{ lista.msnm }}</p>
+		<p class="up">Municipio :{{ lista.municipio }}</p>
+		<p class="up">Fecha de constitucion :{{ lista.fecha_constitucion }}</p>
+		<p class="up">Representante Legal :{{ lista.representante_legal }}</p>
+		<p class="up">Tecnico :{{ lista.tecnico }}</p>
+		
+		<li><a href="/detalle/{{ lista.id }}" class="sel">Ver Detalle de Cooperativas</a></li>
+	</div>
+	
+</div>
+{% endblock %}
+</body>
+</html>
