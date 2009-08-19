@@ -6,7 +6,7 @@ from django.template import RequestContext
 from cooperativas.models import *
 from lugar.models import *
 
-from forms import *
+#from forms import *
 
 def render_to_html(request,template,variables):
         variables['request']=request
