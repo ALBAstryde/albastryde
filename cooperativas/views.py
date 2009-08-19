@@ -16,7 +16,7 @@ def render_to_html(request,template,variables):
 
 def index(request):
 	s = Cooperativa.objects.all()
-	return render_to_html(request,"/cooperativas/coop_index.html", { 's':s })
+	return render_to_html(request,"/cooperativas/base.html", { 's':s })
 
 def cooperativar(request, listar_id):
 	lista = Cooperativa.objects.get(pk=listar_id)
