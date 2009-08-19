@@ -13,8 +13,11 @@ def menu_list(request):
 	list_menuitem = {'url' : '/list/', 'name' : 'Lista de p&aacute;ginas'}
 	estadisticas_menuitem = {'url' : '/estadisticas/', 'name' : 'Estad&iacute;sticas'}
 	biblioteca_menuitem = {'url' : '/biblioteca/', 'name' : 'Biblioteca'}
+	proyectos_menuitem = {'url' : '/proyectos/', 'name' : 'Proyectos'}
+	cooperativas_menuitem = {'url' : '/cooperativas/', 'name' : 'Cooperativas'}
+	mapas_menuitem = {'url' : '/mapas/', 'name' : 'Mapas'}
 	busqueda_menuitem = {'url' : '/busqueda/', 'name' : 'Buscar'}
-	menu_list = (index_menuitem, list_menuitem, estadisticas_menuitem, biblioteca_menuitem, busqueda_menuitem)
+	menu_list = (index_menuitem, list_menuitem, estadisticas_menuitem, biblioteca_menuitem, proyectos_menuitem, cooperativas_menuitem, mapas_menuitem, busqueda_menuitem)
 	return {'menu_list':menu_list}
 
 
