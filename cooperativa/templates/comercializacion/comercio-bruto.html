@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>{% block title %}Comercializacion{% endblock %}</title>
+</head>
+<body>
+<style type="text/css">
+#titulo1 {
+	font-size:25px;
+	font-family: Arial;
+	color: #2474FF;
+}
+#titulo2 {
+	font-size:25px;
+	font-family: Arial;
+	color: black;
+}
+#tabla_salida {
+	width: 700px; 
+	border-collapse: collapse; 
+	margin-left: 30px;
+	font-size:12px;
+	font-family: Arial; 
+	}
+
+#tabla_salida table.accessHide { 
+	position: absolute; 
+	left: -999999px; 
+	}
+
+#tabla_salida td, th {
+	text-align: center; 
+	border: 1px solid #ddd;  
+	height: 1.5em; 
+	padding: 4px;
+	}
+#tabla_salida td.hover { 
+	color: orange; 
+	}
+#tabla_salida td.input { 
+	padding: 0; 
+	}
+
+#tabla_salida td input, td input:focus { 
+	border: 1px solid orange; 
+	outline: none; 
+	padding: 2px; 
+	margin: 1px; 
+	width: 20px; 
+	}
+#tabla_salida caption {
+	margin: 0 0 .5em; 
+	font-size: 1.3em;  
+	text-align: left;   
+	}
+div.centrado {
+	text-align: center;
+}
+div.centrado table {
+margin: 0 auto;
+text-align: left;
+}
+div.centrado #tabla_salida {
+margin: 0 auto;
+text-align: left;
+}
+body {
+	font-family: Arial;
+}
+</style>
+{% block content %}
+		<ul>
+			<li><a href="/comercializacion/">Busqueda por cooperativa</a></li>
+		</ul>
+<div class="centrado">
+<h1 id="titulo1"> Busquedas por Rubro </h1></div>
+<fieldset><legend>CONSULTAR</legend>
+<form action="." method="GET" >
+<div class="centrado">
+<table>
+	<tr>
+		<td>{{ T.productos.errors }}
+    <label for="id_cooperativas">Productos:</label></td>
+		<td>{{ T.productos }}</td>
+	</tr>
+
+	<tr>
+		<td>{{ T.municipios.errors }}
+    <label for="id_anos">Municipios:</label></td>
+		<td>{{ T.municipios }}</td>
+	</tr>
+
+	<tr>
+		<td>{{ T.ciclos.errors }}
+    <label for="id_productos">Ciclos:</label></td>
+		<td>{{ T.ciclos }}</td>
+	</tr>
+</table>
+<input type="submit" value="Consultar" /> 
+</div>
+</form>
+</fieldset>
+<hr>
+<div class="centrado">
+<table id="tabla_salida">
+<caption>Tabla Comercio en bruto</caption>
+<thead>
+         <tr>
+                 <th>Nombre Cooperativas</th>
+                 <th>Area (Mz)</th>
+                 <th>Produccion (qq)</th>
+				 <th>Rendimiento (qqxMz)</th>
+				 <th>Exportacion (qq)</th>
+				 <th>Precio mercados locales ($)</th>
+				 <th>Certificacion</th>
+				 <th>Variedad</th>
+
+         </tr>
+   </thead>
+<tbody>
+		{% for a in h %}
+	<tr>
+			<td>{{ a.cooperativa.nombre_resumido }}</td>
+			<td>{{ a.area }}</td>
+			<td>{{ a.produccion }}</td>
+			<td>{{ a.rendimiento }}</td>
+			<td>{{ a.exportacion }}</td>
+			<td>{{ a.precio_merc_local }}</td>
+			<td>{{ a.get_certificacion_display }} </td>
+			<td>{{ a.get_variedad_display }} </td>
+	</tr>
+		{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}
+
+</body>
+</html>

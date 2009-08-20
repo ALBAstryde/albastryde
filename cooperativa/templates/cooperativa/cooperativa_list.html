@@ -1,0 +1,99 @@
+<html>
+     <head>
+	<title>{% block title %}Cooperativas{% endblock %}</title>
+
+</head>
+<body>
+<style type="text/css">
+#titulo1 {
+	font-size:25px;
+	font-family: Arial;
+	color: #2474FF;
+}
+#titulo2 {
+	font-size:25px;
+	font-family: Arial;
+	color: black;
+}
+#tabla_salida {
+	width: 700px; 
+	border-collapse: collapse; 
+	margin-left: 30px;
+	font-size:12px;
+	font-family: Arial; 
+	}
+
+#tabla_salida table.accessHide { 
+	position: absolute; 
+	left: -999999px; 
+	}
+
+#tabla_salida td, th {
+	text-align: center; 
+	border: 1px solid #ddd;  
+	height: 1.5em; 
+	padding: 4px;
+	}
+#tabla_salida td.hover { 
+	color: orange; 
+	}
+#tabla_salida td.input { 
+	padding: 0; 
+	}
+
+#tabla_salida td input, td input:focus { 
+	border: 1px solid orange; 
+	outline: none; 
+	padding: 2px; 
+	margin: 1px; 
+	width: 20px; 
+	}
+#tabla_salida caption {
+	margin: 0 0 .5em; 
+	font-size: 1.3em;  
+	text-align: left;   
+	}
+body {
+	font-family: Arial;
+}
+</style>
+{% block content %}
+		<ul>
+			<li><a href="/index/">Listado de cooperativas</a></li>
+		</ul>
+	<h2 id="titulo1">Informacion Detallada de la cooperativa</h2>
+<table id="tabla_salida">
+<caption>Tabla detalle de la cooperativa</caption>
+<thead>
+         <tr>
+                 <th>Nombre completo de cooperativas</th>
+                 <th>Año de inscripción</th>
+                 <th>Miembros Hombres</th>
+				 <th>Miembros Mujeres</th>
+				 <th>Miembros totales</th>
+				 <th>Beneficiarios Hombres</th>
+				 <th>Beneficiarias Mujeres</th>
+				 <th>Beneficiarios totales</th>
+				 <th>Mujeres a cargo</th>
+
+         </tr>
+   </thead>
+<tbody>
+{% for p in p %}
+	<tr>
+			<td>{{ p.cooperativa.nombre_completo }}</td>
+			<td>{{ p.ano }}</td>
+			<td>{{ p.mem_hombre }}</td>
+			<td>{{ p.mem_mujer }}</td>
+			<td>{{ p.mem_total }}</td>
+			<td>{{ p.ben_hombre }}</td>
+			<td>{{ p.ben_mujer }}</td>
+			<td>{{ p.ben_total }}</td>
+			<td>{{ p.mujer_cargo }}</td>
+	</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}
+</body>
+</html>

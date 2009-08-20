@@ -1,0 +1,104 @@
+<html>
+     <head>
+	<title>{% block title %}Cooperativa{% endblock %}</title>
+     </head>
+    <body>
+<style type="text/css">
+#titulo2 {
+	font-size:25px;
+	font-family: Arial;
+	color: #2474FF;
+}
+#titulo1 {
+	font-size:25px;
+	font-family: Arial;
+	color: black;
+}
+#tabla_salida {
+	width: 700px; 
+	border-collapse: collapse; 
+	margin-left: 30px;
+	font-size:12px;
+	font-family: Arial; 
+	}
+
+#tabla_salida table.accessHide { 
+	position: absolute; 
+	left: -999999px; 
+	}
+
+#tabla_salida td, th {
+	text-align: center; 
+	border: 1px solid #ddd;  
+	height: 1.5em; 
+	padding: 4px;
+	}
+#tabla_salida td.hover { 
+	color: orange; 
+	}
+#tabla_salida td.input { 
+	padding: 0; 
+	}
+
+#tabla_salida td input, td input:focus { 
+	border: 1px solid orange; 
+	outline: none; 
+	padding: 2px; 
+	margin: 1px; 
+	width: 20px; 
+	}
+#tabla_salida caption {
+	margin: 0 0 .5em; 
+	font-size: 1.3em;  
+	text-align: left;   
+	}
+body {
+	font-family: Arial;
+}
+</style>
+
+{% block content %}
+		<ul>
+			<li><a href="/index/">Lista de cooperativas</a></li>
+		</ul>
+
+<h2 id="titulo1">Cooperativa # {{ lista.id }}: <span>{{ lista.ecp.nombre }}</span></h2>
+<div class="ticket">
+	<h3 id="titulo2">Informacion General</h3>
+<table id="tabla_salida">
+<caption>Información general de la cooperativa</caption>
+		<tr>
+			<th>Nombre completo </th>
+			<td>{{ lista.nombre_completo }}</td>
+		</tr>
+		<tr>
+			<th>Nombre resumido </th>
+			<td>{{ lista.nombre_resumido }}</td>
+		</tr>
+		<tr>
+			<th>Metro sobre el nivel del mar </th>
+			<td>{{ lista.msnm }}</td>
+		</tr>
+		<tr>
+			<th>Municipio </th>
+			<td>{{ lista.municipio }}</td>
+		</tr>
+		<tr>
+			<th>Fecha de constitución </th>
+			<td>{{ lista.fecha_constitucion }}</td>
+		</tr>
+		<tr>
+			<th>Representante legal </th>
+			<td>{{ lista.representante_legal }}</td>
+		</tr>
+		<tr>
+			<th>Tecnico </th>
+			<td>{{ lista.tecnico }}</td>
+		</tr>
+
+</table>
+		<li><a href="/detalle/{{ lista.id }}" class="sel">Ver Detalle de Cooperativas</a></li>
+
+{% endblock %}
+</body>
+</html>
