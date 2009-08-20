@@ -3,9 +3,77 @@
 {% block headline %}Proyectos{% endblock %}
 
 {% block contents %}
-<h1> Beneficiarios / linea base por beneficiario </h1>
-<form action="." method="GET" > 
+<style type="text/css">
+#titulo1 {
+	font-size:25px;
+	font-family: Arial;
+	color: #2474FF;
+}
+#titulo2 {
+	font-size:25px;
+	font-family: Arial;
+	color: black;
+}
+#tabla_salida {
+	width: 700px; 
+	border-collapse: collapse; 
+	margin-left: 30px;
+	font-size:12px;
+	font-family: Arial; 
+	}
 
+#tabla_salida table.accessHide { 
+	position: absolute; 
+	left: -999999px; 
+	}
+
+#tabla_salida td, th {
+	text-align: center; 
+	border: 1px solid #ddd;  
+	height: 1.5em; 
+	padding: 4px;
+	}
+#tabla_salida td.hover { 
+	color: orange; 
+	}
+#tabla_salida td.input { 
+	padding: 0; 
+	}
+
+#tabla_salida td input, td input:focus { 
+	border: 1px solid orange; 
+	outline: none; 
+	padding: 2px; 
+	margin: 1px; 
+	width: 20px; 
+	}
+#tabla_salida caption {
+	margin: 0 0 .5em; 
+	font-size: 1.3em;  
+	text-align: left;   
+	}
+div.centrado {
+	text-align: center;
+}
+div.centrado table {
+margin: 0 auto;
+text-align: left;
+}
+div.centrado #tabla_salida {
+margin: 0 auto;
+text-align: left;
+}
+body {
+	font-family: Arial;
+}
+</style>
+		<ul>
+			<a href="/proyectos/persona/">Busqueda por persona</a> |
+			<a href="/proyectos/detalle/">Busqueda por detalle</a>
+		</ul>
+<h1 id="titulo1"> Beneficiarios / linea base por beneficiario </h1>
+<form action="." method="GET" > 
+Beneficiarios:
 <SELECT NAME="c" SIZE=1 >
 {% for i in bene %}
 <OPTION VALUE="{{i.id|escape}}">{{i.nombre}}</OPTION>
@@ -14,22 +82,43 @@
 <input type="submit" value="Enviar" /> 
 </form>
 <hr>
-{% for d in results %}
-<ul>proyectos: {{ d.proyecto }} </ul>
-<ul>persona: {{ d.persona }} </ul>
-<ul>tamano finca: {{ d.tamano_de_finca }} </ul>
-<ul>altura promedio: {{ d.altura_promedio }} </ul>
-<ul>area produccion: {{ d.area_de_produccion }}</ul>
-<ul>area desarrollo: {{ d.area_en_desarollo }}</ul>
-<ul>Rendimiento QQ: {{ d.rendimiento_promedio_en_qq }}</ul>
-<ul>Rendimiento oro: {{ d.rendimiento_promedio_en_oro }}</ul>
-<ul>manejo: {{ d.get_manejo_display() }}</ul>
-<ul>Variedad:
-{%for x in d.variedad.all%}
-     <li> {{ x.nombre }} </li>
-{%endfor%}
-</ul>
-<ul>Certificacion: {{ d.get_certificada_display() }}</ul>
+<div class="centrado">
+<table id="tabla_salida">
+<caption>Tabla Linea base por beneficiario</caption>
+<thead>
+         <tr>
+                 <th>Proyecto</th>
+                 <th>Beneficiario</th>
+                 <th>Tamaño Finca (Mz)</th>
+				 <th>Altura promedio (Mts)</th>
+				 <th>Area de producción (Mz)</th>
+				 <th>Area en desarrollo (Mz)</th>
+				 <th>Rendimiento (qq)</th>
+				 <th>Rendimiento (oro)</th>
+				 <th>Manejo</th>
+				 <th>Variedad</th>
+				 <th>Certificación</th>
+
+         </tr>
+   </thead>
+<tbody>
+	{% for d in results %}
+<tr>
+		<td>{{ d.proyecto }} </td>
+		<td>{{ d.persona }} </td>
+		<td>{{ d.tamano_de_finca }} </td>
+		<td>{{ d.altura_promedio }} </td>
+		<td>{{ d.area_de_produccion }}</td>
+		<td>{{ d.area_en_desarollo }}</td>
+		<td>{{ d.rendimiento_promedio_en_qq }}</td>
+		<td>{{ d.rendimiento_promedio_en_oro }}</td>
+		<td>{{ d.get_manejo_display }}</td>
+		<td>{%for x in d.variedad.all%}
+     *{{ x.nombre }}
+     {%endfor%}</td>
+<td>{{ d.get_certificada_display }}</td>
 {% endfor %}
-<hr><hr>
+</tbody>
+</table>
+</div>
 {% endblock %}

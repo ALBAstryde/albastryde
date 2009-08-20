@@ -3,7 +3,75 @@
 {% block headline %}Proyectos{% endblock %}
 
 {% block contents %}
-<h1> Información General del proyectos </h1>
+<style type="text/css">
+#titulo1 {
+	font-size:25px;
+	font-family: Arial;
+	color: #2474FF;
+}
+#titulo2 {
+	font-size:25px;
+	font-family: Arial;
+	color: black;
+}
+#tabla_salida {
+	width: 700px; 
+	border-collapse: collapse; 
+	margin-left: 30px;
+	font-size:12px;
+	font-family: Arial; 
+	}
+
+#tabla_salida table.accessHide { 
+	position: absolute; 
+	left: -999999px; 
+	}
+
+#tabla_salida td, th {
+	text-align: center; 
+	border: 1px solid #ddd;  
+	height: 1.5em; 
+	padding: 4px;
+	}
+#tabla_salida td.hover { 
+	color: orange; 
+	}
+#tabla_salida td.input { 
+	padding: 0; 
+	}
+
+#tabla_salida td input, td input:focus { 
+	border: 1px solid orange; 
+	outline: none; 
+	padding: 2px; 
+	margin: 1px; 
+	width: 20px; 
+	}
+#tabla_salida caption {
+	margin: 0 0 .5em; 
+	font-size: 1.3em;  
+	text-align: left;   
+	}
+div.centrado {
+	text-align: center;
+}
+div.centrado table {
+margin: 0 auto;
+text-align: left;
+}
+div.centrado #tabla_salida {
+margin: 0 auto;
+text-align: left;
+}
+body {
+	font-family: Arial;
+}
+</style>
+		<ul>
+			<a href="/proyectos/proyecto/">Busqueda Linea Base por Beneficiario</a> |
+			<a href="/proyectos/persona/">Busqueda por Persona</a>
+		</ul>
+<h1 id="titulo1"> Información General del proyectos </h1>
 <form action="." method="GET" > 
 
 {{ P|safe }}
@@ -11,17 +79,37 @@
 <input type="submit" value="Consultar" /> 
 </form>
 <hr>
+<div class="centrado">
+<table id="tabla_salida">
+<caption>Tabla Información General del proyecto</caption>
+<thead>
+         <tr>
+                 <th>Numeros de Beneficiarios</th>
+                 <th>Nombre del proyecto</th>
+				 <th>Departamento</th>
+				 <th>Fecha de Inicio</th>
+				 <th>Fecha de Finalización</th>
+				 <th>Producto</th>
+				 <th>Números de Mujeres</th>
+				 <th>Números de Hombres</th>
+
+         </tr>
+   </thead>
+<tbody>
 {% for a in j %}
-<ul>Municipio: {{ a.mun }}</ul>
-<ul># de beneficiarios: {{ contar }} </ul>
-<ul>Proyecto: {{ a.nombre }} </ul>
-<ul>Departamento: {{ a.departamento }}</ul>
-<ul>Fecha Inicio: {{ a.fecha_inicio }}</ul>
-<ul>Fecha Final: {{ a.fecha_final }}</ul>
-<ul>Producto: {{ a.producto }}
-<ul># de Mujeres: {{ mujer }}</ul>
-<ul># de hombres: {{ hombre }}</ul>
+<tr>
+		<td>{{ contar }} </td>
+		<td>{{ a.nombre }} </td>
+		<td>{{ a.departamento }}</td>
+		<td>{{ a.fecha_inicio }}</td>
+		<td>{{ a.fecha_final }}</td>
+		<td>{{ a.producto }}</td>
+		<td>{{ mujer }}</td>
+		<td>{{ hombre }}</td>
+</tr>
 {% endfor %}
-<hr></hr>
+</tbody>
+</table>
+</div>
 
 {% endblock %}
