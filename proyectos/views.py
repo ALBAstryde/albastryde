@@ -20,7 +20,7 @@ def ConsulForm(request):
 		return render_to_html(request,"resultado.html", {'results': results})
 	else:
 		bene= Persona.objects.all()
-		return render_to_html(request,"resultado.html", locals())
+		return render_to_html(request,"/proyectos/resultado.html", locals())
 
 # Consulta para saber los detalles de las personas con sus detalles y proyectos a los que pertenece
 def Beneficiario(request):
@@ -29,10 +29,10 @@ def Beneficiario(request):
 	if query:
 		b = Persona.objects.filter(id=query)
 		c = Beneficiario.objects.filter(persona__id=query)
-		return render_to_html(request,"persona.html", {'b': b, 'c': c})
+		return render_to_html(request,"/proyectos/persona.html", {'b': b, 'c': c})
 	else:
 		i = Persona.objects.all()
-		return render_to_html(request,"persona.html", locals())
+		return render_to_html(request,"/proyectos/persona.html", locals())
 
 # Consulta sobre los datos de los proyectos
 def ConsulProyecto(request):
@@ -46,10 +46,10 @@ def ConsulProyecto(request):
 		mujer = contmujer.count()
 		conthombre = Beneficiario.objects.filter(proyecto__id=query).filter(persona__sexo=1)
 		hombre = conthombre.count()
-		return render_to_html(request,"proyecto.html", {'j': j, 'contar': contar, 'mujer': mujer, 'hombre': hombre, 'ma': ma})
+		return render_to_html(request,"/proyectos/proyecto.html", {'j': j, 'contar': contar, 'mujer': mujer, 'hombre': hombre, 'ma': ma})
 	else:
 		k = Proyecto.objects.all()
-		return render_to_html(request,"proyecto.html", locals())
+		return render_to_html(request,"/proyectos/proyecto.html", locals())
 
 #Esto es solo prueba para saber si estaban bien los datos, todos los datos los tenemos en formato CSV 
 
