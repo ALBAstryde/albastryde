@@ -2,41 +2,107 @@
  {% block title %}Inicio mapas{% endblock %}
  {% block headline %}Inicio mapas{% endblock %}
  {% block contents %}
-<h1>prueba</h1> 
-<table border="1" cellpadding="2" cellspacing="2"
- width="100%">
-  <tbody>
-    <tr>
-      <td width="270px"><b>Mapas por Region</b></br>
-<ul><small>
-<li><a href="/mapas/lista/region/1">Region Pacifico Norte</a></li>
-<li><a href="/mapas/lista/region/2">Region Pacifico Central</a></li>
-<li><a href="/mapas/lista/region/3">Region Pacifico Sur</a></li>
-<li><a href="/mapas/lista/region/4">Region Las Segovias</a></li>
-<li><a href="/mapas/lista/region/5">Region Central Norte</a></li>
-<li><a href="/mapas/lista/region/6">Region Central Este</a></li>
-<li><a href="/mapas/lista/region/7">Region Caribe Norte(RAAN)</a></li>
-<li><a href="/mapas/lista/region/8">Region Caribe Sur(RAAS)</a></li>
-<li><a href="/mapas/lista/region/9">Region del Rio San Juan</a></li></small>
-</ul>
+<style type=text/css>
+.izq{
+  float:left;
+}
+.der{
+  float:right;
+}
+#contenido{
+  font-family:Arial;
+  width:912px;
+  !width:916px;
+  background:#ffffff;
+  color:#5d5d5d;
+ }
 
-	</td>
-      <td> 
-      {% block detalle %}Este es una seccion de mapas de Nicaragua{% endblock %}
-      </td>
-      <td width="270px"> <b>Mapas por tipo</b> </br>
+#colum_izq{
+  width:190px;
+
+  padding-left:10px;
+  padding-top:5px;
+  border-top-style:solid;
+  border-top-width:2px;
+  border-top-color:#a2d961;
+  border-bottom-style:solid;
+  border-bottom-width:2px;
+  border-bottom-color:#a2d961;
+  background-color:#ddfbac; 
+
+}
+#colum_izq ul{
+	list-style-type: square;
+	!list-style-type: none;
+	list-style-position: outside;
+	padding-left:20px;
+	!padding-left:0px;
+
+}
+
+#colum_izq li{
+	font-size:14px;
+	color:#5c5c5c;
+	font-weight: none;
+	width:170px;
+	!width:160px;
+	margin-top:10px;
+}
+
+#colum_izq li a{
+
+	font-style:underline;
+	color:#5c5c5c
+}
+
+
+#colum_der{
+  width:680px;
+  margin-left:0px;
+}
+#colum_der a {
+	font-style:underline;
+	color:#3698B9
+}
+
+#separador{
+  clear:both;
+}
+#titulo_mapa{
+font-family:Arial;
+color:#3698B9;
+font-size:22px;
+}
+</style>
+<div id="titulo_mapa"><b>Mapas Tematicos MAGFOR</b> </div></br>
+<div id="contenido">
+<div id="colum_izq" class="izq">
+<b>Mapas por Region</b></br>
+<ul><small>
+<li><a href="/mapa/lista/region/1">Region Pacifico Norte</a></li>
+<li><a href="/mapa/lista/region/2">Region Pacifico Central</a></li>
+<li><a href="/mapa/lista/region/3">Region Pacifico Sur</a></li>
+<li><a href="/mapa/lista/region/4">Region Las Segovias</a></li>
+<li><a href="/mapa/lista/region/5">Region Central Norte</a></li>
+<li><a href="/mapa/lista/region/6">Region Central Este</a></li>
+<li><a href="/mapa/lista/region/7">Region Caribe Norte(RAAN)</a></li>
+<li><a href="/mapa/lista/region/8">Region Caribe Sur(RAAS)</a></li>
+<li><a href="/mapa/lista/region/9">Region del Rio San Juan</a></li></small>
+</ul>
+<hr>
+<b>Mapas por tipo</b> </br>
 <ul><small>
  {% for t in tipo %}
-<li><a href="/mapas/lista/tipo/{{t.id}}">{{ t.nombre}}</a></li>
+<li><a href="/mapa/lista/tipo/{{t.id}}">{{ t.nombre}}</a></li>
 {%endfor%}
 </small>
 </ul>
-</td>
-    </tr>
-  </tbody>
-</table>
-
-
+</div>
+<div id="colum_der" class="der">
+      {% block detalle %}Este es una seccion de mapas de Nicaragua{% endblock %}
+</div>
+<div id="separador" ></div>
+</div>
 </body>
 </html>
  {% endblock %}
