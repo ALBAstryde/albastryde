@@ -1,0 +1,29 @@
+{% extends "/base_three_column.html" %}
+ {% block title %}Mapas{% endblock %}
+ {% block headline %}Mapas tematicos{% endblock %}
+ {% block center_content %} 
+Este es una seccion de mapas de Nicaragua
+{% endblock %}
+
+ {% block left_content %} 
+<h2>Mapas por Region</h2>
+<ul><small>
+<li><a href="/mapas/lista/region/1">Region Pacifico Norte</a></li>
+<li><a href="/mapas/lista/region/2">Region Pacifico Central</a></li>
+<li><a href="/mapas/lista/region/3">Region Pacifico Sur</a></li>
+<li><a href="/mapas/lista/region/4">Region Las Segovias</a></li>
+<li><a href="/mapas/lista/region/5">Region Central Norte</a></li>
+<li><a href="/mapas/lista/region/6">Region Central Este</a></li>
+<li><a href="/mapas/lista/region/7">Region Caribe Norte(RAAN)</a></li>
+<li><a href="/mapas/lista/region/8">Region Caribe Sur(RAAS)</a></li>
+<li><a href="/mapas/lista/region/9">Region del Rio San Juan</a></li></small>
+</ul>
+<hr>
+<h2>Mapas por tipo</h2>
+<ul><small>
+ {% for t in tipo %}
+<li><a href="/mapa/lista/tipo/{{t.id}}">{{ t.nombre}}</a></li>
+{%endfor%}
+</small>
+</ul>
+ {% endblock %}

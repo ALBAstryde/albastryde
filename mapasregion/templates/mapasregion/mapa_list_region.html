@@ -1,6 +1,6 @@
-{% extends 'index_mapa.html' %}
+{% extends '/mapasregion/index_mapa.html' %}
  {% block title %}Detalle de mapas por Region {% endblock %}
- {% block detalle %}
+ {% block center_content %}
 <p>Lista de mapas para la <em>{{ reg }}</em></p>
 <table width="665px">
          {% for m in mapa %}

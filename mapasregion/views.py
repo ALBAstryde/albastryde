@@ -11,13 +11,13 @@ def render_to_html(request,template,variables):
 
 def index_mapa(request):
     tipo = Tipo.objects.all()
-    return render_to_html(request,'index_mapa.html',{'tipo': tipo})
+    return render_to_html(request,'/mapasregion/index_mapa.html',{'tipo': tipo})
 
 def lista_mapa(request, t):
     tipo = Tipo.objects.all()
     query= Mapa.objects.filter(tipo=t)
     t = Tipo.objects.get(pk=t)
-    return render_to_html(request,'mapa_list.html', {'mapa': query, 'tipo': tipo, 't':t})
+    return render_to_html(request,'/mapasregion/mapa_list.html', {'mapa': query, 'tipo': tipo, 't':t})
 
 def lista_mapa_region(request, r):
     tipo = Tipo.objects.all()
@@ -41,4 +41,4 @@ def lista_mapa_region(request, r):
         reg="Region Caribe Sur(RAAS)"
     if r == "9":
         reg="Region del Rio San Juan"
-    return render_to_html(request,'mapa_list_region.html', {'mapa': query, 'tipo': tipo,'reg':reg})
+    return render_to_html(request,'/mapasregion/mapa_list_region.html', {'mapa': query, 'tipo': tipo,'reg':reg})
