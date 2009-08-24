@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 
-#from albastryde.nicalocals import NICedulaNumberField
+from albastryde.nicalocals import NICedulaNumberField
 from albastryde.nicalocals import NIPhoneNumberField
 from django.db.models.fields import Field
 from lugar.models import Departamento
@@ -21,7 +21,17 @@ class PhoneNumberField(Field):
 		defaults.update(kwargs)
 		return super(PhoneNumberField, self).formfield(**defaults)
 
+class CedulaNumberField(Field):
+	def get_internal_type(self):
+		return "CedulaNumberField"
 
+	def db_type(self):
+		return 'varchar(16)'
+
+	def formfield(self, **kwargs):
+		defaults = {'form_class': NICedulaNumberField}
+		defaults.update(kwargs)
+		return super(CedulaNumberField, self).formfield(**defaults)
 
 SEXO_CHOICE=((0, 'Femenino'),(1,'Masculino'))
 
@@ -39,7 +49,7 @@ class Cooperativa(models.Model):
 
 class Persona(models.Model):
 	nombre = models.CharField(max_length=200, verbose_name="Nombre y apellido", help_text="Introduzca por favor el nombre")
-#	numero_cedula = NICedulaNumberField(verbose_name="No. de Cedula", help_text="Introduzca por favor el número de cedula", blank=True, null=True)
+	numero_cedula = CedulaNumberField(verbose_name="No. de Cedula", help_text="Introduzca por favor el número de cedula", blank=True, null=True)
 	sexo = models.IntegerField(max_length=1, choices=SEXO_CHOICE, verbose_name="Sexo", help_text="Introduzca el sexo del beneficiario")
 	direccion = models.CharField(max_length=250,blank=True,default=None)
 	correo_electronico = models.EmailField(max_length=80,default=None,blank=True)
