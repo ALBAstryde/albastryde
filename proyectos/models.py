@@ -82,9 +82,9 @@ class Beneficiario(models.Model):
 	area_en_desarollo = models.DecimalField(max_digits=6,decimal_places=2, verbose_name="Area en desarrollo")
 	rendimiento_promedio_en_qq = models.DecimalField(max_digits=6,decimal_places=2, verbose_name="Rendimiento promedio en QQ")
 	rendimiento_promedio_en_oro = models.DecimalField(max_digits=6,decimal_places=2, verbose_name="Rendimiento promedio en ORO")
-	manejo = models.IntegerField(choices=MANEJO_CHOICES, verbose_name="Manejo", blank=True)
+	manejo = models.IntegerField(choices=MANEJO_CHOICES, verbose_name="Manejo", blank=True, null=True)
 	variedad = models.ManyToManyField(Variedad)
-	certificada = models.IntegerField(choices=CERTIFICADA_CHOICES, verbose_name="Certificación", blank=True)
+	certificada = models.IntegerField(choices=CERTIFICADA_CHOICES, verbose_name="Certificación", blank=True, null=True)
 	
 	class Meta:
 		unique_together = ['proyecto', 'persona']
