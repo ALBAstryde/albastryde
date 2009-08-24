@@ -1,12 +1,25 @@
 # -*- encoding: utf-8 -*-
 
 
-from nicalocals import NICedulaNumberField
+from albastryde.nicalocals import NICedulaNumberField
+from albastryde.nicalocals import NIPhoneNumberField
 from lugar.models import Departamento
 from precios.models import Producto
-from profiles.models import PhoneNumberField
 from django.db import models
 import datetime
+
+class PhoneNumberField(Field):
+	def get_internal_type(self):
+		return "PhoneNumberField"
+
+	def db_type(self):
+		return 'varchar(20)'
+
+	def formfield(self, **kwargs):
+		defaults = {'form_class': NIPhoneNumberField}
+		defaults.update(kwargs)
+		return super(PhoneNumberField, self).formfield(**defaults)
+
 
 
 SEXO_CHOICE=((0, 'Femenino'),(1,'Masculino'))
