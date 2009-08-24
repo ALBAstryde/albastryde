@@ -45,10 +45,11 @@ class Detallecoop(models.Model):
 	class Meta:
 		verbose_name_plural = "Detalle de cooperativa"
 
-	def save(self, force_insert=False, force_update=False):
-		self.mem_total = self.mem_hombre + self.mem_mujer
-		self.ben_total = self.ben_hombre + self.ben_mujer
-		super(Detallecoop,self).save(force_insert, force_update)
+	def mem_total(self):
+		return self.mem_hombre + self.mem_mujer
+	
+	def ben_total(self):
+		return self.ben_hombre + self.ben_mujer
 
 #comienzan modelos de comercializacion 
 
@@ -86,6 +87,8 @@ class Comercializacion(models.Model):
 	certificacion = models.IntegerField("Tipo de certificacion",choices=CERTIFICACION_CHOICES, blank=True)
 	variedad = models.IntegerField("Variedad",choices=VARIEDAD_CHOICES, blank=True)
 
-	def save(self, force_insert=False, force_update=False):
-		self.rendimiento = self.produccion / self.area
-		super(Comercializacion,self).save(force_insert, force_update)
+	def rendimiento(self):
+		if self.produccion != None and self.produccion != 0 and self.area != None and self.area != 0:
+			return self.produccion / self.area
+		else:
+			return 0
