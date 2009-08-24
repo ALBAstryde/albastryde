@@ -1,12 +1,4 @@
-{% extends "/base_graph.html" %}
-{% block extrastatisticsheader %}
-<script language="javascript" type="text/javascript">
-$(document).ready(function() {
-var content_height=$("div.colmask").height(); 
-$("div#contents").height(content_height);
-});
-</script>
-{% endblock %}
+{% extends "/base_three_column.html" %}
 
 {% block title %}
 Biblioteca
@@ -16,11 +8,6 @@ Biblioteca
 {% endblock %}
 
 
-{% block contents %} 
-<div class="colmask threecol">
-	<div class="colmid">
-		<div class="colleft">
-<div class="col1">
 {% block center_content %}
 	<h2>Busqueda</h2>
 	<div id="buscador">
@@ -29,8 +16,6 @@ Biblioteca
 <input type="text" name="q"><input type="submit" value="buscar"></form>
 	</div>
 {% endblock %}
-	</div>
-	<div class="col2">
 {% block left_content %} 
 		<h2 >
 			Ultimos Añadidos
@@ -45,16 +30,10 @@ Biblioteca
 		 {% endblock %}
 		</div>
 {% endblock %} 
-	</div>
-	<div class="col3">
 {% block right_content %}
 	<h2>Palabras claves</h2>
 	{% for palabra_clave in all_palabras_claves %}
 		<a href="/biblioteca/palabra_clave/{{palabra_clave.pk}}/">
 		{{ palabra_clave }}</a><br />
 	{% endfor %}
-{% endblock %}
-	</div>
-
-</div></div></div>
 {% endblock %}
