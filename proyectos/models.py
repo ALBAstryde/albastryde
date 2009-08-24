@@ -17,7 +17,7 @@ class Cooperativa(models.Model):
 	#jefe = models.ForeignKey(Persona,blank=True,default=None)
 	direccion = models.CharField(max_length=250,blank=True,default=None)
 	correo_electronico = models.EmailField(max_length=80,default=None,blank=True)
-	telefono = PhoneNumberField(max_length=200,default=None,blank=True)
+	telefono = PhoneNumberField(default=None,blank=True)
 
 	def __unicode__(self):
 		return self.nombre
@@ -25,11 +25,11 @@ class Cooperativa(models.Model):
 
 class Persona(models.Model):
 	nombre = models.CharField(max_length=200, verbose_name="Nombre y apellido", help_text="Introduzca por favor el nombre")
-	numero_cedula = NICedulaNumberField(max_length=200,verbose_name="No. de Cedula", help_text="Introduzca por favor el número de cedula", blank=True, null=True)
+	numero_cedula = NICedulaNumberField(verbose_name="No. de Cedula", help_text="Introduzca por favor el número de cedula", blank=True, null=True)
 	sexo = models.IntegerField(max_length=1, choices=SEXO_CHOICE, verbose_name="Sexo", help_text="Introduzca el sexo del beneficiario")
 	direccion = models.CharField(max_length=250,blank=True,default=None)
 	correo_electronico = models.EmailField(max_length=80,default=None,blank=True)
-	telefono = PhoneNumberField(max_length=200,default=None,blank=True)
+	telefono = PhoneNumberField(default=None,blank=True)
 	cooperativa = models.ManyToManyField(Cooperativa)
 	
 	def __unicode__(self):
