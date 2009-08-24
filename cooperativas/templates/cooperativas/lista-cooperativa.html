@@ -1,0 +1,27 @@
+{% extends "/base.html" %}
+
+{% block title %}Proyectos{% endblock %}
+{% block headline %}Proyectos{% endblock %}
+
+{% block contents %}
+		<ul>
+			<li><a href="/index/">Listas de cooperativas</a></li>
+		</ul>
+<h1 id="titulo1"> Busquedas por ubicacion </h1>
+<form action="." method="GET" > 
+
+{{ F|safe }}
+
+<input type="submit" value="Consultar" /> 
+</form>
+<hr>
+<caption>Municipios</caption>
+{% for a in j %}
+<table id="tabla_salida">
+<tr>
+	<td><a href="/cooperativa/{{ a.numero }}">{{ a.nombre }}</a></td>
+</tr>
+</table>
+{% endfor %}
+
+{% endblock %}

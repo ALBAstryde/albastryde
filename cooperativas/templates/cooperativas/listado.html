@@ -1,0 +1,30 @@
+{% extends "/base.html" %}
+
+{% block title %}Cooperativa{% endblock %}
+{% block headline %}Cooperativa{% endblock %}
+
+{% block contents %}
+		<ul>
+			<li><a href="/departamento/">Busqueda por ubicacion</a></li>
+		</ul>
+<h2 id="titulo1">Lista de cooperativas.</h2>
+<hr>
+<table id="tabla_salida">
+<caption>Listado de todas las cooperativas</caption>
+<thead>
+		<tr>
+			<th>Cooperativa </th>
+			<th>Nombre Resumido </th>
+		</tr>
+</thead>
+<tbody>
+		{% for k in s %}
+	<tr>
+			<td><a href="/listar/{{ k.id }}">{{k.id}}</a></td>
+			<td><a href="/listar/{{ k.id }}">{{k.nombre_resumido}}</a></td>
+	</tr>
+	{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}                                               

@@ -1,15 +1,14 @@
 # -*- encoding: utf-8 -*-
 
 
-#from nicalocals import NICedulaNumberField
-#from lugar.models import Departamento
-#from precios.models import Producto
-#from profiles.models import PhoneNumberField
+from nicalocals import NICedulaNumberField
+from lugar.models import Departamento
+from precios.models import Producto
+from profiles.models import PhoneNumberField
 from django.db import models
 import datetime
 
 
-# lo de arriba lo comente para que me funcionara las pruebas que estaba haciendo pero podes volverlo a activar
 SEXO_CHOICE=((0, 'Femenino'),(1,'Masculino'))
 
 class Cooperativa(models.Model):
@@ -18,7 +17,7 @@ class Cooperativa(models.Model):
 	#jefe = models.ForeignKey(Persona,blank=True,default=None)
 	direccion = models.CharField(max_length=250,blank=True,default=None)
 	correo_electronico = models.EmailField(max_length=80,default=None,blank=True)
-	telefono = models.CharField(max_length=200,default=None,blank=True) # a los telefonos le quite el PhoneNumberField solo para prueba si claro se lo podes volver a poner
+	telefono = PhoneNumberField(max_length=200,default=None,blank=True)
 
 	def __unicode__(self):
 		return self.nombre
@@ -26,11 +25,11 @@ class Cooperativa(models.Model):
 
 class Persona(models.Model):
 	nombre = models.CharField(max_length=200, verbose_name="Nombre y apellido", help_text="Introduzca por favor el nombre")
-	numero_cedula = models.CharField(max_length=200,verbose_name="No. de Cedula", help_text="Introduzca por favor el número de cedula")
+	numero_cedula = NICedulaNumberField(max_length=200,verbose_name="No. de Cedula", help_text="Introduzca por favor el número de cedula", blank=True, null=True)
 	sexo = models.IntegerField(max_length=1, choices=SEXO_CHOICE, verbose_name="Sexo", help_text="Introduzca el sexo del beneficiario")
 	direccion = models.CharField(max_length=250,blank=True,default=None)
 	correo_electronico = models.EmailField(max_length=80,default=None,blank=True)
-	telefono = models.CharField(max_length=200,default=None,blank=True)
+	telefono = PhoneNumberField(max_length=200,default=None,blank=True)
 	cooperativa = models.ManyToManyField(Cooperativa)
 	
 	def __unicode__(self):
@@ -43,7 +42,7 @@ class Persona(models.Model):
 	
 class Producto(models.Model): # aqui usar los productos ya existente del albastryde
 	nombre = models.CharField(max_length=200, verbose_name="Nombre del Producto", help_text="Introduzca por favor el nombre del producto")
-#	
+
 	def __unicode__(self):
 		return self.nombre
 

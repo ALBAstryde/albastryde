@@ -22,7 +22,7 @@ div#header-bar {
         position:relative;
 	height:80px;
 }
-
+/* CSS se usa en proyecto, cooperativa y comercializacion */
 #titulo1 {
 	font-size:25px;
 	font-family: Arial;
@@ -84,12 +84,87 @@ div.centrado #tabla_salida {
 	margin: 0 auto;
 	text-align: left;
 }
-
+/* FIN de CSS cooperativa, comercializacion, proyectos */
 a img { border:0px;}
 
 body {
 	font:12px Verdana, Arial, Helvetica, sans-serif;
 }
+
+/*CSS usado en mapas por region*/
+.izq{
+  float:left;
+}
+.der{
+  float:right;
+}
+#contenido{
+  font-family:Arial;
+  width:912px;
+  !width:916px;
+  background:#ffffff;
+ }
+
+#colum_izq{
+  width:190px;
+
+  padding-left:10px;
+  padding-top:5px;
+  border-top-style:solid;
+  border-top-width:2px;
+  border-top-color:#a2d961;
+  border-bottom-style:solid;
+  border-bottom-width:2px;
+  border-bottom-color:#a2d961;
+  background-color:#ddfbac; 
+
+}
+#colum_izq ul{
+	list-style-type: square;
+	!list-style-type: none;
+	list-style-position: outside;
+	padding-left:20px;
+	!padding-left:0px;
+
+}
+
+#colum_izq li{
+	font-size:14px;
+	color:#5c5c5c;
+	font-weight: none;
+	width:170px;
+	!width:160px;
+	margin-top:10px;
+}
+
+#colum_izq li a{
+
+	font-style:underline;
+	color:#5c5c5c
+}
+
+
+#colum_der{
+  width:680px;
+  margin-left:0px;
+}
+#colum_der a {
+	font-style:underline;
+	color:#3698B9
+}
+
+#separador{
+  clear:both;
+}
+#titulo_mapa{
+font-family:Arial;
+color:#3698B9;
+font-size:22px;
+}
+
+
+/*Fin del css de mapas region*/
+
 .ui-dialog .ui-dialog-titlebar-one { position: absolute; right: 0.3em; top: 50%; width: 19px; margin: -10px 0 0 0; padding: 1px; height: 18px; }
 .ui-dialog .ui-dialog-titlebar-one span { display: block; margin: 1px; }
 .ui-dialog .ui-dialog-titlebar-one:hover, .ui-dialog .ui-dialog-titlebar-one:focus { padding: 0; }
