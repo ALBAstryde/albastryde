@@ -1,16 +1,40 @@
 {% extends "/base.html" %}
-{% block title %}Ejemplo salida cooperativa{% endblock %}
-{% block headline %}Ejemplo salida cooperativa{% endblock %}
+
+{% block title %}Cooperativa{% endblock %}
+{% block headline %}Cooperativa{% endblock %}
+
 {% block contents %}
-	<h2>Datos de Cooperativas</h2>
-{% for p in c %}
-		<p >Nombre completo de cooperativa :{{ p.nombre_completo }}</p>
-		<p >Nombre resumido de cooperativa :{{ p.nombre_resumido }}</p>
-		<p >Metro sobre el nivel del mar :{{ p.msnm }}</p>
-		<p >Fecha de constitucion :{{ p.fecha_constitucion }}</p>
-		<p >Representante legal :{{ p.representante_legal }}</p>
-		<p >Tecnico a cargo :{{ p.tecnico }}</p>
-<li><a href="/detallec/{{ p.id }}">Ver Detalle de Cooperativas</a></li>
-<hr>
+	<h2 id="titulo1">Datos de Cooperativas</h2>
+<div class="centrado">
+<table id="tabla_salida">
+<caption>Tabla Datos generales de la cooperativa</caption>
+<thead>
+         <tr>
+                 <th>Nombre completo Cooperativas</th>
+                 <th>Nombre resumido de Cooperativa</th>
+                 <th>Metro sobre el nivel del mar</th>
+				 <th>Fecha de constitución</th>
+				 <th>Representante legal</th>
+				 <th>Tecnico a cargo</th>
+         </tr>
+   </thead>
+<tbody>
+		{% for p in c %}
+	<tr>
+		<td>{{ p.nombre_completo }}</td>
+		<td>{{ p.nombre_resumido }}</td>
+		<td>{{ p.msnm }}</td>
+		<td>{{ p.fecha_constitucion }}</td>
+		<td>{{ p.representante_legal }}</td>
+		<td>{{ p.tecnico }}</td>
+	</tr>
+
 {% endfor %}
+</tbody>
+</table>
+</div>
+{% for p in c %}
+<li><a href="/detallec/{{ p.id }}">Ver Detalle de Cooperativas</a></li>
+{% endfor %}
+
 {% endblock %}

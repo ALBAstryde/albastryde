@@ -1,20 +1,46 @@
 {% extends "/base.html" %}
-{% block title %}Ejemplo salida cooperativa{% endblock %}
-{% block headline %}Ejemplo salida cooperativa{% endblock %}
-	
+
+{% block title %}Cooperativa{% endblock %}
+{% block headline %}Cooperativa{% endblock %}
+
 {% block contents %}
-	<h2>Informacion Detallada de la cooperativa</h2>
-{% for p in b %}
-	<div class="date">
-		<p class="cr">Nombre completo de cooperativa :{{ p.cooperativa.nombre_completo }}</p>
-		<p class="up">Año inscrito :{{ p.ano }}</p>
-		<p class="up">Miembros hombre :{{ p.mem_hombre }}</p>
-		<p class="up">Miembros mujeres :{{ p.mem_mujer }}</p>
-		<p class="up">Miembros totales :{{ p.mem_total }}</p>
-		<p class="up">Beneficiarios hombres :{{ p.ben_hombre }}</p>
-		<p class="up">Beneficiarios mujeres :{{ p.ben_mujer }}</p>
-		<p class="up">Beneficiarios totales :{{ p.ben_total }}</p>
-		<p class="up">Mujeres a cargo :{{ p.mujer_cargo }}</p>
+		<ul>
+			<li><a href="/departamento/">Busqueda por ubicación</a></li>
+		</ul>
+<h2 id="titulo1">Informacion Detallada de la cooperativa</h2>
 <hr>
+<div class="centrado">
+<table id="tabla_salida">
+<caption>Tabla detalle de cooperativa</caption>
+<thead>
+         <tr>
+                 <th>Nombre completo Cooperativa</th>
+                 <th>Año de inscrito</th>
+                 <th>Miembros Hombres</th>
+				 <th>Miembros Mujeres</th>
+				 <th>Miembros totales</th>
+				 <th>Beneficiarios Hombres</th>
+				 <th>Beneficiarios Mujeres</th>
+				 <th>Beneficiarios Totales</th>
+				 <th>Mujeres a Cargo</th>
+         </tr>
+   </thead>
+<tbody>
+{% for p in b %}
+	<tr>
+		<td>{{ p.cooperativa.nombre_completo }}</td>
+		<td>{{ p.ano }}</td>
+		<td>{{ p.mem_hombre }}</td>
+		<td>{{ p.mem_mujer }}</td>
+		<td>{{ p.mem_total }}</td>
+		<td>{{ p.ben_hombre }}</td>
+		<td>{{ p.ben_mujer }}</td>
+		<td>{{ p.ben_total }}</td>
+		<td>{{ p.mujer_cargo }}</td>
+	</tr>
 {% endfor %}
+</tbody>
+</table>
+</div>
+
 {% endblock %}
