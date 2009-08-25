@@ -21,3 +21,7 @@ class FormBruto(forms.Form):
 	#departamentos = forms.ModelChoiceField(queryset=Departamento.objects.all(), required=False)
 	municipios = forms.ModelChoiceField(queryset=Municipio.objects.all(), required=False)
 	ciclos = forms.ChoiceField(choices=CICLO_CHOICES, required=False)
+	
+# forms.py proviene de lugar.models
+class FormLugar(forms.Form):
+	departamentos = forms.ModelChoiceField(queryset=Departamento.objects.all(), required=False)
