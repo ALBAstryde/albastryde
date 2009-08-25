@@ -32,10 +32,10 @@ def comercio(request):
 	query_c = request.GET.get('productos', '')
 	if query_a and query_b and query_c:
 		k = Comercializacion.objects.filter(cooperativa=query_a).filter(ciclo=query_b).filter(producto=query_c)
-		return render_to_response("/cooperativas/comercio.html", {'A':A, 'k':k})
+		return render_to_html(request,"/cooperativas/comercio.html", {'A':A, 'k':k})
 	else:
 		l = Comercializacion.objects.all()
-		return render_to_response("/cooperativas/comercio.html", locals())
+		return render_to_html(request,"/cooperativas/comercio.html", locals())
 	
 def comerciobruto(request):
 	T = FormBruto(request.GET)
@@ -44,10 +44,10 @@ def comerciobruto(request):
 	query_g = request.GET.get('ciclos','')
 	if query_d and query_f and query_g:
 		h = Comercializacion.objects.filter(producto=query_d).filter(cooperativa__municipio=query_f).filter(ciclo=query_g)
-		return render_to_response("/cooperativas/comercio-bruto.html", {'T':T, 'h':h})
+		return render_to_html(request,"/cooperativas/comercio-bruto.html", {'T':T, 'h':h})
 	else:
 		i = Comercializacion.objects.all()
-		return render_to_response("/cooperativas/comercio-bruto.html", locals())
+		return render_to_html(request,"/cooperativas/comercio-bruto.html", locals())
 	
 # vistas de cooperativas vienen desde lugar
 def comeindex(request):
@@ -55,19 +55,19 @@ def comeindex(request):
 	query = request.GET.get('departamentos', '')
 	if query:
 		j = Municipio.objects.filter(departamento=query)
-		return render_to_response("/cooperativas/lista-cooperativa.html", {'j':j})
+		return render_to_html(request,"/cooperativas/lista-cooperativa.html", {'j':j})
 	else:
 		k = Departamento.objects.all()
-		return render_to_response("/cooperativas/lista-cooperativa.html", locals())
+		return render_to_html(request,"/cooperativas/lista-cooperativa.html", locals())
 	
 def coopmun(request, mun_id):
 	a = Cooperativa.objects.filter(municipio__numero=mun_id)
-	return render_to_response("/cooperativas/municipio.html", {'a': a})
+	return render_to_html(request,"/cooperativas/municipio.html", {'a': a})
 
 def verdetalle(request, deta_id):
 	c = Cooperativa.objects.filter(id=deta_id)
-	return render_to_response("/cooperativas/detalle.html", {'c':c})
+	return render_to_html(request,"/cooperativas/detalle.html", {'c':c})
 
 def detacompleto(request, p_id):
 	b = Detallecoop.objects.filter(cooperativa=p_id)
-	return render_to_response("/cooperativas/completo.html", {'b':b})
+	return render_to_html(request,"/cooperativas/completo.html", {'b':b})

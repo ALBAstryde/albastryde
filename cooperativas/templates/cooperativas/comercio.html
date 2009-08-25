@@ -17,17 +17,17 @@
     <tr>
 		<td>{{ A.cooperativas.errors }}
     <label for="id_cooperativas">Cooperativas:</label></td>
-		<td>{{ A.cooperativas }}</td>
+		<td>{{ A.cooperativas|safe }}</td>
 	</tr>
     <tr>
         <td>{{ A.anos.errors }}
     <label for="id_anos">Años:</label></td>
-        <td>{{ A.anos }}</td>
+        <td>{{ A.ans }}</td>
     </tr>
     <tr>
         <td>{{ A.productos.errors }}
     <label for="id_productos">Productos:</label></td>
-        <td>{{ A.productos }}</td>
+        <td>{{ A.productos|safe }}</td>
 	</tr>
 </table>
 <input type="submit" value="Consultar" /> 
