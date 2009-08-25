@@ -36,10 +36,8 @@ class Detallecoop(models.Model):
 	ano = models.PositiveIntegerField(choices=ANOS_CHOICES, verbose_name="Año")
 	mem_hombre = models.IntegerField("Membrecias Hombre",max_length=10, blank=True,null=True)
 	mem_mujer = models.IntegerField("Membrecias Mujer",max_length=10, blank=True,null=True)
-	mem_total = models.IntegerField("Membrecia Total",max_length=10, editable=False, blank=True,null=True) # este campo es calculado
 	ben_hombre = models.IntegerField("Beneficiarios Hombre",max_length=10, blank=True,null=True)
 	ben_mujer = models.IntegerField("Beneficiarios Mujer",max_length=10, blank=True,null=True)
-	ben_total = models.IntegerField("Beneficiario Total",max_length=10, editable=False, blank=True,null=True) # este campo es calculado
 	mujer_cargo = models.IntegerField("Mujeres en cargo de direccion",max_length=10, blank=True,null=True)
 	
 	class Meta:
@@ -80,7 +78,6 @@ class Comercializacion(models.Model):
 	productor = models.IntegerField("Numero de Productores",max_length=10, blank=True)
 	area = models.DecimalField("Area",max_digits=10,decimal_places=2, blank=True, help_text="Manzanas (mz)")
 	produccion = models.DecimalField("Produccion",max_digits=10,decimal_places=2, blank=True, help_text="Quintales (qq)")
-	rendimiento = models.DecimalField("Rendimiento",editable=False,max_digits=10,decimal_places=2, blank=True, help_text="Quintasles(qq) / Manzanas (mz)") # este campo es calculado
 	exportacion = models.DecimalField("Exportacion",max_digits=10,decimal_places=2, blank=True, help_text="Quintales (qq)")
 	precio_expt = models.DecimalField("Precio de venta exportacion",max_digits=10,decimal_places=2, blank=True,help_text="Dolares ($)")
 	precio_merc_local = models.DecimalField("Precio de venta mercado local",max_digits=10,decimal_places=2, blank=True,help_text="Dolares ($)")
