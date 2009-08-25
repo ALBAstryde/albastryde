@@ -86,6 +86,6 @@ class Comercializacion(models.Model):
 
 	def rendimiento(self):
 		if self.produccion != None and self.produccion != 0 and self.area != None and self.area != 0:
-			return self.produccion / self.area
+			return "%.2f" % (self.produccion / self.area)
 		else:
 			return 0
