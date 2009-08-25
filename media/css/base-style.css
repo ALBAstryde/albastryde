@@ -25,12 +25,10 @@ div#header-bar {
 /* CSS se usa en proyecto, cooperativa y comercializacion */
 #titulo1 {
 	font-size:25px;
-	font-family: Arial;
-	color: #2474FF;
+	color: black;
 }
 #titulo2 {
 	font-size:25px;
-	font-family: Arial;
 	color: black;
 }
 #tabla_salida {
@@ -38,7 +36,6 @@ div#header-bar {
 	border-collapse: collapse; 
 	margin-left: 30px;
 	font-size:12px;
-	font-family: Arial; 
 	}
 
 #tabla_salida table.accessHide { 

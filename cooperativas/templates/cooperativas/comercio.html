@@ -7,12 +7,9 @@
 		<ul>
 			<li><a href="/comercia/">Busqueda por Rubro</a></li>
 		</ul>
-<div class="centrado">
 <h1 id="titulo1"> Busquedas por Cooperativa </h1>
-</div>
 <fieldset><legend>CONSULTAR</legend>
 <form action="." method="GET" > 
-<div class="centrado">
 <table>
     <tr>
 		<td>{{ A.cooperativas.errors }}
@@ -31,11 +28,9 @@
 	</tr>
 </table>
 <input type="submit" value="Consultar" /> 
-</div>
 </form>
 </fieldset>
 <hr>
-<div class="centrado">
 <table id="tabla_salida">
 <caption>Tabla Cooperativas</caption>
 <thead>
@@ -65,5 +60,4 @@
 {% endfor %}
 </tbody>
 </table>
-</div>
 {% endblock %}
