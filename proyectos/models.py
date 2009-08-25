@@ -64,21 +64,15 @@ class Persona(models.Model):
 		
 
 	
-class Producto(models.Model): # aqui usar los productos ya existente del albastryde
-	nombre = models.CharField(max_length=200, verbose_name="Nombre del Producto", help_text="Introduzca por favor el nombre del producto")
+#class Producto(models.Model): # aqui usar los productos ya existente del albastryde
+#	nombre = models.CharField(max_length=200, verbose_name="Nombre del Producto", help_text="Introduzca por favor el nombre del producto")
 
-	def __unicode__(self):
-		return self.nombre
+#	def __unicode__(self):
+#		return self.nombre
 
 class Variedad(models.Model):
 	nombre = models.CharField(max_length=200, verbose_name="Nombre de la Variedad", help_text="Introduzca por favor el nombre de la variedad")
 	producto = models.ForeignKey(Producto)
-	
-	def __unicode__(self):
-		return self.nombre
-	
-class Departamento(models.Model): # aqui usar los departamentos ya existente del albastryde
-	nombre = models.CharField(max_length=200)
 	
 	def __unicode__(self):
 		return self.nombre
