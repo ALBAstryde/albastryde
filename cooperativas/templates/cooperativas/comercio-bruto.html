@@ -16,19 +16,19 @@
 	<tr>
 		<td>{{ T.productos.errors }}
     <label for="id_cooperativas">Productos:</label></td>
-		<td>{{ T.productos }}</td>
+		<td>{{ T.productos|safe }}</td>
 	</tr>
 
 	<tr>
 		<td>{{ T.municipios.errors }}
     <label for="id_anos">Municipios:</label></td>
-		<td>{{ T.municipios }}</td>
+		<td>{{ T.municipios|safe }}</td>
 	</tr>
 
 	<tr>
 		<td>{{ T.ciclos.errors }}
     <label for="id_productos">Ciclos:</label></td>
-		<td>{{ T.ciclos }}</td>
+		<td>{{ T.ciclos|safe }}</td>
 	</tr>
 </table>
 <input type="submit" value="Consultar" /> 
