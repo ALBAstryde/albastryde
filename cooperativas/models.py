@@ -75,14 +75,14 @@ class Comercializacion(models.Model):
 	ciclo = models.IntegerField("Ciclo de Cosecha",choices=CICLO_CHOICES,max_length=10)
 	cooperativa = models.ForeignKey(Cooperativa)
 	producto = models.ForeignKey(Producto)
-	productor = models.IntegerField("Numero de Productores",max_length=10, blank=True)
-	area = models.DecimalField("Area",max_digits=10,decimal_places=2, blank=True, help_text="Manzanas (mz)")
-	produccion = models.DecimalField("Produccion",max_digits=10,decimal_places=2, blank=True, help_text="Quintales (qq)")
-	exportacion = models.DecimalField("Exportacion",max_digits=10,decimal_places=2, blank=True, help_text="Quintales (qq)")
-	precio_expt = models.DecimalField("Precio de venta exportacion",max_digits=10,decimal_places=2, blank=True,help_text="Dolares ($)")
-	precio_merc_local = models.DecimalField("Precio de venta mercado local",max_digits=10,decimal_places=2, blank=True,help_text="Dolares ($)")
-	certificacion = models.IntegerField("Tipo de certificacion",choices=CERTIFICACION_CHOICES, blank=True)
-	variedad = models.IntegerField("Variedad",choices=VARIEDAD_CHOICES, blank=True)
+	productor = models.IntegerField("Numero de Productores",max_length=10, blank=True, null=True)
+	area = models.DecimalField("Area",max_digits=10,decimal_places=2, blank=True, null=True, help_text="Manzanas (mz)")
+	produccion = models.DecimalField("Produccion",max_digits=10,decimal_places=2, blank=True, null=True, help_text="Quintales (qq)")
+	exportacion = models.DecimalField("Exportacion",max_digits=10,decimal_places=2, blank=True, null=True, help_text="Quintales (qq)")
+	precio_expt = models.DecimalField("Precio de venta exportacion",max_digits=10,decimal_places=2, blank=True, null=True, help_text="Dolares ($)")
+	precio_merc_local = models.DecimalField("Precio de venta mercado local",max_digits=10,decimal_places=2, blank=True, null=True, help_text="Dolares ($)")
+	certificacion = models.IntegerField("Tipo de certificacion",choices=CERTIFICACION_CHOICES, blank=True, null=True)
+	variedad = models.IntegerField("Variedad",choices=VARIEDAD_CHOICES, blank=True, null=True)
 
 	def rendimiento(self):
 		if self.produccion != None and self.produccion != 0 and self.area != None and self.area != 0:

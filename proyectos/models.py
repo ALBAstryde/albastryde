@@ -39,9 +39,9 @@ class Cooperativa(models.Model):
 	nombre = models.CharField(max_length=200, verbose_name="Nombre de cooperativa", help_text="Introduzca el nombre de la cooperativa")
 	#miembros = models.ManyToManyField(Persona)
 	#jefe = models.ForeignKey(Persona,blank=True,default=None)
-	direccion = models.CharField(max_length=250,blank=True,default=None)
-	correo_electronico = models.EmailField(max_length=80,default=None,blank=True)
-	telefono = PhoneNumberField(default=None,blank=True)
+	direccion = models.CharField(max_length=250,blank=True, null=True, default=None)
+	correo_electronico = models.EmailField(max_length=80,default=None,blank=True, null=True)
+	telefono = PhoneNumberField(default=None,blank=True, null=True)
 
 	def __unicode__(self):
 		return self.nombre
@@ -51,9 +51,9 @@ class Persona(models.Model):
 	nombre = models.CharField(max_length=200, verbose_name="Nombre y apellido", help_text="Introduzca por favor el nombre")
 	numero_cedula = CedulaNumberField(verbose_name="No. de Cedula", help_text="Introduzca por favor el número de cedula", blank=True, null=True)
 	sexo = models.IntegerField(max_length=1, choices=SEXO_CHOICE, verbose_name="Sexo", help_text="Introduzca el sexo del beneficiario")
-	direccion = models.CharField(max_length=250,blank=True,default=None)
-	correo_electronico = models.EmailField(max_length=80,default=None,blank=True)
-	telefono = PhoneNumberField(default=None,blank=True)
+	direccion = models.CharField(max_length=250,blank=True, null=True, default=None)
+	correo_electronico = models.EmailField(max_length=80,default=None,blank=True, null=True)
+	telefono = PhoneNumberField(default=None,blank=True, null=True)
 	cooperativa = models.ManyToManyField(Cooperativa)
 	
 	def __unicode__(self):
@@ -63,20 +63,13 @@ class Persona(models.Model):
 		ordering = ['nombre']
 		
 
-	
-#class Producto(models.Model): # aqui usar los productos ya existente del albastryde
-#	nombre = models.CharField(max_length=200, verbose_name="Nombre del Producto", help_text="Introduzca por favor el nombre del producto")
-
-#	def __unicode__(self):
-#		return self.nombre
-
 class Variedad(models.Model):
 	nombre = models.CharField(max_length=200, verbose_name="Nombre de la Variedad", help_text="Introduzca por favor el nombre de la variedad")
 	producto = models.ForeignKey(Producto)
 	
 	def __unicode__(self):
 		return self.nombre
-	
+
 class Proyecto(models.Model):
 	nombre = models.CharField(max_length=200, verbose_name="Nombre del proyecto", help_text="Introduzca por favor el nombre del proyecto")
 	departamento = models.ForeignKey(Departamento) # aqui usar los departamentos ya existente del albastryde

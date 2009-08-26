@@ -1,5 +1,8 @@
-#titulo1 {
+#titulo1 {                           /* color aplicado a los titulos */
 	color: #2474FF;
+}
+#enlaces a {                         /* color aplicado a los enlaces */
+	color: #44D62A;
 }
 .threecol {
         background:#91b8e6;                /* right column background colour */

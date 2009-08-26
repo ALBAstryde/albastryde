@@ -9,8 +9,6 @@ class ListarBeneAdmin(admin.ModelAdmin):
 
 admin.site.register(Cooperativa)
 admin.site.register(Persona, ListarBeneAdmin)
-admin.site.register(Producto)
-admin.site.register(Departamento)
 admin.site.register(Proyecto)
 admin.site.register(Variedad)
 admin.site.register(Beneficiario)
