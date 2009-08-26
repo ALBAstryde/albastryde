@@ -4,9 +4,11 @@
 {% block headline %}Cooperativa{% endblock %}
 
 {% block contents %}
+	<div id="enlaces">
 		<ul>
 			<a href="/cooperativas/">Listado de cooperativas</a>
 		</ul>
+	</div>
 	<h2 id="titulo1">Informacion Detallada de la cooperativa</h2>
 <table id="tabla_salida">
 <caption>Tabla detalle de la cooperativa</caption>
@@ -31,10 +33,10 @@
 			<td>{{ p.ano }}</td>
 			<td>{{ p.mem_hombre }}</td>
 			<td>{{ p.mem_mujer }}</td>
-			<td>{{ p.mem_total }}</td>
+			<td>{{ p.mem_total() }}</td>
 			<td>{{ p.ben_hombre }}</td>
 			<td>{{ p.ben_mujer }}</td>
-			<td>{{ p.ben_total }}</td>
+			<td>{{ p.ben_total() }}</td>
 			<td>{{ p.mujer_cargo }}</td>
 	</tr>
 {% endfor %}

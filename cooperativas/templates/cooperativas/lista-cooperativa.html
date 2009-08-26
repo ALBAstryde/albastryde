@@ -4,10 +4,12 @@
 {% block headline %}Proyectos{% endblock %}
 
 {% block contents %}
+	<div id="enlaces">
 		<ul>
 			<a href="/cooperativas">Listas de cooperativas</a> ||
 			<a href="/cooperativas/comercializacion/">Ir a Comercialización</a>
 		</ul>
+	</div>
 <h1 id="titulo1"> Busquedas por ubicacion </h1>
 <form action="." method="GET" > 
 
@@ -20,7 +22,7 @@
 {% for a in j %}
 <table id="tabla_salida">
 <tr>
-	<td><a href="/cooperativa/{{ a.numero }}">{{ a.nombre }}</a></td>
+	<td><a href="/cooperativas/cooperativa/{{ a.numero }}">{{ a.nombre }}</a></td>
 </tr>
 </table>
 {% endfor %}
