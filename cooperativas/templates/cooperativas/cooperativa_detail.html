@@ -7,9 +7,7 @@
 		<ul>
 			<a href="/cooperativas/">Lista de cooperativas</a>
 		</ul>
-
 <h2 id="titulo1">Cooperativa # {{ lista.id }}: <span>{{ lista.ecp.nombre }}</span></h2>
-<div class="ticket">
 	<h3 id="titulo2">Informacion General</h3>
 <table id="tabla_salida">
 <caption>Información general de la cooperativa</caption>
@@ -44,6 +42,6 @@
 
 </table>
 <ul>
-		<a href="/cooperativas/detalle/{{ lista.id }}" class="sel">Ver Detalle de Cooperativas</a>
+		<a href="/cooperativas/detalle/{{ lista.id }}">Ver Detalle de Cooperativas</a>
 </ul>
 {% endblock %}
