@@ -8,39 +8,43 @@
 {% block maincontents %}
 
 
-  
+<fieldset><legend>REGISTRARSE</legend>  
   <form method="post" action="" class="wide">
-    <p>
-      <label for="id_username">Usuario:</label>
+<table>
+    <tr>   
+     <td> <label for="id_username">Usuario:</label>
       {% if form.username.errors %}
         <p class="errors">{{ form.username.errors.as_text() }}</p>
-      {% endif %}
-      {{ form.username|safe }}
-    </p>
-    <p>
-      <label for="id_email">Correo electrónico:</label>
+      {% endif %}</td>
+      <td>{{ form.username|safe }}</td>
+    </tr>
+    
+    <tr>
+     <td> <label for="id_email">Correo electrónico:</label>
       {% if form.email.errors %}
         <p class="errors">{{ form.email.errors.as_text() }}</p>
-      {% endif %}
-      {{ form.email|safe }}
-    </p>
-    <p>
-      <label for="id_password1">Contraseña:</label>
+      {% endif %} </td>
+     <td> {{ form.email|safe }}</td>
+    </tr>
+
+    <tr>
+      <td><label for="id_password1">Contraseña:</label>
       {% if form.password1.errors %}
         <p class="errors">{{ form.password1.errors.as_text() }}</p>
-      {% endif %}
-      {{ form.password1|safe }}
-    </p>
-    <p>
-      <label for="id_password2">Contraseña (otra vez, por seguridad):</label>
+      {% endif %}</td>
+      <td>{{ form.password1|safe }}</td>
+    </tr>
+    <tr>
+      <td><label for="id_password2">Contraseña (otra vez, por seguridad):</label>
       {% if form.password2.errors %}
         <p class="errors">{{ form.password2.errors.as_text() }}</p>
-      {% endif %}
-      {{ form.password2|safe }}
-    </p>
+      {% endif %}</td>
+      <td>{{ form.password2|safe }}</td>
+    </tr>
+</table>
     <p class="submit"><input type="submit" value="Registrar &rarr;"></p>
   </form>
-  
+</fieldset> 
 {% endblock %}
 
 {% block related %}
