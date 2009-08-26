@@ -6,10 +6,10 @@
 {% block contents %}
 	<div id="enlaces">
 		<ul>
-			<li><a href="/departamento/">Busqueda por ubicación</a></li>
+			<li><a href="/cooperativas/departamento/">Busqueda por ubicación</a></li>
 		</ul>
 	</div>
-<h2 id="titulo1">Informacion Detallada de la cooperativa</h2>
+<h2 id="titulo1">Información Detallada de la Cooperativa</h2>
 <hr>
 <div class="centrado">
 <table id="tabla_salida">
@@ -34,10 +34,10 @@
 		<td>{{ p.ano }}</td>
 		<td>{{ p.mem_hombre }}</td>
 		<td>{{ p.mem_mujer }}</td>
-		<td>{{ p.mem_total }}</td>
+		<td>{{ p.mem_total() }}</td>
 		<td>{{ p.ben_hombre }}</td>
 		<td>{{ p.ben_mujer }}</td>
-		<td>{{ p.ben_total }}</td>
+		<td>{{ p.ben_total() }}</td>
 		<td>{{ p.mujer_cargo }}</td>
 	</tr>
 {% endfor %}
