@@ -5,7 +5,7 @@
 
 {% block contents %}
 		<ul>
-			<li><a href="/index/">Lista de cooperativas</a></li>
+			<a href="/cooperativas/">Lista de cooperativas</a>
 		</ul>
 
 <h2 id="titulo1">Cooperativa # {{ lista.id }}: <span>{{ lista.ecp.nombre }}</span></h2>
@@ -43,6 +43,7 @@
 		</tr>
 
 </table>
-		<li><a href="/detalle/{{ lista.id }}" class="sel">Ver Detalle de Cooperativas</a></li>
-
+<ul>
+		<a href="/cooperativas/detalle/{{ lista.id }}" class="sel">Ver Detalle de Cooperativas</a>
+</ul>
 {% endblock %}
