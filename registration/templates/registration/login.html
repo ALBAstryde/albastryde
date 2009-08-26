@@ -9,7 +9,7 @@
 {% if form.errors %}
 <p class="warning">Por favor, corija los siguentes erores:</p>
 {% endif %}
-
+<fieldset><legend>ENTRAR</legend>
 <form method="post" action="?next={{ next|default("/") }}">
 <dl>
 <dt><label for="id_username">Usuario:</label>{% if form.username.errors %} <span class="warning">{{ form.username.errors|join(", ") }}</span>{% endif %}</dt>
@@ -19,6 +19,7 @@
 <dt><input type="submit" value="Log in" /></dt>
 </dl>
 </form>
+</fieldset> 
 {% endblock %}
 
 {% block related %}
