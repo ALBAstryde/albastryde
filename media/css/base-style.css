@@ -56,7 +56,7 @@ div#header-bar {
 	padding: 0; 
 	}
 
-#tabla_salida td input, td input:focus { 
+#tabla_salida td input, #tabla_salida td input:focus { 
 	border: 1px solid orange; 
 	outline: none; 
 	padding: 2px; 
@@ -68,6 +68,7 @@ div#header-bar {
 	font-size: 1.3em;  
 	text-align: left;   
 	}
+
 div.centrado {
 	text-align: center;
 }
