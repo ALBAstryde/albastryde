@@ -20,8 +20,8 @@ class Mapa(models.Model):
 	region = models.IntegerField("Region",choices=REGION,max_length=2)
 	tipo = models.ForeignKey(Tipo)
 	descripcion = models.TextField("Descripcion adicional")
-	adjunto = ImageWithThumbsField("Imagen mapa",upload_to="attachment",help_text="Subir la imagen del mapa .jpg",sizes=((120,150),(360,480)))
-	info = ImageWithThumbsField("informacion adicional",upload_to="attachment",help_text="Subir la imagen de informacion adicional")
+	adjunto = ImageWithThumbsField("Imagen mapa",upload_to="upload/attachment",help_text="Subir la imagen del mapa .jpg",sizes=((120,150),(360,480)))
+	info = ImageWithThumbsField("informacion adicional",upload_to="upload/attachment",help_text="Subir la imagen de informacion adicional")
 
 	class Meta:
 		ordering = ['region']

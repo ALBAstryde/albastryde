@@ -7,8 +7,8 @@
          {% for m in mapa %}
          <tr>
                  <td><img src="{{m.adjunto.url_120x150}}"></a></td>
-                 <td><b>{{ m.get_region_display }}</b> <br> <small>{{m.descripcion}}</small>
-                <br> <small><a href="/{{ m.adjunto }}"> descargar mapa</a></small> | <small><a href="/{{ m.info }}"> descargar informacion </a></small></td>
+                 <td><b>{{ m.get_region_display() }}</b> <br> <small>{{m.descripcion}}</small>
+                <br> <small><a href="/media/{{ m.adjunto }}"> descargar mapa</a></small> | <small><a href="/media/{{ m.info }}"> descargar informacion </a></small></td>
 
                 
          </tr>
