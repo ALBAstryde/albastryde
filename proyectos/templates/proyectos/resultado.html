@@ -50,11 +50,11 @@ Beneficiarios:
 		<td>{{ d.area_en_desarollo }}</td>
 		<td>{{ d.rendimiento_promedio_en_qq }}</td>
 		<td>{{ d.rendimiento_promedio_en_oro }}</td>
-		<td>{{ d.get_manejo_display }}</td>
-		<td>{%for x in d.variedad.all%}
+		<td>{{ d.get_manejo_display() }}</td>
+		<td>{% for x in d.variedad.all() %}
      *{{ x.nombre }}
      {%endfor%}</td>
-<td>{{ d.get_certificada_display }}</td>
+<td>{{ d.get_certificada_display() }}</td>
 {% endfor %}
 </tbody>
 </table>

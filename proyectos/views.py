@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
-from proyectos.forms import *
+from proyectos.forms import BeneficiarioForm, ProyectoForm
 from django.template import RequestContext
-from proyectos.models import *
+from proyectos.models import Beneficiario, Persona, Proyecto
 from coffin.shortcuts import render_to_response
 
 import os
@@ -17,13 +17,13 @@ def ConsulForm(request):
 	query = request.GET.get('c', '')
 	if query:
 		results = Beneficiario.objects.filter(persona=query)
-		return render_to_html(request,"resultado.html", {'results': results})
+		return render_to_html(request,"/proyectos/resultado.html", {'results': results})
 	else:
 		bene= Persona.objects.all()
 		return render_to_html(request,"/proyectos/resultado.html", locals())
 
 # Consulta para saber los detalles de las personas con sus detalles y proyectos a los que pertenece
-def Beneficiario(request):
+def BeneficiarioView(request):
 	F = BeneficiarioForm(request.GET)
 	query = request.GET.get('beneficiarios', '')
 	if query:

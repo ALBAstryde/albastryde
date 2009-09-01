@@ -1,7 +1,7 @@
 from django.contrib import admin
 from models import Cooperativa, Persona, Producto, Departamento, Proyecto, Variedad, Beneficiario
 #from proyectos.ajax_select import make_ajax_form
-from forms import beneForm
+#from forms import beneForm
 
 class ListarBeneAdmin(admin.ModelAdmin):
 	list_filter = ('nombre',)
