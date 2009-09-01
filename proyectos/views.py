@@ -14,13 +14,13 @@ def render_to_html(request,template,variables):
 
 # Consulta para saber los beneficiarios con sus detalles
 def ConsulForm(request):
+	bene = Persona.objects.all()
 	query = request.GET.get('c', '')
 	if query:
 		results = Beneficiario.objects.filter(persona=query)
-		return render_to_html(request,"/proyectos/resultado.html", {'results': results})
+		return render_to_html(request,"/proyectos/resultado.html", {'results': results, 'bene':bene })
 	else:
-		bene= Persona.objects.all()
-		return render_to_html(request,"/proyectos/resultado.html", locals())
+		return render_to_html(request,"/proyectos/resultado.html", {'bene':bene })
 
 # Consulta para saber los detalles de las personas con sus detalles y proyectos a los que pertenece
 def BeneficiarioView(request):
@@ -29,7 +29,7 @@ def BeneficiarioView(request):
 	if query:
 		b = Persona.objects.filter(id=query)
 		c = Beneficiario.objects.filter(persona__id=query)
-		return render_to_html(request,"/proyectos/persona.html", {'b': b, 'c': c})
+		return render_to_html(request,"/proyectos/persona.html", {'b': b, 'c': c })
 	else:
 		i = Persona.objects.all()
 		return render_to_html(request,"/proyectos/persona.html", locals())
