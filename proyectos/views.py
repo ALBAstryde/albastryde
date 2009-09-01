@@ -26,18 +26,20 @@ def ConsulForm(request):
 def BeneficiarioView(request):
 	F = BeneficiarioForm(request.GET)
 	query = request.GET.get('beneficiarios', '')
+	i = Persona.objects.all()
 	if query:
 		b = Persona.objects.filter(id=query)
 		c = Beneficiario.objects.filter(persona__id=query)
-		return render_to_html(request,"/proyectos/persona.html", {'b': b, 'c': c })
+		return render_to_html(request,"/proyectos/persona.html", {'F':F, 'b': b, 'c': c, 'i':i})
 	else:
-		i = Persona.objects.all()
+		
 		return render_to_html(request,"/proyectos/persona.html", locals())
 
 # Consulta sobre los datos de los proyectos
 def ConsulProyecto(request):
 	P = ProyectoForm(request.GET)
 	query = request.GET.get('proyectos', '')
+	k = Proyecto.objects.all()
 	if query:
 		j = Proyecto.objects.filter(id=query)
 		ma = Beneficiario.objects.filter(proyecto__id=query)
@@ -46,9 +48,9 @@ def ConsulProyecto(request):
 		mujer = contmujer.count()
 		conthombre = Beneficiario.objects.filter(proyecto__id=query).filter(persona__sexo=1)
 		hombre = conthombre.count()
-		return render_to_html(request,"/proyectos/proyecto.html", {'j': j, 'contar': contar, 'mujer': mujer, 'hombre': hombre, 'ma': ma})
+		return render_to_html(request,"/proyectos/proyecto.html", {'P':P, 'j': j, 'contar': contar, 'mujer': mujer, 'hombre': hombre, 'ma': ma})
 	else:
-		k = Proyecto.objects.all()
+		
 		return render_to_html(request,"/proyectos/proyecto.html", locals())
 
 #Esto es solo prueba para saber si estaban bien los datos, todos los datos los tenemos en formato CSV 
