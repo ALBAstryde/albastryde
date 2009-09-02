@@ -53,11 +53,12 @@ def comerciobruto(request):
 def comeindex(request):
 	F = FormLugar(request.GET)
 	query = request.GET.get('departamentos', '')
+	k = Departamento.objects.all()
 	if query:
 		j = Municipio.objects.filter(departamento=query)
-		return render_to_html(request,"/cooperativas/lista-cooperativa.html", {'j':j})
+		return render_to_html(request,"/cooperativas/lista-cooperativa.html", {'F':F, 'j':j})
 	else:
-		k = Departamento.objects.all()
+
 		return render_to_html(request,"/cooperativas/lista-cooperativa.html", locals())
 	
 def coopmun(request, mun_id):
