@@ -60,11 +60,11 @@
 			<td>{{ a.cooperativa.nombre_resumido }}</td>
 			<td>{{ a.area }}</td>
 			<td>{{ a.produccion }}</td>
-			<td>{{ a.rendimiento }}</td>
+			<td>{{ a.rendimiento() }}</td>
 			<td>{{ a.exportacion }}</td>
 			<td>{{ a.precio_merc_local }}</td>
-			<td>{{ a.get_certificacion_display }} </td>
-			<td>{{ a.get_variedad_display }} </td>
+			<td>{{ a.get_certificacion_display() }} </td>
+			<td>{{ a.get_variedad_display() }} </td>
 	</tr>
 		{% endfor %}
 </tbody>
