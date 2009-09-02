@@ -50,8 +50,8 @@ class Documento(models.Model):
 	descripcion = models.TextField(max_length=200, verbose_name="Descripcion")
 	organizacion = models.ForeignKey(Editorial, verbose_name="Organizacion")
 	enlace = models.URLField(verbose_name="Enlace o Link", null=True, blank=True)
-        index = djangosearch.ModelIndex(text=['nombre','descripcion','text_contents'])
 	palabras_claves = models.ManyToManyField(PalabraClave)
+        index = djangosearch.ModelIndex(text=['nombre','descripcion','text_contents'])
 	attachment = models.FileField(upload_to="upload/documentos", verbose_name="Archivo adjunto", help_text="ADVERTENCIA: solo añadir un archivo *.pdf", null=True, blank=True)
 
 	def get_absolute_url(self):
@@ -72,5 +72,9 @@ class Documento(models.Model):
 			else:
 				self.attachment=None
 				self.text_contents=None
+		else:
+			self.text_contents=u''
+		for palabra in self.palabras_claves.all():
+			self.text_contents=u' '+palabra.palabra
                 super(Documento, self).save()
 
