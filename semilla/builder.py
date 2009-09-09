@@ -64,19 +64,28 @@ def pick_categoria_name(categoria):
 def semilla_graph(categoria,departamento,start_date,end_date,pk_list,frequency,variedad=None,producto=None):
 	semilla_start=traducir_fecha(start_date)
 	semilla_end=traducir_fecha(end_date)
-	a=Semilla.objects.filter(ano=semilla_start['ano']).filter(mes__gt= semilla_start['mes']-1).filter(categoria=categoria).filter(productor__departamento=departamento)
-	b=Semilla.objects.filter(ano__gt=semilla_start['ano']).filter(ano__lt=semilla_end['ano']).filter(categoria=categoria).filter(productor__departamento=departamento)
-	c=Semilla.objects.filter(ano=semilla_end['ano']).filter(mes__lt=semilla_end['mes']+1).filter(categoria=categoria).filter(productor__departamento=departamento)
-	basic_queryset=a|b|c
+	if semilla_start['ano']==semilla_end['ano']:
+		basic_queryset=Semilla.objects.filter(ano=semilla_start['ano']).filter(mes__gt= semilla_start['mes']-1).filter(mes__lt=semilla_end['mes']+1).filter(categoria=categoria).filter(productor__departamento=departamento)
+	elif semilla_start['ano']==semilla_end['ano'] + 1:
+		a=Semilla.objects.filter(ano=semilla_start['ano']).filter(mes__gt= semilla_start['mes']-1).filter(categoria=categoria).filter(productor__departamento=departamento)
+		b=Semilla.objects.filter(ano=semilla_end['ano']).filter(mes__lt=semilla_end['mes']+1).filter(categoria=categoria).filter(productor__departamento=departamento)
+		basic_queryset=a|b
+	else:
+		a=Semilla.objects.filter(ano=semilla_start['ano']).filter(mes__gt= semilla_start['mes']-1).filter(categoria=categoria).filter(productor__departamento=departamento)
+		b=Semilla.objects.filter(ano__gt=semilla_start['ano']).filter(ano__lt=semilla_end['ano']).filter(categoria=categoria).filter(productor__departamento=departamento)
+		c=Semilla.objects.filter(ano=semilla_end['ano']).filter(mes__lt=semilla_end['mes']+1).filter(categoria=categoria).filter(productor__departamento=departamento)
+		basic_queryset=a|b|c
 	if producto:
 		basic_queryset=basic_queryset.filter(variedad__producto=producto)
 	elif variedad:
 		basic_queryset=basic_queryset.filter(variedad=variedad)
+	basic_queryset=basic_queryset.order_by('ano','mes')
 	if frequency=='annualy':
 		valued_queryset = basic_queryset.values('ano')
 	else:
 		valued_queryset = basic_queryset.values('ano','mes')
 	queryset = valued_queryset.annotate(Sum('cantidad'))
+
 
 	if len(queryset)==0:
 		return None,pk_list

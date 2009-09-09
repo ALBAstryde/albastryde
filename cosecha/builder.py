@@ -116,10 +116,18 @@ def variable_converter(variable):
 def cosecha_graph(variable,producto,start_date,end_date,pk_list,frequency,departamento=None,municipio=None):
 	cosecha_start=traducir_fecha(start_date)
 	cosecha_end=traducir_fecha(end_date)
-	a=Cosecha.objects.filter(ano=cosecha_start['ano']).filter(tiempo__gt= cosecha_start['tiempo']-1).filter(producto=producto)
-	b=Cosecha.objects.filter(ano__gt=cosecha_start['ano']).filter(ano__lt=cosecha_end['ano']).filter(producto=producto)
-	c=Cosecha.objects.filter(ano=cosecha_end['ano']).filter(tiempo__lt=cosecha_end['tiempo']+1).filter(producto=producto)
-	basic_queryset=a|b|c
+	if cosecha_start['ano']==cosecha_end['ano']:
+		basic_queryset=Cosecha.objects.filter(ano=cosecha_start['ano']).filter(tiempo__lt=cosecha_end['tiempo']+1).filter(tiempo__gt= cosecha_start['tiempo']-1).filter(producto=producto)
+	elif cosecha_start['ano']==cosecha_end['ano'] + 1:
+		a=Cosecha.objects.filter(ano=cosecha_start['ano']).filter(tiempo__gt= cosecha_start['tiempo']-1).filter(producto=producto)
+		b=Cosecha.objects.filter(ano=cosecha_end['ano']).filter(tiempo__lt=cosecha_end['tiempo']+1).filter(producto=producto)
+		basic_queryset=a|b
+	else:
+		a=Cosecha.objects.filter(ano=cosecha_start['ano']).filter(tiempo__gt= cosecha_start['tiempo']-1).filter(producto=producto)
+		b=Cosecha.objects.filter(ano__gt=cosecha_start['ano']).filter(ano__lt=cosecha_end['ano']).filter(producto=producto)
+		c=Cosecha.objects.filter(ano=cosecha_end['ano']).filter(tiempo__lt=cosecha_end['tiempo']+1).filter(producto=producto)
+		basic_queryset=a|b|c
+        basic_queryset=basic_queryset.order_by('ano','tiempo')
 	if departamento:
 		geo_situated_queryset=basic_queryset.filter(municipio__departamento=departamento)
 		if frequency=='annualy':
