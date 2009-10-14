@@ -44,10 +44,32 @@ class Detallecoop(models.Model):
 		verbose_name_plural = "Detalle de cooperativa"
 
 	def mem_total(self):
-		return self.mem_hombre + self.mem_mujer
+		if self.mem_hombre == None and self.mem_mujer == None:
+			return 0
+		elif self.mem_hombre == None and self.mem_mujer != None:
+			return self.mem_mujer
+		elif self.mem_hombre != None and self.mem_mujer == None:
+			return self.mem_hombre
+		else:
+			return self.mem_hombre + self.mem_mujer
+#		if self.mem_hombre != None and self.mem_hombre != 0 and self.mem_mujer != None and self.mem_mujer != 0:
+#			return self.mem_hombre + self.mem_mujer
+#		else:
+#			return 0
 	
 	def ben_total(self):
-		return self.ben_hombre + self.ben_mujer
+		if self.ben_hombre == None and self.ben_mujer == None:
+			return 0
+		elif self.ben_hombre == None and self.ben_mujer != None:
+			return self.ben_mujer
+		elif self.ben_hombre != None and self.ben_mujer == None:
+			return self.ben_hombre
+		else:
+			return self.ben_hombre + self.ben_mujer
+#		if self.ben_hombre != None and self.ben_hombre != 0 and self.ben_mujer != None and self.ben_mujer != 0:
+#			return self.ben_hombre + self.ben_mujer
+#		else:
+#			return 0
 
 #comienzan modelos de comercializacion 
 
