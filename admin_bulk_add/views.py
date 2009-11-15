@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from admin_bulk_add.forms import LluviaParameterForm, PreciosParameterForm
+from django.contrib.auth.decorators import permission_required
+
 
 import calendar
 from django import forms
@@ -21,6 +23,7 @@ def render_to_html(request,template,variables):
 	new_variables=variables
         return render_to_response(template, new_variables,context_instance=RequestContext(request))
 
+@permission_required('lluvia.can_add')
 def lluvia(request,ano=None,mes=None,estacion_de_lluvia=None):
 	app_label="lluvia"
 	model_label="prueba"
@@ -80,6 +83,7 @@ def lluvia(request,ano=None,mes=None,estacion_de_lluvia=None):
 				form = LluviaPruebaFormSet(initial=initial_list,queryset=LluviaPrueba.objects.none())
 			return render_to_html(request,"bulk_add_form.html", {"form":form,"next_set_description":next_set_description,"app_label":app_label,"model_label":model_label,"title":title})
 
+@permission_required('precios.can_add')
 def precios(request,ano=None,mes=None,dia=None,mercado=None):
 	app_label="precios"
 	model_label="prueba"
