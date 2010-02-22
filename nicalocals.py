@@ -11,7 +11,7 @@ waiting for official inclusion
 
 from django.forms import ValidationError
 from django.forms.fields import  RegexField, Select, EMPTY_VALUES
-from django.forms.util import smart_unicode
+from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
 import re
 
