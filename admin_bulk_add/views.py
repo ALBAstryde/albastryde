@@ -127,7 +127,7 @@ def precios(request,ano=None,mes=None,dia=None,mercado=None):
 				productos=Producto.objects.filter(se_vende_en_menor=True)
 			if len(queryset) > 0:
 				PreciosPruebaFormSet = modelformset_factory(PreciosPrueba,extra=(len(productos)-len(queryset)))
-				form = LluviaPruebaFormSet(queryset=queryset)
+				form = PreciosPruebaFormSet(queryset=queryset)
 			else:
 				initial_list=[]
 				if mes > 9:
