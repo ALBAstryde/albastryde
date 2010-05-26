@@ -42,7 +42,7 @@ class Approvable(Timestamped):
 		abstract = True
  
 	def save(self):  
-        	if ((self.actualizado_por) AND (self.actualizado_por.has_perm(str(self)+'.puede_aprobar'))):
+        	if ((self.actualizado_por) and (self.actualizado_por.has_perm(str(self)+'.puede_aprobar'))):
 			if self.es_aprobado==False:
 				self.aprobado_a=datetime.now()
 	        	 	self.es_aprobado = True
